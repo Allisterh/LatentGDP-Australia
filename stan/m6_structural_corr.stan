@@ -7,7 +7,7 @@
 
 data {
   int<lower=1> T;
-  int<lower=1> K;                    // K must be 3 here
+  int<lower=3, upper=3> K;           // E, I, P: the structural Sigma is 3 x 3
   matrix[T, K] y;
 }
 transformed data {

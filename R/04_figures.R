@@ -13,20 +13,20 @@ gdp_growth   <- readRDS("data/processed/gdp_growth.rds") |>
 gdp_growth_4 <- readRDS("data/processed/gdp_growth_with_hours.rds") |>
   mutate(headline = (g_E + g_I + g_P) / 3)
 
-names_full <- c("m1", "m2", "m3", "m4", "m5", "m6", "m7", "m9")
+names_full <- c("m1", "m2", "m3", "m4", "m5", "m6", "m7", "m9", "m12")
 labels_m <- c(
   m1 = "m1: baseline", m2 = "m2: AR(1) latent",
   m3 = "m3: free corr errors", m4 = "m4: SV",
   m5 = "m5: serial errors", m6 = "m6: structural Sigma",
   m7 = "m7: COVID scale", m8 = "m8: 4-signal (+hours)",
-  m9 = "m9: structural Sigma + SV", m10 = "m10: 4-signal + SV",
-  m11 = "m11: mixed-frequency"
+  m9 = "m9: structural Sigma + SV", m10 = "m10: 4-signal + SV (latent SV)",
+  m11 = "m11: mixed-frequency", m12 = "m12: m9 + serial errors"
 )
 
 mu_summary <- function(fit, nm, dates) {
-  d <- fit$draws("mu", format = "draws_matrix")
+  d <- unclass(as.matrix(fit$draws("mu", format = "draws_matrix")))
   tibble(
-    date = dates, model = labels_m[nm],
+    date = dates, model = factor(labels_m[nm], levels = labels_m),
     mean = colMeans(d),
     lo = apply(d, 2, quantile, 0.05),
     hi = apply(d, 2, quantile, 0.95)
@@ -50,29 +50,39 @@ p1 <- ggplot(mu_full, aes(x = date)) +
     x = NULL, y = NULL
   )
 ggsave("output/figures/01_latent_vs_headline.png",
-       p1, width = 10, height = 14, dpi = 150)
+       p1, width = 10, height = 15.5, dpi = 150)
 
-# m4 SV path (unchanged from before)
-fit_m4 <- readRDS("output/fit_m4.rds")
-sigma_t_draws <- fit_m4$draws("sigma_t", format = "draws_matrix")
+# SV paths: m4 (independent errors), m9 (structural Sigma) and m12 (m9 + AR(1) errors;
+# its sigma_t is the sd of the error innovation u_t), posterior mean and 90% interval of
+# the measurement-error sd sigma_t (filename kept from the m4-only version of this figure).
 T_ <- nrow(gdp_growth)
-sigma_t_mean <- matrix(colMeans(sigma_t_draws), nrow = T_, ncol = 3)
-colnames(sigma_t_mean) <- c("E", "I", "P")
-sv_df <- as_tibble(sigma_t_mean) |>
-  mutate(date = gdp_growth$date) |>
-  pivot_longer(c(E, I, P), names_to = "approach", values_to = "sigma_t")
-p2 <- ggplot(sv_df, aes(x = date, y = sigma_t, colour = approach)) +
-  geom_line(linewidth = 0.6) +
-  labs(title = "m4: posterior-mean measurement-error sd over time",
-       x = NULL, y = expression(sigma[t]), colour = "Approach")
+sv_df <- bind_rows(lapply(c("m4", "m9", "m12"), function(nm) {
+  d <- unclass(as.matrix(readRDS(sprintf("output/fit_%s.rds", nm))$draws("sigma_t", format = "draws_matrix")))
+  stopifnot(ncol(d) == T_ * 3)                     # sigma_t[t, k], column-major
+  tibble(
+    model = factor(labels_m[nm], levels = labels_m),
+    date = rep(gdp_growth$date, 3),
+    approach = rep(c("E", "I", "P"), each = T_),
+    mean = colMeans(d),
+    lo = apply(d, 2, quantile, 0.05),
+    hi = apply(d, 2, quantile, 0.95)
+  )
+}))
+p2 <- ggplot(sv_df, aes(x = date, colour = approach, fill = approach)) +
+  geom_ribbon(aes(ymin = lo, ymax = hi), alpha = 0.15, colour = NA) +
+  geom_line(aes(y = mean), linewidth = 0.6) +
+  facet_wrap(~ model, ncol = 1) +
+  labs(title = "Measurement-error sd over time (posterior mean, 90% interval)",
+       subtitle = "Annualised %. SV models m4 (independent errors), m9 (structural Sigma) and m12 (m9 + AR(1) errors: sd of the innovation).",
+       x = NULL, y = expression(sigma[t]), colour = "Approach", fill = "Approach")
 ggsave("output/figures/02_m4_sv_path.png",
-       p2, width = 9, height = 4, dpi = 150)
+       p2, width = 9, height = 9, dpi = 150)
 
 # m7 kappa posterior
 fit_m7 <- readRDS("output/fit_m7.rds")
 kappa_draws <- fit_m7$draws("kappa", format = "draws_matrix")
 covid_labels <- c("2020 Q2", "2020 Q3", "2020 Q4", "2021 Q1")
-kappa_df <- as_tibble(as.matrix(kappa_draws)) |>
+kappa_df <- as_tibble(unclass(as.matrix(kappa_draws))) |>
   setNames(covid_labels) |>
   pivot_longer(everything(), names_to = "quarter", values_to = "kappa") |>
   mutate(quarter = factor(quarter, levels = covid_labels))
@@ -87,29 +97,32 @@ p3 <- ggplot(kappa_df, aes(x = kappa, fill = quarter)) +
        x = expression(kappa), y = NULL)
 ggsave("output/figures/04_m7_kappa.png", p3, width = 8, height = 6, dpi = 150)
 
-# m8 standalone: 4-signal latent path vs all 4 observed series
-fit_m8 <- readRDS("output/fit_m8.rds")
-mu_m8 <- mu_summary(fit_m8, "m8", gdp_growth_4$date)
+# 4-signal models (hours subsample): m8 and m10 latent paths vs the observed series
+# (filename kept from the m8-only version of this figure).
+mu_4 <- bind_rows(lapply(c("m8", "m10"), function(nm)
+  mu_summary(readRDS(sprintf("output/fit_%s.rds", nm)), nm, gdp_growth_4$date)))
 gdp4_long <- gdp_growth_4 |>
   select(date, `GDP(E)` = g_E, `GDP(I)` = g_I, `GDP(P)` = g_P,
          `Hours worked` = g_U) |>
   pivot_longer(-date, names_to = "series", values_to = "growth")
-p4 <- ggplot(mu_m8, aes(x = date)) +
+p4 <- ggplot(mu_4, aes(x = date)) +
   geom_hline(yintercept = 0, colour = "grey80") +
   geom_line(data = gdp4_long, aes(y = growth, colour = series), alpha = 0.55) +
   geom_ribbon(aes(ymin = lo, ymax = hi), alpha = 0.3, fill = "black") +
   geom_line(aes(y = mean), colour = "black", linewidth = 0.7) +
+  facet_wrap(~ model, ncol = 1) +
   scale_colour_manual(values = c(
     "GDP(E)" = "#d95f02", "GDP(I)" = "#1b9e77",
     "GDP(P)" = "#7570b3", "Hours worked" = "#e7298a"
   )) +
   labs(
-    title = "m8: 4-signal latent growth (black, 90% CI) vs observed series",
-    subtitle = "Post-1979 sample. Hours loaded as alpha + beta*mu (annualised %).",
+    title = "4-signal latent growth (black, 90% CI) vs observed series",
+    subtitle = sprintf("Hours subsample from %s. Hours loaded as alpha + beta*mu (annualised %%).",
+                       format(min(gdp_growth_4$date), "%Y")),
     x = NULL, y = "%", colour = NULL
   )
 ggsave("output/figures/05_m8_4signal.png", p4,
-       width = 10, height = 5, dpi = 150)
+       width = 10, height = 8, dpi = 150)
 
 # m5 COVID zoom (unchanged from before, but rebuilt for consistency)
 mu_m5 <- mu_full |>
@@ -135,10 +148,11 @@ emp_growth <- readRDS("data/processed/employment_growth_monthly.rds")
 gdp_growth_full <- readRDS("data/processed/gdp_growth.rds") |>
   mutate(headline = (g_E + g_I + g_P) / 3)
 
-mu_m_draws <- fit_m11$draws("mu_m", format = "draws_matrix")
+mu_m_draws <- unclass(as.matrix(fit_m11$draws("mu_m", format = "draws_matrix")))
 m_dates <- emp_growth |>
   filter(date <= max(gdp_growth_full$date)) |>
   pull(date)
+stopifnot(length(m_dates) == ncol(mu_m_draws))   # fit_m11.rds must match current data
 mu_m_df <- tibble(
   date = m_dates,
   mean = colMeans(mu_m_draws),
@@ -159,10 +173,43 @@ p6 <- ggplot(mu_m_df, aes(x = date)) +
 ggsave("output/figures/06_m11_monthly_path.png", p6,
        width = 10, height = 5, dpi = 150)
 
+# PSIS-LFO: cumulative one-step-ahead log predictive density relative to a reference
+# model, from R/03_compare.R (output/tables/lfo_pointwise.csv).
+if (file.exists("output/tables/lfo_pointwise.csv")) {
+  pw <- read.csv("output/tables/lfo_pointwise.csv") |> mutate(date = as.Date(date))
+  rel <- function(d, ref, col = "elpd") {
+    r <- d |> filter(model == ref) |> select(date, ref_v = all_of(col))
+    d |> select(model, date, v = all_of(col)) |> inner_join(r, by = "date") |>
+      group_by(model) |> arrange(date) |> mutate(cum = cumsum(v - ref_v)) |> ungroup()
+  }
+  g1 <- c("m1", "m2", "m3", "m4", "m5", "m6", "m7", "m9", "m12")
+  d1 <- rel(filter(pw, model %in% g1), "m2") |> mutate(panel = "Group 1 (E, I, P), relative to m2")
+  d2 <- rel(filter(pw, model %in% c("m8", "m10")), "m8") |>
+    mutate(panel = "Group 2 (E, I, P, hours), relative to m8")
+  dd <- bind_rows(d1, d2) |> mutate(model = factor(labels_m[model], levels = labels_m))
+  # One fixed, clearly separated colour per model, so that the legend alone identifies
+  # every line (ggplot's default hue scale gave m10 and m12 near-identical pinks).
+  pal7 <- c(m1 = "#9e9e9e", m2 = "#000000", m3 = "#a6761d", m4 = "#56b4e9",
+            m5 = "#e69f00", m6 = "#cc79a7", m7 = "#009e73", m8 = "#7f7f7f",
+            m9 = "#0072b2", m10 = "#d55e00", m12 = "#7b3294")
+  pal7 <- setNames(pal7, labels_m[names(pal7)])
+  p7 <- ggplot(dd, aes(date, cum, colour = model)) +
+    geom_hline(yintercept = 0, colour = "grey70") +
+    geom_vline(xintercept = as.Date("2020-06-01"), colour = "grey80", linetype = 2) +
+    geom_step(linewidth = 0.6) +
+    scale_colour_manual(values = pal7, drop = TRUE) +
+    facet_wrap(~ panel, ncol = 1, scales = "free_y") +
+    labs(title = "PSIS-LFO: cumulative one-step-ahead log predictive density",
+         subtitle = "Marginal likelihood (latent states integrated out; SV models: mean of 4 particle-filter passes). Above 0 = better than the reference model.",
+         x = NULL, y = "cumulative elpd difference", colour = NULL)
+  ggsave("output/figures/07_lfo_cumulative_elpd.png", p7, width = 10, height = 8, dpi = 150)
+}
+
 cat("Figures written to output/figures/:\n",
-    "  01_latent_vs_headline.png  (all full-sample specs including m9)\n",
-    "  02_m4_sv_path.png\n",
+    "  01_latent_vs_headline.png  (all full-sample specs including m9 and m12)\n",
+    "  02_m4_sv_path.png          (m4, m9 and m12 measurement-error sd paths)\n",
     "  03_m5_covid_zoom.png\n",
     "  04_m7_kappa.png\n",
-    "  05_m8_4signal.png\n",
-    "  06_m11_monthly_path.png\n", sep = "")
+    "  05_m8_4signal.png          (m8 and m10)\n",
+    "  06_m11_monthly_path.png\n",
+    "  07_lfo_cumulative_elpd.png (if R/03_compare.R has run)\n", sep = "")

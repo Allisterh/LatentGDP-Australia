@@ -1,6 +1,17 @@
-# Production fit: m9 only (structural Sigma + SV).
-# Runs in CI quarterly after each ABS 5206.0 release.
-# Fits the single LOO-best model and saves draws for downstream use.
+# Production fit: m12 only (m9's structural Sigma + SV, plus AR(1) measurement errors).
+# Runs in CI (weekly; picks up each quarterly ABS 5206.0 release).
+# Fits the production model, saves the fit for downstream use, and then applies a
+# strict convergence gate: if any check fails the script stop()s, so CI never
+# publishes an estimate from a fit that has not converged.
+#
+# Why m12 (NOTES.md, "2026-10-17"): it replaced m9 under a rule fixed before the
+# results were known - pass this gate on two seeds, a reliable LFO score, beat m9
+# on PSIS-LFO-CV by z_NW >= 2, and a local fit <= 30 min. Observed: both seeds
+# pass; m12 - m9 = +16.77 nats (Newey-West SE 6.12, z 2.74).
+#
+# m12 is sampled with mu integrated out by a Kalman filter on quasi-differenced
+# data (see the header of stan/m12_struct_sv_serial.stan); mu is drawn exactly by
+# FFBS in generated quantities. psi = 0 gives m9 exactly.
 
 suppressPackageStartupMessages({
   library(cmdstanr)
@@ -17,7 +28,7 @@ stan_data <- list(
   y = as.matrix(gdp_growth[, c("g_E", "g_I", "g_P")])
 )
 
-mod <- cmdstan_model("stan/m9_struct_sv.stan")
+mod <- cmdstan_model("stan/m12_struct_sv_serial.stan")
 fit <- mod$sample(
   data = stan_data,
   chains = 4,
@@ -30,22 +41,151 @@ fit <- mod$sample(
   max_treedepth = 12
 )
 
-# Persist for the estimate writer; not committed (see .gitignore).
+# Persist for the estimate writer; not committed (see .gitignore). Saved before
+# the gate so a failing fit can still be inspected locally.
 fit$save_object(file = "output/fit_production.rds")
 
-cat("\n=== m9 production fit ===\n")
-print(fit$summary(variables = c("mu_bar", "rho", "tau", "rho_EI")))
-diag <- fit$diagnostic_summary()
-print(diag)
+cat("\n=== m12 production fit ===\n")
+print(fit$summary(variables = c("mu_bar", "rho", "tau", "rho_EI", "psi")))
+cat(sprintf("Wall time: %.0f s\n", fit$time()$total))
 
-# Hard-fail CI on divergences > 1% so a broken fit doesn't get published.
-total_divs <- sum(diag$num_divergent)
-total_draws <- 4 * 2000
-if (total_divs / total_draws > 0.01) {
-  stop(sprintf(
-    "Fit quality gate failed: %d divergences (%.2f%%) exceeds 1%% threshold.",
-    total_divs, 100 * total_divs / total_draws
+# ---------------------------------------------------------------------------
+# Convergence gate. Thresholds are fixed targets, not tuned to the result.
+#   divergences          < 0.1% of post-warmup draws
+#   min E-BFMI (chains)  >= 0.3   (0.2 is the hard floor at which Stan itself
+#                                  warns; anything below 0.3 already fails)
+#   max R-hat            <= 1.01 on hyperparameters, <= 1.05 on every mu[t], h[t,k]
+#   min bulk & tail ESS  >= 400  on hyperparameters and on every mu[t]
+# Chain and draw counts are read from the fit, never hard-coded.
+# ---------------------------------------------------------------------------
+GATE <- list(
+  max_div_frac   = 0.001,
+  min_ebfmi      = 0.3,
+  ebfmi_floor    = 0.2,
+  max_rhat_hyper = 1.01,
+  max_rhat_state = 1.05,
+  min_ess        = 400
+)
+hyper_vars <- c("c", "rho", "tau", "mu_h", "phi", "omega", "rho_EI", "psi", "mu_bar")
+
+n_chains <- fit$num_chains()
+sdiag    <- fit$sampler_diagnostics(format = "draws_df")
+n_draws  <- nrow(sdiag)                       # post-warmup draws, all chains
+n_div    <- sum(sdiag$divergent__)
+n_tdmax  <- sum(sdiag$treedepth__ >= fit$metadata()$max_treedepth)
+ebfmi    <- fit$diagnostic_summary(diagnostics = "ebfmi", quiet = TRUE)$ebfmi
+
+summ_conv <- function(vars) {
+  posterior::summarise_draws(
+    fit$draws(variables = vars),
+    "rhat", "ess_bulk", "ess_tail"
+  )
+}
+s_hyper <- summ_conv(hyper_vars)
+s_mu    <- summ_conv("mu")
+s_h     <- summ_conv("h")
+
+stopifnot(nrow(s_mu) == stan_data$T, nrow(s_h) == stan_data$T * stan_data$K)
+
+# NA diagnostics (e.g. a constant draw) count as failures, never as passes.
+worst_max <- function(x) if (anyNA(x)) NA_real_ else max(x)
+worst_min <- function(x) if (anyNA(x)) NA_real_ else min(x)
+which_at  <- function(s, col, fn) {
+  v <- s[[col]]
+  if (anyNA(v)) return(paste(s$variable[is.na(v)][1], "(NA)"))
+  s$variable[fn(v)]
+}
+
+div_frac <- n_div / n_draws
+min_eb   <- worst_min(ebfmi)
+
+checks <- data.frame(
+  metric = c(
+    sprintf("divergences (%d of %d draws, %d chains)", n_div, n_draws, n_chains),
+    "min E-BFMI over chains",
+    "max R-hat, hyperparameters",
+    "max R-hat, mu[t]",
+    "max R-hat, h[t,k]",
+    "min bulk ESS, hyperparameters",
+    "min tail ESS, hyperparameters",
+    "min bulk ESS, mu[t]",
+    "min tail ESS, mu[t]"
+  ),
+  value = c(
+    div_frac,
+    min_eb,
+    worst_max(s_hyper$rhat),
+    worst_max(s_mu$rhat),
+    worst_max(s_h$rhat),
+    worst_min(s_hyper$ess_bulk),
+    worst_min(s_hyper$ess_tail),
+    worst_min(s_mu$ess_bulk),
+    worst_min(s_mu$ess_tail)
+  ),
+  op = c("<", ">=", "<=", "<=", "<=", ">=", ">=", ">=", ">="),
+  threshold = c(
+    GATE$max_div_frac, GATE$min_ebfmi,
+    GATE$max_rhat_hyper, GATE$max_rhat_state, GATE$max_rhat_state,
+    GATE$min_ess, GATE$min_ess, GATE$min_ess, GATE$min_ess
+  ),
+  worst = c(
+    "",
+    sprintf("chain %d", if (anyNA(ebfmi)) which(is.na(ebfmi))[1] else which.min(ebfmi)),
+    which_at(s_hyper, "rhat", which.max),
+    which_at(s_mu, "rhat", which.max),
+    which_at(s_h, "rhat", which.max),
+    which_at(s_hyper, "ess_bulk", which.min),
+    which_at(s_hyper, "ess_tail", which.min),
+    which_at(s_mu, "ess_bulk", which.min),
+    which_at(s_mu, "ess_tail", which.min)
+  ),
+  stringsAsFactors = FALSE
+)
+checks$pass <- mapply(function(v, op, th) {
+  if (is.na(v)) return(FALSE)
+  switch(op, "<" = v < th, "<=" = v <= th, ">=" = v >= th)
+}, checks$value, checks$op, checks$threshold)
+
+fmt_val <- function(v, i) {
+  if (is.na(v)) return("NA")
+  if (i == 1) return(sprintf("%.3f%%", 100 * v))
+  if (checks$op[i] == "<=") return(sprintf("%.4f", v))
+  if (grepl("ESS", checks$metric[i])) return(sprintf("%.0f", v))
+  sprintf("%.3f", v)
+}
+fmt_th <- function(i) {
+  th <- checks$threshold[i]
+  if (i == 1) return(sprintf("%s %.1f%%", checks$op[i], 100 * th))
+  sprintf("%s %s", checks$op[i], format(th))
+}
+
+cat("\n=== Convergence gate ===\n")
+cat(sprintf("Per-chain E-BFMI: %s\n", paste(sprintf("%.3f", ebfmi), collapse = ", ")))
+cat(sprintf("Max-treedepth hits: %d of %d draws (informational)\n", n_tdmax, n_draws))
+cat(sprintf("%-46s %10s  %-10s %-6s %s\n", "metric", "value", "threshold", "status", "worst"))
+for (i in seq_len(nrow(checks))) {
+  cat(sprintf("%-46s %10s  %-10s %-6s %s\n",
+              checks$metric[i], fmt_val(checks$value[i], i), fmt_th(i),
+              if (checks$pass[i]) "PASS" else "FAIL", checks$worst[i]))
+}
+
+failures <- character(0)
+for (i in which(!checks$pass)) {
+  failures <- c(failures, sprintf(
+    "%s = %s (required %s; worst: %s)",
+    checks$metric[i], fmt_val(checks$value[i], i), fmt_th(i), checks$worst[i]
   ))
 }
-cat(sprintf("\nFit quality gate passed: %d divergences (%.2f%%).\n",
-            total_divs, 100 * total_divs / total_draws))
+if (!is.na(min_eb) && min_eb < GATE$ebfmi_floor) {
+  failures <- c(failures, sprintf(
+    "min E-BFMI %.3f is below the hard floor %.1f", min_eb, GATE$ebfmi_floor))
+}
+
+if (length(failures) > 0) {
+  stop(paste0(
+    "Fit quality gate FAILED (", length(failures), " problem",
+    if (length(failures) > 1) "s" else "", "):\n  - ",
+    paste(failures, collapse = "\n  - ")
+  ), call. = FALSE)
+}
+cat("\nFit quality gate passed: all checks within thresholds.\n")
