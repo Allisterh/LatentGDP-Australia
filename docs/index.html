@@ -32,7 +32,7 @@
   <h1>Latent Australian GDP growth, 2026 Q2</h1>
   <div class="card">
     <p class="headline" style="color: #1b9e77;">+0.48%</p>
-    <p class="ci">90% credible interval: [+0.31, +0.64] (quarter-on-quarter growth)</p>
+    <p class="ci">90% credible interval: [+0.31, +0.63] (quarter-on-quarter growth)</p>
     <p class="meta">Headline (mean of E, I, P): +0.42%. Latent-path variance is 87% of headline variance over 1980 Q1&ndash;present (posterior median; 90% interval 81%&ndash;94%).</p>
   </div>
 
@@ -123,7 +123,7 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
 &rho;<sub>EI</sub>         ~ N(0, 0.5)    constrained to (-1, 1)
 &psi;<sub>k</sub>          ~ N(0, 0.5)    constrained to (-1, 1)</div>
   <p>All priors for all models:
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/priors.md">priors.md</a>.
+  <a href="https://github.com/DavidAStephan/LatentGDP/blob/0bf4313f42a27d478327f4f88a3cc771af2d7c63/priors.md">priors.md</a>.
   Nothing is published unless the fit has &lt;0.1% divergences, E-BFMI
   &ge; 0.3, R-hat &le; 1.01 (hyperparameters) / 1.05 (latent growth and
   both volatility paths) and ESS &ge; 400.</p>
@@ -191,12 +191,12 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
 
   <p>Full research record (all 13 specs, the comparison tables and the
   caveats) at
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/NOTES.md">NOTES.md</a>.
+  <a href="https://github.com/DavidAStephan/LatentGDP/blob/0bf4313f42a27d478327f4f88a3cc771af2d7c63/NOTES.md">NOTES.md</a>.
   Stan source at
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/stan/m13_serial_latent_sv.stan">stan/m13_serial_latent_sv.stan</a>.</p>
+  <a href="https://github.com/DavidAStephan/LatentGDP/blob/0bf4313f42a27d478327f4f88a3cc771af2d7c63/stan/m13_serial_latent_sv.stan">stan/m13_serial_latent_sv.stan</a>.</p>
 
   <footer>
-    Last updated 2026-10-18 23:22:24 UTC. CmdStan 2.39.0. 0 divergences out of 8000 post-warmup draws (4 chains &times; 2000). Min E-BFMI 0.882; max R-hat (hyperparameters) 1.001; min bulk / tail ESS 1315 / 882.
+    Last updated 2026-10-18 23:53:01 UTC. CmdStan 2.39.0. 2 divergences out of 8000 post-warmup draws (4 chains &times; 2000). Min E-BFMI 0.846; max R-hat (hyperparameters) 1.003; min bulk / tail ESS 1285 / 915.
     Sample 1980 Q1 to 2026 Q2 (T = 186 quarters). Source: <a href="https://github.com/DavidAStephan/LatentGDP">github.com/DavidAStephan/LatentGDP</a>.
   </footer>
 </body>

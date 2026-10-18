@@ -3,16 +3,16 @@
   "date": "2026-06-01",
   "mu_median": 0.48,
   "mu_q05": 0.31,
-  "mu_q95": 0.64,
+  "mu_q95": 0.63,
   "headline_mean": 0.42,
   "observed": {
     "g_E": 0.26,
     "g_I": 0.52,
     "g_P": 0.47
   },
-  "variance_ratio_vs_headline": 0.8716,
-  "variance_ratio_vs_headline_q05": 0.8113,
-  "variance_ratio_vs_headline_q95": 0.9385,
+  "variance_ratio_vs_headline": 0.872,
+  "variance_ratio_vs_headline_q05": 0.8106,
+  "variance_ratio_vs_headline_q95": 0.9361,
   "units": "quarter-on-quarter growth, % (100 x dlog of chain volume measures)",
   "model": "m13: structural Sigma (Cov(eps_P, .) = 0) + stochastic volatility + AR(1) measurement errors + stochastic volatility on latent growth",
   "data_source": "ABS 5206.0 Table 24, seasonally adjusted, chain volume measures"
