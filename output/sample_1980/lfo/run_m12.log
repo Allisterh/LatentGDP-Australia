@@ -1,0 +1,981 @@
+2026-10-18 23:15:52  === PSIS-LFO run (m12; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 23:15:52  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 23:15:52  [m12] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 23:16:22  [m12] fit 1:40 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 183 periods, raised in 3 (max 81500, in 1 periods), cost x1.23 of N=2000
+2026-10-18 23:17:00  [m12] fit on periods 1:40 (to 1989-12-01): 2000 draws, 68 s; divergences=0 min_ebfmi=0.9047 max_rhat=1.003 min_ess_bulk=1212 worst_rhat=omega[3] seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:18:07  [m12] fit 1:65 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 182 periods, raised in 4 (max 100000, in 1 periods), cost x1.29 of N=2000
+2026-10-18 23:18:46  [m12] fit on periods 1:65 (to 1996-03-01): 2000 draws, 106 s; divergences=0 min_ebfmi=0.843 max_rhat=1.004 min_ess_bulk=611.6 worst_rhat=omega[2] seed=10065 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:20:23  [m12] fit 1:96 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 181 periods, raised in 5 (max 100000, in 1 periods), cost x1.27 of N=2000
+2026-10-18 23:21:03  [m12] fit on periods 1:96 (to 2003-12-01): 2000 draws, 136 s; divergences=0 min_ebfmi=0.9382 max_rhat=1.004 min_ess_bulk=702.5 worst_rhat=phi[3] seed=10096 attempt=1 cached=FALSE fails= below_rule=FALSE
+Warning: 1 of 4000 (0.0%) transitions ended with a divergence.
+See https://mc-stan.org/misc/warnings for details.
+
+2026-10-18 23:23:34  [m12] fit 1:135 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 179 periods, raised in 7 (max 100000, in 1 periods), cost x1.28 of N=2000
+2026-10-18 23:24:14  [m12] fit on periods 1:135 (to 2013-09-01): 2000 draws, 191 s; divergences=1 min_ebfmi=0.9067 max_rhat=1.005 min_ess_bulk=1169 worst_rhat=phi[1] seed=10135 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:27:18  [m12] fit 1:142 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 174 periods, raised in 12 (max 100000, in 1 periods), cost x1.30 of N=2000
+2026-10-18 23:27:58  [m12] fit on periods 1:142 (to 2015-06-01): 2000 draws, 224 s; divergences=0 min_ebfmi=0.8389 max_rhat=1.013 min_ess_bulk=488.7 worst_rhat=phi[2] seed=10142 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:31:11  [m12] fit 1:162 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 163 periods, raised in 23 (max 100000, in 1 periods), cost x1.38 of N=2000
+2026-10-18 23:31:55  [m12] fit on periods 1:162 (to 2020-06-01): 2000 draws, 236 s; divergences=0 min_ebfmi=0.8075 max_rhat=1.005 min_ess_bulk=729.4 worst_rhat=phi[1] seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:36:45  [m12] fit 1:168 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 166 periods, raised in 20 (max 100000, in 1 periods), cost x1.34 of N=2000
+2026-10-18 23:37:28  [m12] fit on periods 1:168 (to 2021-12-01): 2000 draws, 333 s; divergences=0 min_ebfmi=0.7425 max_rhat=1.006 min_ess_bulk=496 worst_rhat=phi[1] seed=10168 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:37:28  [m12] done: elpd_lfo = -1095.45 over 146 predictions, 6 refits, 0 high-k steps used
+2026-10-18 23:42:13  [m12] filter re-run 1/3 with new seeds: elpd -1097.74 vs main pass -1095.45 (285 s)
+2026-10-18 23:46:59  [m12] filter re-run 2/3 with new seeds: elpd -1098.58 vs main pass -1095.45 (286 s)
+2026-10-18 23:51:45  [m12] filter re-run 3/3 with new seeds: elpd -1095.84 vs main pass -1095.45 (286 s)
+
+=== PSIS-LFO-CV, one-step-ahead, marginal likelihood (states integrated out) ===
+   group model n_pred elpd_lfo se_elpd elpd_diff_vs_best se_diff_vs_best
+1      1   m13    146    -1039   21.14              0.00            0.00
+2      1   m12    146    -1097   43.12            -57.40           27.23
+3      1    m7    146    -1120   20.75            -80.93           12.16
+4      1    m5    146    -1134   48.21            -94.68           33.80
+5      1    m1    146    -1149   45.94           -109.90           31.82
+6      1    m2    146    -1155   48.07           -115.09           33.79
+7      1    m6    146    -1156   48.56           -116.87           34.32
+8      1    m3    146    -1158   50.76           -118.79           36.47
+9      2    m8    146    -1535   70.14              0.00            0.00
+10     3   m11    146    -2469  177.62              0.00            0.00
+   se_diff_vs_best_nw n_refits n_k_high_unrefit max_k_used n_fits_below_rule
+1                0.00        7                0     0.6977                 0
+2               36.61        6                0     0.6895                 0
+3               19.05        6                0     0.6925                 0
+4               42.94        5                0     0.6954                 0
+5               35.68        4                0     0.6761                 0
+6               42.86        5                0     0.6990                 0
+7               43.65        4                0     0.6908                 0
+8               45.04        5                0     0.6946                 0
+9                0.00        5                0     0.6795                 0
+10               0.00        7                0     0.6779                 0
+   n_fits_retried mcse_elpd elpd_lfo_gdp_only
+1               0   0.02202             -1039
+2               0   0.74877             -1097
+3               0        NA             -1120
+4               0        NA             -1134
+5               0        NA             -1149
+6               0        NA             -1155
+7               0        NA             -1156
+8               0        NA             -1158
+9               0        NA             -1159
+10              0        NA             -1120
+
+=== Key differences by sub-period (a - b) ===
+            period n_pred model_a model_b     elpd  se_iid   se_nw
+1          1990-99     40     m12      m5   2.0101  0.9839  0.7618
+2          1990-99     40      m5      m2   5.3323  2.8115  1.4847
+3          1990-99     40     m12      m2   7.3424  3.0438  1.5522
+4          1990-99     40     m13     m12  -0.4049  0.2587  0.1617
+5          1990-99     40      m6      m2  -0.3491  0.2490  0.2582
+6          1990-99     40     m13      m5   1.6052  0.9623  0.7800
+7          2000-07     32     m12      m5   4.7761  1.5014  1.1237
+8          2000-07     32      m5      m2   5.0159  1.2962  0.6022
+9          2000-07     32     m12      m2   9.7920  2.0725  1.2667
+10         2000-07     32     m13     m12   0.4023  0.2087  0.1411
+11         2000-07     32      m6      m2   0.0961  0.2565  0.2393
+12         2000-07     32     m13      m5   5.1784  1.4898  1.0537
+13         2008-19     48     m12      m5  11.0305  2.2427  4.1272
+14         2008-19     48      m5      m2   6.8484  1.3851  1.3590
+15         2008-19     48     m12      m2  17.8789  2.7961  5.1598
+16         2008-19     48     m13     m12   6.3594  2.2665  1.7701
+17         2008-19     48      m6      m2  -0.6682  0.3216  0.2577
+18         2008-19     48     m13      m5  17.3899  3.4868  5.5556
+19            2020      4     m12      m5  10.2849 12.0186  5.5080
+20            2020      4      m5      m2   0.2596  1.5367  0.5573
+21            2020      4     m12      m2  10.5446 13.1277  5.9112
+22            2020      4     m13     m12  32.4117 24.4271  8.7579
+23            2020      4      m6      m2  -0.9922  0.6516  0.2775
+24            2020      4     m13      m5  42.6966 29.8232 12.1672
+25         2021-22      8     m12      m5  -7.7979  3.3207  3.1620
+26         2021-22      8      m5      m2   1.0226  0.3974  0.1995
+27         2021-22      8     m12      m2  -6.7753  3.3928  3.0276
+28         2021-22      8     m13     m12  12.2700  4.8653  3.2467
+29         2021-22      8      m6      m2   0.1243  0.0869  0.0804
+30         2021-22      8     m13      m5   4.4721  2.9002  1.2496
+31         2023-26     14     m12      m5  16.9731  1.4213  2.4529
+32         2023-26     14      m5      m2   1.9345  0.2130  0.1804
+33         2023-26     14     m12      m2  18.9076  1.4091  2.4131
+34         2023-26     14     m13     m12   6.3662  0.8068  0.4577
+35         2023-26     14      m6      m2   0.0177  0.0216  0.0124
+36         2023-26     14     m13      m5  23.3394  1.6220  2.7821
+37        pre-2020    120     m12      m5  17.8167  2.9715  5.0344
+38        pre-2020    120      m5      m2  17.1966  3.3641  2.0994
+39        pre-2020    120     m12      m2  35.0133  4.6711  6.1178
+40        pre-2020    120     m13     m12   6.3569  2.3874  2.7464
+41        pre-2020    120      m6      m2  -0.9211  0.4827  0.4821
+42        pre-2020    120     m13      m5  24.1736  4.1757  7.2951
+43         2020 on     26     m12      m5  19.4601 12.8963 12.9596
+44         2020 on     26      m5      m2   3.2167  1.4308  0.4727
+45         2020 on     26     m12      m2  22.6768 13.6996 13.1849
+46         2020 on     26     m13     m12  51.0479 26.0588 29.4636
+47         2020 on     26      m6      m2  -0.8502  0.7533  0.8194
+48         2020 on     26     m13      m5  70.5080 31.9708 32.2193
+49 all excl. COVID    142     m12      m5  28.9184  6.4440 13.2398
+50 all excl. COVID    142      m5      m2  19.9828  3.3903  2.1340
+51 all excl. COVID    142     m12      m2  48.9011  7.4414 13.8281
+52 all excl. COVID    142     m13     m12  22.6370  6.6783 10.4597
+53 all excl. COVID    142      m6      m2  -0.8658  0.4869  0.4885
+54 all excl. COVID    142     m13      m5  51.5554  7.4652 16.3343
+55         1990-99     40     m13     m11   7.1662  4.1059  3.6691
+56         1990-99     40     m12     m11   7.5711  4.1496  3.6775
+57         1990-99     40     m13      m8   5.2334  2.8858  1.4114
+58         2000-07     32     m13     m11   8.9979  2.3884  1.4266
+59         2000-07     32     m12     m11   8.5956  2.3810  1.4638
+60         2000-07     32     m13      m8  10.5579  2.0962  1.4939
+61         2008-19     48     m13     m11  22.0136  4.1621  6.5508
+62         2008-19     48     m12     m11  15.6541  2.9333  5.0989
+63         2008-19     48     m13      m8  23.9372  3.9863  6.7384
+64            2020      4     m13     m11  23.0026 23.9373 10.1174
+65            2020      4     m12     m11  -9.4090  7.2426  4.4229
+66            2020      4     m13      m8  48.8809 31.3475 13.1193
+67         2021-22      8     m13     m11  -3.6663  3.4933  2.6302
+68         2021-22      8     m12     m11 -15.9363  8.2093  5.8464
+69         2021-22      8     m13      m8   5.7914  3.1814  1.2698
+70         2023-26     14     m13     m11  23.0339  1.3863  2.3229
+71         2023-26     14     m12     m11  16.6676  1.2375  1.9914
+72         2023-26     14     m13      m8  25.3825  1.5694  2.7370
+73        pre-2020    120     m13     m11  38.1778  6.4055  8.5058
+74        pre-2020    120     m12     m11  31.8209  5.6014  6.6267
+75        pre-2020    120     m13      m8  39.7285  5.5810  8.6517
+76         2020 on     26     m13     m11  42.3702 23.8080 18.4956
+77         2020 on     26     m12     m11  -8.6777 13.3184 24.3636
+78         2020 on     26     m13      m8  80.0548 34.5712 37.0598
+79 all excl. COVID    142     m13     m11  57.3950  9.0868 16.3121
+80 all excl. COVID    142     m12     m11  34.7580 11.7627 18.3269
+81 all excl. COVID    142     m13      m8  70.3297  8.4785 17.1537
+          target
+1  group 1 joint
+2  group 1 joint
+3  group 1 joint
+4  group 1 joint
+5  group 1 joint
+6  group 1 joint
+7  group 1 joint
+8  group 1 joint
+9  group 1 joint
+10 group 1 joint
+11 group 1 joint
+12 group 1 joint
+13 group 1 joint
+14 group 1 joint
+15 group 1 joint
+16 group 1 joint
+17 group 1 joint
+18 group 1 joint
+19 group 1 joint
+20 group 1 joint
+21 group 1 joint
+22 group 1 joint
+23 group 1 joint
+24 group 1 joint
+25 group 1 joint
+26 group 1 joint
+27 group 1 joint
+28 group 1 joint
+29 group 1 joint
+30 group 1 joint
+31 group 1 joint
+32 group 1 joint
+33 group 1 joint
+34 group 1 joint
+35 group 1 joint
+36 group 1 joint
+37 group 1 joint
+38 group 1 joint
+39 group 1 joint
+40 group 1 joint
+41 group 1 joint
+42 group 1 joint
+43 group 1 joint
+44 group 1 joint
+45 group 1 joint
+46 group 1 joint
+47 group 1 joint
+48 group 1 joint
+49 group 1 joint
+50 group 1 joint
+51 group 1 joint
+52 group 1 joint
+53 group 1 joint
+54 group 1 joint
+55      GDP-only
+56      GDP-only
+57      GDP-only
+58      GDP-only
+59      GDP-only
+60      GDP-only
+61      GDP-only
+62      GDP-only
+63      GDP-only
+64      GDP-only
+65      GDP-only
+66      GDP-only
+67      GDP-only
+68      GDP-only
+69      GDP-only
+70      GDP-only
+71      GDP-only
+72      GDP-only
+73      GDP-only
+74      GDP-only
+75      GDP-only
+76      GDP-only
+77      GDP-only
+78      GDP-only
+79      GDP-only
+80      GDP-only
+81      GDP-only
+
+=== Pairwise differences (a - b), selected ===
+                                    comparison model_a model_b n_pred elpd_diff
+1  GDP-only target, common window (all groups)     m13      m7    146    80.925
+2  GDP-only target, common window (all groups)      m5      m6    146    22.185
+3  GDP-only target, common window (all groups)      m5      m2    146    20.413
+4  GDP-only target, common window (all groups)      m5      m3    146    24.112
+5  GDP-only target, common window (all groups)     m12      m1    146    52.494
+6  GDP-only target, common window (all groups)     m12      m2    146    57.690
+7  GDP-only target, common window (all groups)     m12      m6    146    59.461
+8  GDP-only target, common window (all groups)     m12      m3    146    61.389
+9  GDP-only target, common window (all groups)      m5      m8    146    25.102
+10 GDP-only target, common window (all groups)     m13      m1    146   109.899
+11 GDP-only target, common window (all groups)     m13      m2    146   115.095
+12 GDP-only target, common window (all groups)     m13      m6    146   116.866
+13 GDP-only target, common window (all groups)     m12      m8    146    62.379
+14 GDP-only target, common window (all groups)     m13      m8    146   119.783
+15 GDP-only target, common window (all groups)     m13      m3    146   118.794
+16 GDP-only target, common window (all groups)     m13     m11    146    80.548
+17 GDP-only target, common window (all groups)     m13      m5    146    94.682
+18 GDP-only target, common window (all groups)     m12      m5    146    37.277
+19 GDP-only target, common window (all groups)     m11      m1    146    29.351
+20 GDP-only target, common window (all groups)     m11      m6    146    36.318
+21 GDP-only target, common window (all groups)     m11      m2    146    34.547
+22 GDP-only target, common window (all groups)     m11      m3    146    38.246
+23 GDP-only target, common window (all groups)     m11      m8    146    39.235
+24 GDP-only target, common window (all groups)     m13     m12    146    57.405
+25 GDP-only target, common window (all groups)      m2      m6    146     1.771
+26 GDP-only target, common window (all groups)      m5      m1    146    15.217
+27 GDP-only target, common window (all groups)     m12     m11    146    23.143
+28 GDP-only target, common window (all groups)      m2      m3    146     3.699
+29 GDP-only target, common window (all groups)      m7      m8    146    38.858
+30 GDP-only target, common window (all groups)      m7      m6    146    35.941
+31 GDP-only target, common window (all groups)      m7      m3    146    37.868
+32 GDP-only target, common window (all groups)     m11      m5    146    14.134
+33 GDP-only target, common window (all groups)      m7      m2    146    34.170
+34 GDP-only target, common window (all groups)      m2      m8    146     4.688
+35 GDP-only target, common window (all groups)      m1      m3    146     8.895
+36 GDP-only target, common window (all groups)      m7      m1    146    28.973
+37 GDP-only target, common window (all groups)     m12      m7    146    23.520
+38 GDP-only target, common window (all groups)      m1      m8    146     9.885
+39 GDP-only target, common window (all groups)      m1      m6    146     6.968
+40 GDP-only target, common window (all groups)      m6      m8    146     2.917
+41 GDP-only target, common window (all groups)      m6      m3    146     1.928
+42 GDP-only target, common window (all groups)      m1      m2    146     5.196
+43 GDP-only target, common window (all groups)      m7      m5    146    13.756
+44 GDP-only target, common window (all groups)      m3      m8    146     0.990
+45 GDP-only target, common window (all groups)     m11      m7    146     0.377
+46                             group 1 (joint)     m13      m7    146    80.925
+47                             group 1 (joint)      m5      m6    146    22.185
+48                             group 1 (joint)      m5      m2    146    20.413
+49                             group 1 (joint)      m5      m3    146    24.112
+50                             group 1 (joint)     m12      m1    146    52.494
+51                             group 1 (joint)     m12      m2    146    57.690
+52                             group 1 (joint)     m12      m6    146    59.461
+53                             group 1 (joint)     m12      m3    146    61.389
+54                             group 1 (joint)     m13      m1    146   109.899
+55                             group 1 (joint)     m13      m2    146   115.095
+56                             group 1 (joint)     m13      m6    146   116.866
+57                             group 1 (joint)     m13      m3    146   118.794
+58                             group 1 (joint)     m13      m5    146    94.682
+59                             group 1 (joint)     m12      m5    146    37.277
+60                             group 1 (joint)     m13     m12    146    57.405
+61                             group 1 (joint)      m2      m6    146     1.771
+62                             group 1 (joint)      m5      m1    146    15.217
+63                             group 1 (joint)      m2      m3    146     3.699
+64                             group 1 (joint)      m7      m6    146    35.941
+65                             group 1 (joint)      m7      m3    146    37.868
+66                             group 1 (joint)      m7      m2    146    34.170
+67                             group 1 (joint)      m1      m3    146     8.895
+68                             group 1 (joint)      m7      m1    146    28.973
+69                             group 1 (joint)     m12      m7    146    23.520
+70                             group 1 (joint)      m1      m6    146     6.968
+71                             group 1 (joint)      m6      m3    146     1.928
+72                             group 1 (joint)      m1      m2    146     5.196
+73                             group 1 (joint)      m7      m5    146    13.756
+   se_diff      z se_diff_nw   z_nw lag1_acf mcse_diff
+1   12.161 6.6542      19.05 4.2484  0.29247     0.022
+2    3.842 5.7747       2.32 9.5820 -0.36794     0.000
+3    3.646 5.5995       2.17 9.3992 -0.40858     0.000
+4    4.311 5.5937       3.03 7.9563 -0.17880     0.000
+5   10.813 4.8546      16.11 3.2584  0.34266     0.749
+6   14.517 3.9740      15.52 3.7166  0.18669     0.749
+7   15.125 3.9315      15.88 3.7452  0.19114     0.749
+8   15.780 3.8902      16.51 3.7174  0.25800     0.749
+9    6.663 3.7675       6.13 4.0931 -0.06045     0.000
+10  31.817 3.4541      35.68 3.0800 -0.00224     0.022
+11  33.794 3.4058      42.86 2.6852  0.24333     0.022
+12  34.316 3.4056      43.65 2.6771  0.25606     0.022
+13  18.363 3.3971      18.18 3.4310  0.17829     0.749
+14  36.752 3.2592      48.31 2.4793  0.32911     0.022
+15  36.471 3.2572      45.04 2.6375  0.21435     0.022
+16  25.035 3.2174      24.64 3.2684 -0.00159     0.022
+17  33.803 2.8010      42.94 2.2049  0.22945     0.022
+18  13.326 2.7973      15.07 2.4730  0.30052     0.749
+19  10.622 2.7632      16.20 1.8113  0.18314     0.000
+20  14.956 2.4283      24.46 1.4847  0.52752     0.000
+21  14.324 2.4119      23.68 1.4590  0.53033     0.000
+22  16.008 2.3892      25.75 1.4851  0.50538     0.000
+23  18.284 2.1458      29.28 1.3402  0.52578     0.000
+24  27.234 2.1079      36.61 1.5679  0.00528     0.749
+25   0.892 1.9859       1.01 1.7575  0.30950     0.000
+26   8.552 1.7793       9.15 1.6628  0.08588     0.000
+27  14.518 1.5941      26.35 0.8783  0.42611     0.749
+28   3.102 1.1923       2.62 1.4119 -0.10934     0.000
+29  37.424 1.0383      40.57 0.9577  0.27474     0.000
+30  35.309 1.0179      36.03 0.9976  0.19879     0.000
+31  37.639 1.0061      37.57 1.0079  0.16130     0.000
+32  14.370 0.9835      24.07 0.5872  0.52783     0.000
+33  34.814 0.9815      35.17 0.9715  0.18515     0.000
+34   4.912 0.9545       6.00 0.7818  0.27070     0.000
+35   9.351 0.9512      10.86 0.8193  0.26911     0.000
+36  33.837 0.8563      28.39 1.0205 -0.04470     0.000
+37  29.016 0.8106      31.36 0.7500 -0.07431     0.749
+38  13.674 0.7229      14.65 0.6747  0.10179     0.000
+39   9.663 0.7210       9.61 0.7252  0.02939     0.000
+40   4.249 0.6866       5.22 0.5590  0.24562     0.000
+41   2.870 0.6716       1.82 1.0604 -0.31686     0.000
+42   9.010 0.5768       8.83 0.5888 -0.00123     0.000
+43  35.236 0.3904      35.45 0.3881  0.15840     0.000
+44   5.306 0.1865       4.19 0.2361 -0.24700     0.000
+45  28.817 0.0131      21.70 0.0174  0.00435     0.000
+46  12.161 6.6542      19.05 4.2484  0.29247     0.022
+47   3.842 5.7747       2.32 9.5820 -0.36794     0.000
+48   3.646 5.5995       2.17 9.3992 -0.40858     0.000
+49   4.311 5.5937       3.03 7.9563 -0.17880     0.000
+50  10.813 4.8546      16.11 3.2584  0.34266     0.749
+51  14.517 3.9740      15.52 3.7166  0.18669     0.749
+52  15.125 3.9315      15.88 3.7452  0.19114     0.749
+53  15.780 3.8902      16.51 3.7174  0.25800     0.749
+54  31.817 3.4541      35.68 3.0800 -0.00224     0.022
+55  33.794 3.4058      42.86 2.6852  0.24333     0.022
+56  34.316 3.4056      43.65 2.6771  0.25606     0.022
+57  36.471 3.2572      45.04 2.6375  0.21435     0.022
+58  33.803 2.8010      42.94 2.2049  0.22945     0.022
+59  13.326 2.7973      15.07 2.4730  0.30052     0.749
+60  27.234 2.1079      36.61 1.5679  0.00528     0.749
+61   0.892 1.9859       1.01 1.7575  0.30950     0.000
+62   8.552 1.7793       9.15 1.6628  0.08588     0.000
+63   3.102 1.1923       2.62 1.4119 -0.10934     0.000
+64  35.309 1.0179      36.03 0.9976  0.19879     0.000
+65  37.639 1.0061      37.57 1.0079  0.16130     0.000
+66  34.814 0.9815      35.17 0.9715  0.18515     0.000
+67   9.351 0.9512      10.86 0.8193  0.26911     0.000
+68  33.837 0.8563      28.39 1.0205 -0.04470     0.000
+69  29.016 0.8106      31.36 0.7500 -0.07431     0.749
+70   9.663 0.7210       9.61 0.7252  0.02939     0.000
+71   2.870 0.6716       1.82 1.0604 -0.31686     0.000
+72   9.010 0.5768       8.83 0.5888 -0.00123     0.000
+73  35.236 0.3904      35.45 0.3881  0.15840     0.000
+
+=== Bounds actually hit ===
+m1: 5 fits (initial + 4 refits, cap 12); 0 high-k steps used without refit 
+m2: 6 fits (initial + 5 refits, cap 12); 0 high-k steps used without refit 
+m3: 6 fits (initial + 5 refits, cap 12); 0 high-k steps used without refit 
+m5: 6 fits (initial + 5 refits, cap 12); 0 high-k steps used without refit 
+m6: 5 fits (initial + 4 refits, cap 12); 0 high-k steps used without refit 
+m7: 7 fits (initial + 6 refits, cap 12); 0 high-k steps used without refit 
+m8: 6 fits (initial + 5 refits, cap 12); 0 high-k steps used without refit 
+m11: 8 fits (initial + 7 refits, cap 12); 0 high-k steps used without refit 
+m12: 7 fits (initial + 6 refits, cap 12); 0 high-k steps used without refit 
+m13: 8 fits (initial + 7 refits, cap 12); 0 high-k steps used without refit 
+
+=== Same 146 targets: full sample vs 1980-03-01 sample (a - b) ===
+   model_a model_b        target diff_full se_nw_full diff_sample se_nw_sample
+1      m12      m5 group 1 joint    63.367     20.706       37.28        15.07
+2       m5      m2 group 1 joint    27.413      1.951       20.41         2.17
+3      m13     m12 group 1 joint    59.646     28.889       57.40        36.61
+4       m6      m2 group 1 joint     0.662      0.380       -1.77         1.01
+5       m3      m2 group 1 joint     0.318      0.776       -3.70         2.62
+6      m13     m11      GDP-only    67.536     18.419       80.55        24.64
+7      m12     m11      GDP-only     7.890     27.049       23.14        26.35
+8      m13      m8      GDP-only   114.863     44.915      119.78        48.31
+9      m13      m5 group 1 joint   123.013     25.715       94.68        42.94
+10     m13      m7 group 1 joint   131.713     20.745       80.93        19.05
+11      m7      m1 group 1 joint    18.125     16.710       28.97        28.39
+   z_nw_full z_nw_sample change se_nw_change
+1      3.060       2.473 -26.09        20.54
+2     14.049       9.399  -7.00         1.01
+3      2.065       1.568  -2.24        11.11
+4      1.744      -1.757  -2.43         1.24
+5      0.410      -1.412  -4.02         2.24
+6      3.667       3.268  13.01        13.45
+7      0.292       0.878  15.25        12.20
+8      2.557       2.479   4.92         5.53
+9      4.784       2.205 -28.33        25.79
+10     6.349       4.248 -50.79        13.26
+11     1.085       1.020  10.85        12.55
+   model group        target elpd_full elpd_sample   change se_iid_change
+1     m1     1 group 1 joint   -1195.7     -1149.4 46.26491       16.6555
+2     m2     1 group 1 joint   -1196.2     -1154.6 41.65653       19.7705
+3     m3     1 group 1 joint   -1195.9     -1158.3 37.63976       22.2358
+4     m5     1 group 1 joint   -1168.8     -1134.2 34.65723       19.7331
+5     m6     1 group 1 joint   -1195.6     -1156.4 39.22294       20.5848
+6     m7     1 group 1 joint   -1177.5     -1120.4 57.11307        8.9727
+7     m8     2 group 2 joint   -1542.0     -1535.0  6.93148        4.5781
+8     m8     2      GDP-only   -1160.7     -1159.3  1.40523        3.3753
+9    m11     3 group 3 joint   -2469.9     -2469.5  0.38297        3.3981
+10   m11     3      GDP-only   -1113.4     -1120.0 -6.68637       12.4970
+11   m12     1 group 1 joint   -1105.5     -1096.9  8.56675        6.6202
+12   m13     1 group 1 joint   -1045.8     -1039.5  6.32574        4.6288
+   se_nw_change rank_gdp_full rank_gdp_sample
+1       18.1631             8               6
+2       25.2734            10               7
+3       27.2022             9               9
+4       24.9733             5               5
+5       26.3699             7               8
+6       12.8156             6               4
+7        2.6044            NA              NA
+8        3.8451             4              10
+9        3.4237            NA              NA
+10      12.2737             3               3
+11      11.3458             2               2
+12       3.7432             1               1
+2026-10-18 23:51:45  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+Error while shutting down parallel: unable to terminate some child processes
+2026-10-19 01:32:45  === PSIS-LFO run (m12; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:45  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:45  [m12] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:45  [m12] complete checkpoint found, skipping
+
+=== PSIS-LFO-CV, one-step-ahead, marginal likelihood (states integrated out) ===
+   group model n_pred elpd_lfo se_elpd elpd_diff_vs_best se_diff_vs_best
+1      1   m13    146    -1039   21.14              0.00            0.00
+2      1   m12    146    -1097   43.12            -57.40           27.23
+3      1    m9    146    -1118   46.68            -78.01           30.61
+4      1    m7    146    -1120   20.75            -80.93           12.16
+5      1    m5    146    -1134   48.21            -94.68           33.80
+6      1    m1    146    -1149   45.94           -109.90           31.82
+7      1    m2    146    -1155   48.07           -115.09           33.79
+8      1    m6    146    -1156   48.56           -116.87           34.32
+9      1    m3    146    -1158   50.76           -118.79           36.47
+10     2    m8    146    -1535   70.14              0.00            0.00
+11     3   m11    146    -2469  177.62              0.00            0.00
+   se_diff_vs_best_nw n_refits n_k_high_unrefit max_k_used n_fits_below_rule
+1                0.00        7                0     0.6977                 0
+2               36.61        6                0     0.6895                 0
+3               40.43        6                0     0.6991                 0
+4               19.05        6                0     0.6925                 0
+5               42.94        5                0     0.6954                 0
+6               35.68        4                0     0.6761                 0
+7               42.86        5                0     0.6990                 0
+8               43.65        4                0     0.6908                 0
+9               45.04        5                0     0.6946                 0
+10               0.00        5                0     0.6795                 0
+11               0.00        7                0     0.6779                 0
+   n_fits_retried mcse_elpd elpd_lfo_gdp_only
+1               0   0.02202             -1039
+2               0   0.74877             -1097
+3               0   0.60255             -1118
+4               0        NA             -1120
+5               0        NA             -1134
+6               0        NA             -1149
+7               0        NA             -1155
+8               0        NA             -1156
+9               0        NA             -1158
+10              0        NA             -1159
+11              0        NA             -1120
+
+=== Key differences by sub-period (a - b) ===
+             period n_pred model_a model_b     elpd  se_iid   se_nw
+1           1990-99     40     m12      m9   5.6688  2.8256  1.8387
+2           1990-99     40     m12      m5   2.0101  0.9839  0.7618
+3           1990-99     40      m9      m5  -3.6587  2.9298  2.0886
+4           1990-99     40      m5      m2   5.3323  2.8115  1.4847
+5           1990-99     40      m9      m2   1.6736  1.0810  0.8939
+6           1990-99     40     m12      m2   7.3424  3.0438  1.5522
+7           1990-99     40     m13     m12  -0.4049  0.2587  0.1617
+8           1990-99     40     m13      m9   5.2639  2.8050  1.7550
+9           1990-99     40      m6      m2  -0.3491  0.2490  0.2582
+10          1990-99     40     m13      m5   1.6052  0.9623  0.7800
+11          2000-07     32     m12      m9   5.9634  1.6599  0.7989
+12          2000-07     32     m12      m5   4.7761  1.5014  1.1237
+13          2000-07     32      m9      m5  -1.1873  2.0886  1.2980
+14          2000-07     32      m5      m2   5.0159  1.2962  0.6022
+15          2000-07     32      m9      m2   3.8287  1.4849  1.0445
+16          2000-07     32     m12      m2   9.7920  2.0725  1.2667
+17          2000-07     32     m13     m12   0.4023  0.2087  0.1411
+18          2000-07     32     m13      m9   6.3657  1.6841  0.8423
+19          2000-07     32      m6      m2   0.0961  0.2565  0.2393
+20          2000-07     32     m13      m5   5.1784  1.4898  1.0537
+21          2008-19     48     m12      m9   2.8830  1.9229  1.0438
+22          2008-19     48     m12      m5  11.0305  2.2427  4.1272
+23          2008-19     48      m9      m5   8.1475  3.1236  4.1012
+24          2008-19     48      m5      m2   6.8484  1.3851  1.3590
+25          2008-19     48      m9      m2  14.9959  2.8104  4.9644
+26          2008-19     48     m12      m2  17.8789  2.7961  5.1598
+27          2008-19     48     m13     m12   6.3594  2.2665  1.7701
+28          2008-19     48     m13      m9   9.2424  2.8697  2.3570
+29          2008-19     48      m6      m2  -0.6682  0.3216  0.2577
+30          2008-19     48     m13      m5  17.3899  3.4868  5.5556
+31             2020      4     m12      m9   5.1664  7.3026  3.4078
+32             2020      4     m12      m5  10.2849 12.0186  5.5080
+33             2020      4      m9      m5   5.1185  4.7402  2.1207
+34             2020      4      m5      m2   0.2596  1.5367  0.5573
+35             2020      4      m9      m2   5.3782  5.8723  2.5424
+36             2020      4     m12      m2  10.5446 13.1277  5.9112
+37             2020      4     m13     m12  32.4117 24.4271  8.7579
+38             2020      4     m13      m9  37.5781 26.9934 10.5923
+39             2020      4      m6      m2  -0.9922  0.6516  0.2775
+40             2020      4     m13      m5  42.6966 29.8232 12.1672
+41          2021-22      8     m12      m9   0.4726  1.4285  0.9636
+42          2021-22      8     m12      m5  -7.7979  3.3207  3.1620
+43          2021-22      8      m9      m5  -8.2705  3.3055  2.6697
+44          2021-22      8      m5      m2   1.0226  0.3974  0.1995
+45          2021-22      8      m9      m2  -7.2479  3.3600  2.5668
+46          2021-22      8     m12      m2  -6.7753  3.3928  3.0276
+47          2021-22      8     m13     m12  12.2700  4.8653  3.2467
+48          2021-22      8     m13      m9  12.7426  5.4806  3.0916
+49          2021-22      8      m6      m2   0.1243  0.0869  0.0804
+50          2021-22      8     m13      m5   4.4721  2.9002  1.2496
+51          2023-26     14     m12      m9   0.4474  0.6027  0.7300
+52          2023-26     14     m12      m5  16.9731  1.4213  2.4529
+53          2023-26     14      m9      m5  16.5258  1.8371  3.1380
+54          2023-26     14      m5      m2   1.9345  0.2130  0.1804
+55          2023-26     14      m9      m2  18.4602  1.7741  3.0818
+56          2023-26     14     m12      m2  18.9076  1.4091  2.4131
+57          2023-26     14     m13     m12   6.3662  0.8068  0.4577
+58          2023-26     14     m13      m9   6.8136  0.8183  0.5296
+59          2023-26     14      m6      m2   0.0177  0.0216  0.0124
+60          2023-26     14     m13      m5  23.3394  1.6220  2.7821
+61         pre-2020    120     m12      m9  14.5151  3.8114  2.7904
+62         pre-2020    120     m12      m5  17.8167  2.9715  5.0344
+63         pre-2020    120      m9      m5   3.3016  4.9010  6.1846
+64         pre-2020    120      m5      m2  17.1966  3.3641  2.0994
+65         pre-2020    120      m9      m2  20.4982  3.5816  6.4981
+66         pre-2020    120     m12      m2  35.0133  4.6711  6.1178
+67         pre-2020    120     m13     m12   6.3569  2.3874  2.7464
+68         pre-2020    120     m13      m9  20.8720  4.3298  3.1640
+69         pre-2020    120      m6      m2  -0.9211  0.4827  0.4821
+70         pre-2020    120     m13      m5  24.1736  4.1757  7.2951
+71          2020 on     26     m12      m9   6.0864  7.0218  4.7797
+72          2020 on     26     m12      m5  19.4601 12.8963 12.9596
+73          2020 on     26      m9      m5  13.3738  7.7179 12.4013
+74          2020 on     26      m5      m2   3.2167  1.4308  0.4727
+75          2020 on     26      m9      m2  16.5905  8.2985 12.6297
+76          2020 on     26     m12      m2  22.6768 13.6996 13.1849
+77          2020 on     26     m13     m12  51.0479 26.0588 29.4636
+78          2020 on     26     m13      m9  57.1343 29.2824 33.5303
+79          2020 on     26      m6      m2  -0.8502  0.7533  0.8194
+80          2020 on     26     m13      m5  70.5080 31.9708 32.2193
+81  all excl. COVID    142     m12      m9  16.3690  3.9475  3.0433
+82  all excl. COVID    142     m12      m5  28.9184  6.4440 13.2398
+83  all excl. COVID    142      m9      m5  12.5494  7.9355 14.6184
+84  all excl. COVID    142      m5      m2  19.9828  3.3903  2.1340
+85  all excl. COVID    142      m9      m2  32.5322  7.2243 14.8882
+86  all excl. COVID    142     m12      m2  48.9011  7.4414 13.8281
+87  all excl. COVID    142     m13     m12  22.6370  6.6783 10.4597
+88  all excl. COVID    142     m13      m9  39.0060  7.9538 10.8184
+89  all excl. COVID    142      m6      m2  -0.8658  0.4869  0.4885
+90  all excl. COVID    142     m13      m5  51.5554  7.4652 16.3343
+91          1990-99     40     m13     m11   7.1662  4.1059  3.6691
+92          1990-99     40     m12     m11   7.5711  4.1496  3.6775
+93          1990-99     40     m13      m8   5.2334  2.8858  1.4114
+94          2000-07     32     m13     m11   8.9979  2.3884  1.4266
+95          2000-07     32     m12     m11   8.5956  2.3810  1.4638
+96          2000-07     32     m13      m8  10.5579  2.0962  1.4939
+97          2008-19     48     m13     m11  22.0136  4.1621  6.5508
+98          2008-19     48     m12     m11  15.6541  2.9333  5.0989
+99          2008-19     48     m13      m8  23.9372  3.9863  6.7384
+100            2020      4     m13     m11  23.0026 23.9373 10.1174
+101            2020      4     m12     m11  -9.4090  7.2426  4.4229
+102            2020      4     m13      m8  48.8809 31.3475 13.1193
+103         2021-22      8     m13     m11  -3.6663  3.4933  2.6302
+104         2021-22      8     m12     m11 -15.9363  8.2093  5.8464
+105         2021-22      8     m13      m8   5.7914  3.1814  1.2698
+106         2023-26     14     m13     m11  23.0339  1.3863  2.3229
+107         2023-26     14     m12     m11  16.6676  1.2375  1.9914
+108         2023-26     14     m13      m8  25.3825  1.5694  2.7370
+109        pre-2020    120     m13     m11  38.1778  6.4055  8.5058
+110        pre-2020    120     m12     m11  31.8209  5.6014  6.6267
+111        pre-2020    120     m13      m8  39.7285  5.5810  8.6517
+112         2020 on     26     m13     m11  42.3702 23.8080 18.4956
+113         2020 on     26     m12     m11  -8.6777 13.3184 24.3636
+114         2020 on     26     m13      m8  80.0548 34.5712 37.0598
+115 all excl. COVID    142     m13     m11  57.3950  9.0868 16.3121
+116 all excl. COVID    142     m12     m11  34.7580 11.7627 18.3269
+117 all excl. COVID    142     m13      m8  70.3297  8.4785 17.1537
+           target
+1   group 1 joint
+2   group 1 joint
+3   group 1 joint
+4   group 1 joint
+5   group 1 joint
+6   group 1 joint
+7   group 1 joint
+8   group 1 joint
+9   group 1 joint
+10  group 1 joint
+11  group 1 joint
+12  group 1 joint
+13  group 1 joint
+14  group 1 joint
+15  group 1 joint
+16  group 1 joint
+17  group 1 joint
+18  group 1 joint
+19  group 1 joint
+20  group 1 joint
+21  group 1 joint
+22  group 1 joint
+23  group 1 joint
+24  group 1 joint
+25  group 1 joint
+26  group 1 joint
+27  group 1 joint
+28  group 1 joint
+29  group 1 joint
+30  group 1 joint
+31  group 1 joint
+32  group 1 joint
+33  group 1 joint
+34  group 1 joint
+35  group 1 joint
+36  group 1 joint
+37  group 1 joint
+38  group 1 joint
+39  group 1 joint
+40  group 1 joint
+41  group 1 joint
+42  group 1 joint
+43  group 1 joint
+44  group 1 joint
+45  group 1 joint
+46  group 1 joint
+47  group 1 joint
+48  group 1 joint
+49  group 1 joint
+50  group 1 joint
+51  group 1 joint
+52  group 1 joint
+53  group 1 joint
+54  group 1 joint
+55  group 1 joint
+56  group 1 joint
+57  group 1 joint
+58  group 1 joint
+59  group 1 joint
+60  group 1 joint
+61  group 1 joint
+62  group 1 joint
+63  group 1 joint
+64  group 1 joint
+65  group 1 joint
+66  group 1 joint
+67  group 1 joint
+68  group 1 joint
+69  group 1 joint
+70  group 1 joint
+71  group 1 joint
+72  group 1 joint
+73  group 1 joint
+74  group 1 joint
+75  group 1 joint
+76  group 1 joint
+77  group 1 joint
+78  group 1 joint
+79  group 1 joint
+80  group 1 joint
+81  group 1 joint
+82  group 1 joint
+83  group 1 joint
+84  group 1 joint
+85  group 1 joint
+86  group 1 joint
+87  group 1 joint
+88  group 1 joint
+89  group 1 joint
+90  group 1 joint
+91       GDP-only
+92       GDP-only
+93       GDP-only
+94       GDP-only
+95       GDP-only
+96       GDP-only
+97       GDP-only
+98       GDP-only
+99       GDP-only
+100      GDP-only
+101      GDP-only
+102      GDP-only
+103      GDP-only
+104      GDP-only
+105      GDP-only
+106      GDP-only
+107      GDP-only
+108      GDP-only
+109      GDP-only
+110      GDP-only
+111      GDP-only
+112      GDP-only
+113      GDP-only
+114      GDP-only
+115      GDP-only
+116      GDP-only
+117      GDP-only
+
+=== Pairwise differences (a - b), selected ===
+                                    comparison model_a model_b n_pred elpd_diff
+1  GDP-only target, common window (all groups)     m13      m7    146    80.925
+2  GDP-only target, common window (all groups)      m5      m6    146    22.185
+3  GDP-only target, common window (all groups)      m5      m2    146    20.413
+4  GDP-only target, common window (all groups)      m5      m3    146    24.112
+5  GDP-only target, common window (all groups)     m12      m1    146    52.494
+6  GDP-only target, common window (all groups)      m9      m2    146    37.089
+7  GDP-only target, common window (all groups)      m9      m6    146    38.860
+8  GDP-only target, common window (all groups)     m12      m2    146    57.690
+9  GDP-only target, common window (all groups)      m9      m3    146    40.788
+10 GDP-only target, common window (all groups)     m12      m6    146    59.461
+11 GDP-only target, common window (all groups)     m12      m3    146    61.389
+12 GDP-only target, common window (all groups)      m5      m8    146    25.102
+13 GDP-only target, common window (all groups)     m13      m1    146   109.899
+14 GDP-only target, common window (all groups)      m9      m1    146    31.892
+15 GDP-only target, common window (all groups)     m13      m2    146   115.095
+16 GDP-only target, common window (all groups)     m13      m6    146   116.866
+17 GDP-only target, common window (all groups)     m12      m8    146    62.379
+18 GDP-only target, common window (all groups)      m9      m8    146    41.777
+19 GDP-only target, common window (all groups)     m13      m8    146   119.783
+20 GDP-only target, common window (all groups)     m13      m3    146   118.794
+21 GDP-only target, common window (all groups)     m13     m11    146    80.548
+22 GDP-only target, common window (all groups)     m13      m5    146    94.682
+23 GDP-only target, common window (all groups)     m12      m5    146    37.277
+24 GDP-only target, common window (all groups)     m11      m1    146    29.351
+25 GDP-only target, common window (all groups)     m12      m9    146    20.601
+26 GDP-only target, common window (all groups)     m13      m9    146    78.006
+27 GDP-only target, common window (all groups)     m11      m6    146    36.318
+28 GDP-only target, common window (all groups)     m11      m2    146    34.547
+29 GDP-only target, common window (all groups)     m11      m3    146    38.246
+30 GDP-only target, common window (all groups)     m11      m8    146    39.235
+31 GDP-only target, common window (all groups)     m13     m12    146    57.405
+32 GDP-only target, common window (all groups)      m2      m6    146     1.771
+33 GDP-only target, common window (all groups)      m9      m5    146    16.675
+34 GDP-only target, common window (all groups)      m5      m1    146    15.217
+35 GDP-only target, common window (all groups)     m12     m11    146    23.143
+36 GDP-only target, common window (all groups)      m2      m3    146     3.699
+37 GDP-only target, common window (all groups)      m7      m8    146    38.858
+38 GDP-only target, common window (all groups)      m7      m6    146    35.941
+39 GDP-only target, common window (all groups)      m7      m3    146    37.868
+40 GDP-only target, common window (all groups)     m11      m5    146    14.134
+41 GDP-only target, common window (all groups)      m7      m2    146    34.170
+42 GDP-only target, common window (all groups)      m2      m8    146     4.688
+43 GDP-only target, common window (all groups)      m1      m3    146     8.895
+44 GDP-only target, common window (all groups)      m7      m1    146    28.973
+45 GDP-only target, common window (all groups)     m12      m7    146    23.520
+46 GDP-only target, common window (all groups)      m1      m8    146     9.885
+47 GDP-only target, common window (all groups)      m1      m6    146     6.968
+48 GDP-only target, common window (all groups)      m6      m8    146     2.917
+49 GDP-only target, common window (all groups)      m6      m3    146     1.928
+50 GDP-only target, common window (all groups)      m1      m2    146     5.196
+51 GDP-only target, common window (all groups)      m7      m5    146    13.756
+52 GDP-only target, common window (all groups)      m3      m8    146     0.990
+53 GDP-only target, common window (all groups)      m9     m11    146     2.542
+54 GDP-only target, common window (all groups)      m9      m7    146     2.919
+55 GDP-only target, common window (all groups)     m11      m7    146     0.377
+56                             group 1 (joint)     m13      m7    146    80.925
+57                             group 1 (joint)      m5      m6    146    22.185
+58                             group 1 (joint)      m5      m2    146    20.413
+59                             group 1 (joint)      m5      m3    146    24.112
+60                             group 1 (joint)     m12      m1    146    52.494
+61                             group 1 (joint)      m9      m2    146    37.089
+62                             group 1 (joint)      m9      m6    146    38.860
+63                             group 1 (joint)     m12      m2    146    57.690
+64                             group 1 (joint)      m9      m3    146    40.788
+65                             group 1 (joint)     m12      m6    146    59.461
+66                             group 1 (joint)     m12      m3    146    61.389
+67                             group 1 (joint)     m13      m1    146   109.899
+68                             group 1 (joint)      m9      m1    146    31.892
+69                             group 1 (joint)     m13      m2    146   115.095
+70                             group 1 (joint)     m13      m6    146   116.866
+71                             group 1 (joint)     m13      m3    146   118.794
+72                             group 1 (joint)     m13      m5    146    94.682
+73                             group 1 (joint)     m12      m5    146    37.277
+74                             group 1 (joint)     m12      m9    146    20.601
+75                             group 1 (joint)     m13      m9    146    78.006
+76                             group 1 (joint)     m13     m12    146    57.405
+77                             group 1 (joint)      m2      m6    146     1.771
+78                             group 1 (joint)      m9      m5    146    16.675
+79                             group 1 (joint)      m5      m1    146    15.217
+80                             group 1 (joint)      m2      m3    146     3.699
+81                             group 1 (joint)      m7      m6    146    35.941
+82                             group 1 (joint)      m7      m3    146    37.868
+83                             group 1 (joint)      m7      m2    146    34.170
+84                             group 1 (joint)      m1      m3    146     8.895
+85                             group 1 (joint)      m7      m1    146    28.973
+86                             group 1 (joint)     m12      m7    146    23.520
+87                             group 1 (joint)      m1      m6    146     6.968
+88                             group 1 (joint)      m6      m3    146     1.928
+89                             group 1 (joint)      m1      m2    146     5.196
+90                             group 1 (joint)      m7      m5    146    13.756
+91                             group 1 (joint)      m9      m7    146     2.919
+   se_diff      z se_diff_nw   z_nw lag1_acf mcse_diff
+1   12.161 6.6542      19.05 4.2484  0.29247     0.022
+2    3.842 5.7747       2.32 9.5820 -0.36794     0.000
+3    3.646 5.5995       2.17 9.3992 -0.40858     0.000
+4    4.311 5.5937       3.03 7.9563 -0.17880     0.000
+5   10.813 4.8546      16.11 3.2584  0.34266     0.749
+6    9.175 4.0424      14.95 2.4803  0.47961     0.603
+7    9.664 4.0210      15.08 2.5769  0.45540     0.603
+8   14.517 3.9740      15.52 3.7166  0.18669     0.749
+9   10.274 3.9701      15.40 2.6480  0.49206     0.603
+10  15.125 3.9315      15.88 3.7452  0.19114     0.749
+11  15.780 3.8902      16.51 3.7174  0.25800     0.749
+12   6.663 3.7675       6.13 4.0931 -0.06045     0.000
+13  31.817 3.4541      35.68 3.0800 -0.00224     0.022
+14   9.363 3.4064      17.72 1.7994  0.49218     0.603
+15  33.794 3.4058      42.86 2.6852  0.24333     0.022
+16  34.316 3.4056      43.65 2.6771  0.25606     0.022
+17  18.363 3.3971      18.18 3.4310  0.17829     0.749
+18  12.510 3.3395      16.32 2.5602  0.34032     0.603
+19  36.752 3.2592      48.31 2.4793  0.32911     0.022
+20  36.471 3.2572      45.04 2.6375  0.21435     0.022
+21  25.035 3.2174      24.64 3.2684 -0.00159     0.022
+22  33.803 2.8010      42.94 2.2049  0.22945     0.022
+23  13.326 2.7973      15.07 2.4730  0.30052     0.749
+24  10.622 2.7632      16.20 1.8113  0.18314     0.000
+25   7.907 2.6055       5.55 3.7153 -0.01330     0.961
+26  30.610 2.5484      40.43 1.9296  0.14294     0.603
+27  14.956 2.4283      24.46 1.4847  0.52752     0.000
+28  14.324 2.4119      23.68 1.4590  0.53033     0.000
+29  16.008 2.3892      25.75 1.4851  0.50538     0.000
+30  18.284 2.1458      29.28 1.3402  0.52578     0.000
+31  27.234 2.1079      36.61 1.5679  0.00528     0.749
+32   0.892 1.9859       1.01 1.7575  0.30950     0.000
+33   9.314 1.7903      14.73 1.1320  0.45793     0.603
+34   8.552 1.7793       9.15 1.6628  0.08588     0.000
+35  14.518 1.5941      26.35 0.8783  0.42611     0.749
+36   3.102 1.1923       2.62 1.4119 -0.10934     0.000
+37  37.424 1.0383      40.57 0.9577  0.27474     0.000
+38  35.309 1.0179      36.03 0.9976  0.19879     0.000
+39  37.639 1.0061      37.57 1.0079  0.16130     0.000
+40  14.370 0.9835      24.07 0.5872  0.52783     0.000
+41  34.814 0.9815      35.17 0.9715  0.18515     0.000
+42   4.912 0.9545       6.00 0.7818  0.27070     0.000
+43   9.351 0.9512      10.86 0.8193  0.26911     0.000
+44  33.837 0.8563      28.39 1.0205 -0.04470     0.000
+45  29.016 0.8106      31.36 0.7500 -0.07431     0.749
+46  13.674 0.7229      14.65 0.6747  0.10179     0.000
+47   9.663 0.7210       9.61 0.7252  0.02939     0.000
+48   4.249 0.6866       5.22 0.5590  0.24562     0.000
+49   2.870 0.6716       1.82 1.0604 -0.31686     0.000
+50   9.010 0.5768       8.83 0.5888 -0.00123     0.000
+51  35.236 0.3904      35.45 0.3881  0.15840     0.000
+52   5.306 0.1865       4.19 0.2361 -0.24700     0.000
+53  14.828 0.1714      29.03 0.0876  0.60356     0.603
+54  31.865 0.0916      35.60 0.0820  0.08470     0.603
+55  28.817 0.0131      21.70 0.0174  0.00435     0.000
+56  12.161 6.6542      19.05 4.2484  0.29247     0.022
+57   3.842 5.7747       2.32 9.5820 -0.36794     0.000
+58   3.646 5.5995       2.17 9.3992 -0.40858     0.000
+59   4.311 5.5937       3.03 7.9563 -0.17880     0.000
+60  10.813 4.8546      16.11 3.2584  0.34266     0.749
+61   9.175 4.0424      14.95 2.4803  0.47961     0.603
+62   9.664 4.0210      15.08 2.5769  0.45540     0.603
+63  14.517 3.9740      15.52 3.7166  0.18669     0.749
+64  10.274 3.9701      15.40 2.6480  0.49206     0.603
+65  15.125 3.9315      15.88 3.7452  0.19114     0.749
+66  15.780 3.8902      16.51 3.7174  0.25800     0.749
+67  31.817 3.4541      35.68 3.0800 -0.00224     0.022
+68   9.363 3.4064      17.72 1.7994  0.49218     0.603
+69  33.794 3.4058      42.86 2.6852  0.24333     0.022
+70  34.316 3.4056      43.65 2.6771  0.25606     0.022
+71  36.471 3.2572      45.04 2.6375  0.21435     0.022
+72  33.803 2.8010      42.94 2.2049  0.22945     0.022
+73  13.326 2.7973      15.07 2.4730  0.30052     0.749
+74   7.907 2.6055       5.55 3.7153 -0.01330     0.961
+75  30.610 2.5484      40.43 1.9296  0.14294     0.603
+76  27.234 2.1079      36.61 1.5679  0.00528     0.749
+77   0.892 1.9859       1.01 1.7575  0.30950     0.000
+78   9.314 1.7903      14.73 1.1320  0.45793     0.603
+79   8.552 1.7793       9.15 1.6628  0.08588     0.000
+80   3.102 1.1923       2.62 1.4119 -0.10934     0.000
+81  35.309 1.0179      36.03 0.9976  0.19879     0.000
+82  37.639 1.0061      37.57 1.0079  0.16130     0.000
+83  34.814 0.9815      35.17 0.9715  0.18515     0.000
+84   9.351 0.9512      10.86 0.8193  0.26911     0.000
+85  33.837 0.8563      28.39 1.0205 -0.04470     0.000
+86  29.016 0.8106      31.36 0.7500 -0.07431     0.749
+87   9.663 0.7210       9.61 0.7252  0.02939     0.000
+88   2.870 0.6716       1.82 1.0604 -0.31686     0.000
+89   9.010 0.5768       8.83 0.5888 -0.00123     0.000
+90  35.236 0.3904      35.45 0.3881  0.15840     0.000
+91  31.865 0.0916      35.60 0.0820  0.08470     0.603
+
+=== Bounds actually hit ===
+m1: 5 fits (initial + 4 refits, cap 12); 0 high-k steps used without refit 
+m2: 6 fits (initial + 5 refits, cap 12); 0 high-k steps used without refit 
+m3: 6 fits (initial + 5 refits, cap 12); 0 high-k steps used without refit 
+m5: 6 fits (initial + 5 refits, cap 12); 0 high-k steps used without refit 
+m6: 5 fits (initial + 4 refits, cap 12); 0 high-k steps used without refit 
+m7: 7 fits (initial + 6 refits, cap 12); 0 high-k steps used without refit 
+m9: 7 fits (initial + 6 refits, cap 12); 0 high-k steps used without refit 
+m8: 6 fits (initial + 5 refits, cap 12); 0 high-k steps used without refit 
+m11: 8 fits (initial + 7 refits, cap 12); 0 high-k steps used without refit 
+m12: 7 fits (initial + 6 refits, cap 12); 0 high-k steps used without refit 
+m13: 8 fits (initial + 7 refits, cap 12); 0 high-k steps used without refit 
+
+=== Same 146 targets: full sample vs 1980-03-01 sample (a - b) ===
+   model_a model_b        target diff_full se_nw_full diff_sample se_nw_sample
+1       m9      m5 group 1 joint    46.595     19.664       16.68        14.73
+2      m12      m5 group 1 joint    63.367     20.706       37.28        15.07
+3       m5      m2 group 1 joint    27.413      1.951       20.41         2.17
+4      m12      m9 group 1 joint    16.772      6.124       20.60         5.55
+5      m13     m12 group 1 joint    59.646     28.889       57.40        36.61
+6       m6      m2 group 1 joint     0.662      0.380       -1.77         1.01
+7       m3      m2 group 1 joint     0.318      0.776       -3.70         2.62
+8      m13     m11      GDP-only    67.536     18.419       80.55        24.64
+9      m12     m11      GDP-only     7.890     27.049       23.14        26.35
+10     m13      m8      GDP-only   114.863     44.915      119.78        48.31
+11     m13      m9 group 1 joint    76.418     24.777       78.01        40.43
+12     m13      m5 group 1 joint   123.013     25.715       94.68        42.94
+13     m13      m7 group 1 joint   131.713     20.745       80.93        19.05
+14      m7      m1 group 1 joint    18.125     16.710       28.97        28.39
+   z_nw_full z_nw_sample change se_nw_change
+1      2.370       1.132 -29.92        14.34
+2      3.060       2.473 -26.09        20.54
+3     14.049       9.399  -7.00         1.01
+4      2.739       3.715   3.83         8.82
+5      2.065       1.568  -2.24        11.11
+6      1.744      -1.757  -2.43         1.24
+7      0.410      -1.412  -4.02         2.24
+8      3.667       3.268  13.01        13.45
+9      0.292       0.878  15.25        12.20
+10     2.557       2.479   4.92         5.53
+11     3.084       1.930   1.59        18.15
+12     4.784       2.205 -28.33        25.79
+13     6.349       4.248 -50.79        13.26
+14     1.085       1.020  10.85        12.55
+   model group        target elpd_full elpd_sample   change se_iid_change
+1     m1     1 group 1 joint   -1195.7     -1149.4 46.26491       16.6555
+2     m2     1 group 1 joint   -1196.2     -1154.6 41.65653       19.7705
+3     m3     1 group 1 joint   -1195.9     -1158.3 37.63976       22.2358
+4     m5     1 group 1 joint   -1168.8     -1134.2 34.65723       19.7331
+5     m6     1 group 1 joint   -1195.6     -1156.4 39.22294       20.5848
+6     m7     1 group 1 joint   -1177.5     -1120.4 57.11307        8.9727
+7     m9     1 group 1 joint   -1122.2     -1117.5  4.73764        9.3546
+8     m8     2 group 2 joint   -1542.0     -1535.0  6.93148        4.5781
+9     m8     2      GDP-only   -1160.7     -1159.3  1.40523        3.3753
+10   m11     3 group 3 joint   -2469.9     -2469.5  0.38297        3.3981
+11   m11     3      GDP-only   -1113.4     -1120.0 -6.68637       12.4970
+12   m12     1 group 1 joint   -1105.5     -1096.9  8.56675        6.6202
+13   m13     1 group 1 joint   -1045.8     -1039.5  6.32574        4.6288
+   se_nw_change rank_gdp_full rank_gdp_sample
+1       18.1631             9               7
+2       25.2734            11               8
+3       27.2022            10              10
+4       24.9733             6               6
+5       26.3699             8               9
+6       12.8156             7               5
+7       18.0229             4               3
+8        2.6044            NA              NA
+9        3.8451             5              11
+10       3.4237            NA              NA
+11      12.2737             3               4
+12      11.3458             2               2
+13       3.7432             1               1
+2026-10-19 01:32:46  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp

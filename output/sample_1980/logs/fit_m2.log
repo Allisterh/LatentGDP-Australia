@@ -1,0 +1,65 @@
+sample start 1980-03-01; output root output/sample_1980 
+
+===== m2 (T = 186) =====
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 2 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 3 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 4 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 1 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 2 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 3 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 4 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 1 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 1 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 2 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 3 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 3 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 4 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 2 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 3 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 4 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 1 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 1 finished in 2.6 seconds.
+Chain 2 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 2 finished in 2.7 seconds.
+Chain 3 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 4 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 3 finished in 2.8 seconds.
+Chain 4 finished in 2.8 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 2.7 seconds.
+Total execution time: 2.9 seconds.
+
+# A tibble: 7 × 10
+  variable  mean median     sd    mad     q5   q95  rhat ess_bulk ess_tail
+  <chr>    <dbl>  <dbl>  <dbl>  <dbl>  <dbl> <dbl> <dbl>    <dbl>    <dbl>
+1 mu_bar   2.82   2.82  0.317  0.313  2.29   3.34  1.00     2815.    4102.
+2 c        2.42   2.42  0.342  0.338  1.86   2.98  1.00     2473.    4188.
+3 rho      0.142  0.142 0.0775 0.0764 0.0137 0.270 1.00     2145.    4001.
+4 tau      3.56   3.56  0.214  0.213  3.22   3.93  1.00     2749.    3693.
+5 sigma[1] 2.55   2.55  0.185  0.184  2.26   2.87  1.000    6822.    5692.
+6 sigma[2] 3.02   3.01  0.196  0.197  2.71   3.35  1.00     8975.    6243.
+7 sigma[3] 2.04   2.04  0.188  0.186  1.73   2.34  1.00     3342.    3255.
+  model   T chains draws adapt_delta max_treedepth divergences treedepth_hits
+1    m2 186      4  8000         0.8            10           0              0
+  min_ebfmi max_rhat_hyper worst_rhat_var min_ess_bulk_hyper min_ess_tail_hyper
+1 0.5432052       1.000838            tau           2144.824           3254.721
+  max_rhat_mu min_ess_bulk_mu wall_secs        fitted_at
+1    1.003271        6268.384         5 2026-10-18 07:43
+
+Diagnostics written to output/sample_1980/tables/fit_diagnostics.csv
+  model   T chains draws adapt_delta max_treedepth divergences treedepth_hits
+1    m1 186      4  8000         0.8            10           0              0
+2    m2 186      4  8000         0.8            10           0              0
+  min_ebfmi max_rhat_hyper worst_rhat_var min_ess_bulk_hyper min_ess_tail_hyper
+1 0.7612291       1.000358       sigma[1]           4140.675           4635.368
+2 0.5432052       1.000838            tau           2144.824           3254.721
+  max_rhat_mu min_ess_bulk_mu wall_secs        fitted_at
+1    1.003104       10707.695         3 2026-10-18 07:42
+2    1.003271        6268.384         5 2026-10-18 07:43

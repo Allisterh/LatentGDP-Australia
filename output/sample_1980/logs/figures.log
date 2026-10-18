@@ -1,0 +1,9 @@
+sample start 1980-03-01; output root output/sample_1980 
+Figures written to output/sample_1980/figures/:
+  01_latent_vs_headline.png  (all full-sample specs including m9, m12 and m13)
+  02_m4_sv_path.png          (m4, m9, m12 and m13 measurement-error sd paths)
+  03_m5_covid_zoom.png
+  04_m7_kappa.png
+  05_m8_4signal.png          (m8 and m10)
+  06_m11_monthly_path.png
+  07_lfo_cumulative_elpd.png (if R/03_compare.R has run)

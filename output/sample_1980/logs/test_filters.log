@@ -1,0 +1,19 @@
+Test passed with 8 successes 🎉.
+Test passed with 3 successes 🎉.
+Test passed with 4 successes 🎉.
+Test passed with 12 successes 🎉.
+
+  (vii) m9: brute force -47.1823 (se 0.0165); schedule RBPF log mean p-hat -47.2060 (se 0.0144); mean log p-hat -47.5471
+
+  (vii) m12: brute force -49.7420 (se 0.0226); schedule RBPF log mean p-hat -49.7622 (se 0.0177); mean log p-hat -50.2325
+
+  (vii) m10 (adapted proposal): brute force -61.4028 (se 0.0315); schedule RBPF log mean p-hat -61.4672 (se 0.0528); mean log p-hat -63.3035
+Test passed with 15 successes 🎊.
+Test passed with 10 successes 😀.
+
+  RBPF sd of log p-hat(y_1:T | theta) across seeds, per draw (T = 267): 0.29 0.31 0.60 0.41 0.82 0.58 0.69 0.49 0.59 0.72
+  log p(y | theta) means: m9 -2234 -2234 -2235 -2232 -2235 | m4 -2238 -2235 -2235 -2235 -2237 | m6 (Kalman) -2324 -2327 -2325 -2326 -2328
+Test passed with 2 successes 🎊.
+Test passed with 9 successes 🥳.
+
+All filter tests finished.

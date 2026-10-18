@@ -1,0 +1,6 @@
+2026-10-19 02:06:13  === particle-count check on the 2015-2019 targets: m13, m12 (4 cores)
+2026-10-19 02:16:02  [m13] pfcheck fit 1:140 (20 precovid targets, 589 s): reference N_t: base 8000 in 14 periods, raised in 146 (max 34500, in 1 periods), cost x1.38 of N=8000
+2026-10-19 02:16:02  [m13] pfcheck: sum over 2015-2019 targets: bias N=2000 -0.003, bias schedule -0.030 (vs reference)
+2026-10-19 02:18:40  [m12] pfcheck fit 1:135 (2 precovid targets, 158 s): reference N_t: base 8000 in 57 periods, raised in 85 (max 19500, in 1 periods), cost x1.14 of N=8000
+2026-10-19 02:21:49  [m12] pfcheck fit 1:142 (18 precovid targets, 189 s): reference N_t: base 8000 in 51 periods, raised in 109 (max 29500, in 1 periods), cost x1.22 of N=8000
+2026-10-19 02:21:49  [m12] pfcheck: sum over 2015-2019 targets: bias N=2000 -0.023, bias schedule -0.020 (vs reference)

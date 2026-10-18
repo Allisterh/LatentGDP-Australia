@@ -1,11 +1,26 @@
+# Fit m11 (stan/m11_mixed_freq.stan: monthly latent growth, quarterly GDP(E, I, P) and
+# monthly employment) and save it to <root>/fit_m11.rds.
+#
+#   Rscript R/fit_m11.R
+#   LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980 Rscript R/fit_m11.R
+#
+# Sample window and output root: R/sample_window.R. With LATENTGDP_START set, the monthly
+# employment series starts in the first month of the start quarter (1980-01 for
+# 1980-03-01) and the quarterly series in the start quarter, so the first quarter is
+# complete; the alignment below keeps only quarters whose three months are all present.
+# Unset = the full sample into output/, exactly as before. The diagnostics row for
+# <root>/tables/fit_diagnostics.csv: Rscript R/02_fit_models.R --diag-only m11.
+
 suppressPackageStartupMessages({
   library(cmdstanr)
   library(posterior)
   library(dplyr)
 })
 
-emp_growth <- readRDS("data/processed/employment_growth_monthly.rds")
-gdp_growth <- readRDS("data/processed/gdp_growth.rds")
+source("R/sample_window.R")
+cat(sw_describe(), "\n")
+emp_growth <- sw_trim_m(readRDS("data/processed/employment_growth_monthly.rds"))
+gdp_growth <- sw_trim_q(readRDS("data/processed/gdp_growth.rds"))
 
 # Align samples. Quarterly GDP date convention: first day of last month of quarter.
 # Monthly employment: first day of month. We need each quarter's 3 months to be
@@ -41,7 +56,8 @@ fit <- mod$sample(
   iter_warmup = 2000, iter_sampling = 2000, seed = 1, refresh = 1000,
   adapt_delta = 0.99, max_treedepth = 12
 )
-fit$save_object("output/fit_m11.rds")
+dir.create(sw_out_root(), showWarnings = FALSE, recursive = TRUE)
+fit$save_object(sw_out("fit_m11.rds"))
 
 print(fit$summary(variables = c(
   "mu_bar_m", "c", "rho", "tau", "sigma_q",

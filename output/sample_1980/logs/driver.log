@@ -1,0 +1,52 @@
+2026-10-18 07:42:43 start fit_m1
+2026-10-18 07:42:52 end fit_m1 (exit 0)
+2026-10-18 07:42:52 start fit_m2
+2026-10-18 07:43:03 end fit_m2 (exit 0)
+2026-10-18 07:43:03 start fit_m5
+2026-10-18 07:43:37 end fit_m5 (exit 0)
+2026-10-18 07:43:37 start fit_m6
+2026-10-18 07:44:36 end fit_m6 (exit 0)
+2026-10-18 07:44:36 start fit_m7
+2026-10-18 07:44:59 end fit_m7 (exit 0)
+2026-10-18 07:44:59 start fit_m8
+2026-10-18 07:45:17 end fit_m8 (exit 0)
+2026-10-18 07:45:17 start fit_m3
+2026-10-18 07:45:52 end fit_m3 (exit 0)
+2026-10-18 07:45:52 start m13_seed1
+2026-10-18 08:03:41 end m13_seed1 (exit 0)
+2026-10-18 08:03:41 start m13_seed2
+2026-10-18 08:17:32 end m13_seed2 (exit 0)
+2026-10-18 08:17:32 diag m13
+2026-10-18 08:17:35 end diag m13 (exit 0)
+2026-10-18 08:17:35 start fit_m4
+2026-10-18 08:20:08 end fit_m4 (exit 0)
+2026-10-18 08:20:08 start fit_m9
+2026-10-18 08:23:35 end fit_m9 (exit 0)
+2026-10-18 08:23:35 start fit_m10
+output/sample_1980/run_1980.sh: line 19: 63317 Terminated: 15          Rscript R/02_fit_models.R $m > $L/fit_$m.log 2>&1
+2026-10-18 08:27:09 end fit_m10 (exit 143)
+2026-10-18 08:27:09 start fit_m12
+2026-10-18 20:37:03 skip fit_m1 (fit + row exist)
+2026-10-18 20:37:03 skip fit_m2 (fit + row exist)
+2026-10-18 20:37:03 skip fit_m5 (fit + row exist)
+2026-10-18 20:37:03 skip fit_m6 (fit + row exist)
+2026-10-18 20:37:03 skip fit_m7 (fit + row exist)
+2026-10-18 20:37:03 skip fit_m8 (fit + row exist)
+2026-10-18 20:37:03 skip fit_m3 (fit + row exist)
+2026-10-18 20:37:03 skip m13_seed1 (output/sample_1980/fit_m13_gate.rds exists)
+2026-10-18 20:37:03 skip m13_seed2 (output/sample_1980/fit_m13_seed2_gate.rds exists)
+2026-10-18 20:37:03 skip fit_m4 (fit + row exist)
+2026-10-18 20:37:03 skip fit_m9 (fit + row exist)
+2026-10-18 20:37:03 start fit_m10
+2026-10-18 20:42:21 end fit_m10 (exit 0)
+2026-10-18 20:42:21 start fit_m12
+2026-10-18 20:53:03 end fit_m12 (exit 0)
+2026-10-18 20:53:03 start fit_m11
+2026-10-18 20:54:13 end fit_m11 (exit 0)
+2026-10-18 20:54:13 diag m11
+2026-10-18 20:54:16 end diag m11 (exit 0)
+2026-10-18 20:54:16 vardecomp
+2026-10-18 20:54:34 end vardecomp (exit 0)
+2026-10-18 20:54:34 figures
+2026-10-18 20:54:58 end figures (exit 0)
+2026-10-18 20:54:58 DRIVER DONE

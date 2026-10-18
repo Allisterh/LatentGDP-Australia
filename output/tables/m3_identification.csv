@@ -1,0 +1,33 @@
+"check","value"
+"v = tau^2/(1-rho^2): posterior mean",16.6306331424733
+"v: posterior sd",2.91880658135553
+"cor(v, Sigma[1,1])",-0.558483940538066
+"sd(v + Sigma[1,1]) / sd(Sigma[1,1])",0.890890014858738
+"cor(v, Sigma[2,2])",-0.65813721676706
+"sd(v + Sigma[2,2]) / sd(Sigma[2,2])",0.868928596512129
+"cor(v, Sigma[3,3])",-0.740927546161687
+"sd(v + Sigma[3,3]) / sd(Sigma[3,3])",0.79437823096664
+"cor(v, Sigma[2,1])",-0.696093372474087
+"sd(v + Sigma[2,1]) / sd(Sigma[2,1])",0.846758386465051
+"cor(v, Sigma[3,1])",-0.736697438107582
+"sd(v + Sigma[3,1]) / sd(Sigma[3,1])",0.810892242429147
+"cor(v, Sigma[3,2])",-0.781239735756917
+"sd(v + Sigma[3,2]) / sd(Sigma[3,2])",0.805854906122892
+"rho * v (lag-1 autocovariance): posterior mean",0.972988142080633
+"rho * v: posterior sd",1.19769638237228
+"cor(tau, mean off-diagonal Omega)",-0.70312935511895
+"Omega[2,1]: mean in lowest-tau decile",0.290422544458163
+"Omega[2,1]: mean in highest-tau decile",-0.0166996782905837
+"Omega[3,1]: mean in lowest-tau decile",0.31039390486475
+"Omega[3,1]: mean in highest-tau decile",-0.09067348907931
+"Omega[3,2]: mean in lowest-tau decile",0.212379682385237
+"Omega[3,2]: mean in highest-tau decile",-0.432765335971875
+"tau: mean in lowest-tau decile",3.1577440464875
+"tau: mean in highest-tau decile",4.547085772
+"prior sd of an Omega off-diagonal under LKJ(4)",0.316227766016838
+"Omega[2,1]: posterior sd / prior sd",0.46423671714693
+"Omega[3,1]: posterior sd / prior sd",0.56868033380083
+"Omega[3,2]: posterior sd / prior sd",0.82637288289667
+"variance ratio: 5% quantile",0.593250431730718
+"variance ratio: median",0.830970198445123
+"variance ratio: 95% quantile",0.924285242458635
