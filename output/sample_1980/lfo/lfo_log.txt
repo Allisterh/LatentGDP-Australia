@@ -1,0 +1,322 @@
+2026-10-18 21:16:07  === PSIS-LFO run (m1; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:16:07  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:16:07  [m1] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:16:09  [m1] fit on periods 1:40 (to 1989-12-01): 4000 draws, 2 s; divergences=0 min_ebfmi=0.7927 max_rhat=1.002 min_ess_bulk=972.8 worst_rhat=mu_bar seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:16:11  [m1] fit on periods 1:83 (to 2000-09-01): 4000 draws, 2 s; divergences=0 min_ebfmi=0.784 max_rhat=1.001 min_ess_bulk=2071 worst_rhat=sigma[1] seed=10083 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:16:13  [m1] fit on periods 1:129 (to 2012-03-01): 4000 draws, 2 s; divergences=0 min_ebfmi=0.8156 max_rhat=1.003 min_ess_bulk=3118 worst_rhat=tau seed=10129 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:16:16  [m1] fit on periods 1:156 (to 2018-12-01): 4000 draws, 2 s; divergences=0 min_ebfmi=0.8543 max_rhat=1.001 min_ess_bulk=2596 worst_rhat=sigma[2] seed=10156 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:16:19  [m1] fit on periods 1:162 (to 2020-06-01): 4000 draws, 2 s; divergences=0 min_ebfmi=0.7937 max_rhat=1.004 min_ess_bulk=2113 worst_rhat=sigma[1] seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:16:19  [m1] done: elpd_lfo = -1149.40 over 146 predictions, 4 refits, 0 high-k steps used
+2026-10-18 21:16:35  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:17:08  === PSIS-LFO run (m1; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:17:08  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:17:08  [m1] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:17:08  [m1] complete checkpoint found, skipping
+2026-10-18 21:17:08  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:17:16  === PSIS-LFO run (m2; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:17:16  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:17:16  [m2] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:17:18  [m2] fit on periods 1:40 (to 1989-12-01): 4000 draws, 2 s; divergences=17 min_ebfmi=0.5424 max_rhat=1.004 min_ess_bulk=1203 worst_rhat=rho seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:17:21  [m2] fit on periods 1:84 (to 2000-12-01): 4000 draws, 2 s; divergences=1 min_ebfmi=0.5487 max_rhat=1.005 min_ess_bulk=1180 worst_rhat=c seed=10084 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:17:24  [m2] fit on periods 1:115 (to 2008-09-01): 4000 draws, 3 s; divergences=0 min_ebfmi=0.5066 max_rhat=1.004 min_ess_bulk=1188 worst_rhat=tau seed=10115 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:17:28  [m2] fit on periods 1:144 (to 2015-12-01): 4000 draws, 3 s; divergences=0 min_ebfmi=0.4854 max_rhat=1.005 min_ess_bulk=1160 worst_rhat=rho seed=10144 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:17:33  [m2] fit on periods 1:162 (to 2020-06-01): 4000 draws, 4 s; divergences=0 min_ebfmi=0.5235 max_rhat=1.011 min_ess_bulk=533.4 worst_rhat=rho seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:17:37  [m2] fit on periods 1:163 (to 2020-09-01): 4000 draws, 4 s; divergences=0 min_ebfmi=0.5192 max_rhat=1.004 min_ess_bulk=1174 worst_rhat=c seed=10163 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:17:37  [m2] done: elpd_lfo = -1154.59 over 146 predictions, 5 refits, 0 high-k steps used
+2026-10-18 21:17:38  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:17:47  === PSIS-LFO run (m3; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:17:47  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:17:47  [m3] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:17:50  [m3] fit on periods 1:40 (to 1989-12-01): 4000 draws, 4 s; divergences=0 min_ebfmi=0.9293 max_rhat=1.002 min_ess_bulk=1872 worst_rhat=Omega[3,2] seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:17:57  [m3] fit on periods 1:82 (to 2000-06-01): 4000 draws, 6 s; divergences=0 min_ebfmi=0.9467 max_rhat=1.003 min_ess_bulk=1404 worst_rhat=Omega[2,1] seed=10082 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:18:06  [m3] fit on periods 1:127 (to 2011-09-01): 4000 draws, 9 s; divergences=0 min_ebfmi=0.9225 max_rhat=1.004 min_ess_bulk=1166 worst_rhat=Omega[3,2] seed=10127 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:18:19  [m3] fit on periods 1:159 (to 2019-09-01): 4000 draws, 13 s; divergences=0 min_ebfmi=0.9129 max_rhat=1.004 min_ess_bulk=871 worst_rhat=c seed=10159 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:18:33  [m3] fit on periods 1:162 (to 2020-06-01): 4000 draws, 13 s; divergences=0 min_ebfmi=0.8674 max_rhat=1.009 min_ess_bulk=1115 worst_rhat=tau seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:18:47  [m3] fit on periods 1:163 (to 2020-09-01): 4000 draws, 14 s; divergences=0 min_ebfmi=0.9109 max_rhat=1.002 min_ess_bulk=902.4 worst_rhat=Omega[3,1] seed=10163 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:18:48  [m3] done: elpd_lfo = -1158.29 over 146 predictions, 5 refits, 0 high-k steps used
+2026-10-18 21:18:48  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:18:57  === PSIS-LFO run (m5; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:18:57  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:18:57  [m5] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:19:04  [m5] fit on periods 1:40 (to 1989-12-01): 4000 draws, 7 s; divergences=0 min_ebfmi=0.5248 max_rhat=1.003 min_ess_bulk=1165 worst_rhat=c seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:19:15  [m5] fit on periods 1:70 (to 1997-06-01): 4000 draws, 11 s; divergences=0 min_ebfmi=0.5849 max_rhat=1.003 min_ess_bulk=1194 worst_rhat=tau seed=10070 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:19:32  [m5] fit on periods 1:110 (to 2007-06-01): 4000 draws, 16 s; divergences=0 min_ebfmi=0.5393 max_rhat=1.005 min_ess_bulk=972.2 worst_rhat=tau seed=10110 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:19:51  [m5] fit on periods 1:141 (to 2015-03-01): 4000 draws, 18 s; divergences=0 min_ebfmi=0.5913 max_rhat=1.005 min_ess_bulk=974.1 worst_rhat=psi[2] seed=10141 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:20:15  [m5] fit on periods 1:162 (to 2020-06-01): 4000 draws, 24 s; divergences=0 min_ebfmi=0.5373 max_rhat=1.003 min_ess_bulk=740.6 worst_rhat=rho seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:20:33  [m5] fit on periods 1:163 (to 2020-09-01): 4000 draws, 17 s; divergences=0 min_ebfmi=0.5076 max_rhat=1.009 min_ess_bulk=679.5 worst_rhat=rho seed=10163 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:20:33  [m5] done: elpd_lfo = -1134.18 over 146 predictions, 5 refits, 0 high-k steps used
+2026-10-18 21:20:33  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:20:45  === PSIS-LFO run (m6; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:20:45  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:20:45  [m6] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:20:55  [m6] fit on periods 1:40 (to 1989-12-01): 4000 draws, 10 s; divergences=0 min_ebfmi=0.3959 max_rhat=1.004 min_ess_bulk=613.2 worst_rhat=rho_EI seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:21:12  [m6] fit on periods 1:85 (to 2001-03-01): 4000 draws, 16 s; divergences=0 min_ebfmi=0.5363 max_rhat=1.003 min_ess_bulk=1003 worst_rhat=sigma[2] seed=10085 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:21:41  [m6] fit on periods 1:124 (to 2010-12-01): 4000 draws, 28 s; divergences=0 min_ebfmi=0.4644 max_rhat=1.002 min_ess_bulk=1135 worst_rhat=tau seed=10124 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:22:20  [m6] fit on periods 1:162 (to 2020-06-01): 4000 draws, 39 s; divergences=0 min_ebfmi=0.418 max_rhat=1.008 min_ess_bulk=735.6 worst_rhat=sigma[3] seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:22:47  [m6] fit on periods 1:163 (to 2020-09-01): 4000 draws, 26 s; divergences=0 min_ebfmi=0.4368 max_rhat=1.015 min_ess_bulk=617 worst_rhat=rho seed=10163 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:22:47  [m6] done: elpd_lfo = -1156.36 over 146 predictions, 4 refits, 0 high-k steps used
+2026-10-18 21:22:48  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:22:56  === PSIS-LFO run (m7; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:22:56  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:22:56  [m7] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:23:01  [m7] fit on periods 1:40 (to 1989-12-01): 4000 draws, 4 s; divergences=0 min_ebfmi=0.5484 max_rhat=1.005 min_ess_bulk=1248 worst_rhat=tau seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:23:08  [m7] fit on periods 1:80 (to 1999-12-01): 4000 draws, 7 s; divergences=0 min_ebfmi=0.5745 max_rhat=1.003 min_ess_bulk=1382 worst_rhat=rho seed=10080 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:23:15  [m7] fit on periods 1:119 (to 2009-09-01): 4000 draws, 7 s; divergences=0 min_ebfmi=0.5322 max_rhat=1.005 min_ess_bulk=825.5 worst_rhat=rho seed=10119 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:23:26  [m7] fit on periods 1:149 (to 2017-03-01): 4000 draws, 10 s; divergences=0 min_ebfmi=0.5065 max_rhat=1.002 min_ess_bulk=1308 worst_rhat=tau seed=10149 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:23:37  [m7] fit on periods 1:163 (to 2020-09-01): 4000 draws, 11 s; divergences=0 min_ebfmi=0.5032 max_rhat=1.004 min_ess_bulk=741.5 worst_rhat=rho seed=10163 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:23:49  [m7] fit on periods 1:165 (to 2021-03-01): 4000 draws, 12 s; divergences=0 min_ebfmi=0.4519 max_rhat=1.004 min_ess_bulk=830.4 worst_rhat=tau seed=10165 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:24:01  [m7] fit on periods 1:168 (to 2021-12-01): 4000 draws, 11 s; divergences=0 min_ebfmi=0.5379 max_rhat=1.003 min_ess_bulk=868.1 worst_rhat=sigma[3] seed=10168 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:24:01  [m7] done: elpd_lfo = -1120.42 over 146 predictions, 6 refits, 0 high-k steps used
+2026-10-18 21:24:02  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:24:10  === PSIS-LFO run (m8; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:24:10  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:24:10  [m8] PSIS-LFO start: group 2, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:24:13  [m8] fit on periods 1:40 (to 1989-12-01): 4000 draws, 3 s; divergences=4 min_ebfmi=0.6086 max_rhat=1.002 min_ess_bulk=1114 worst_rhat=rho seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:24:18  [m8] fit on periods 1:68 (to 1996-12-01): 4000 draws, 4 s; divergences=0 min_ebfmi=0.6381 max_rhat=1.003 min_ess_bulk=1019 worst_rhat=rho seed=10068 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:24:24  [m8] fit on periods 1:101 (to 2005-03-01): 4000 draws, 5 s; divergences=0 min_ebfmi=0.5517 max_rhat=1.009 min_ess_bulk=981.2 worst_rhat=tau seed=10101 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:24:32  [m8] fit on periods 1:138 (to 2014-06-01): 4000 draws, 7 s; divergences=0 min_ebfmi=0.5337 max_rhat=1.005 min_ess_bulk=961.4 worst_rhat=sigma_gdp[3] seed=10138 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:24:43  [m8] fit on periods 1:162 (to 2020-06-01): 4000 draws, 11 s; divergences=0 min_ebfmi=0.5185 max_rhat=1.003 min_ess_bulk=608 worst_rhat=rho seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:24:51  [m8] fit on periods 1:163 (to 2020-09-01): 4000 draws, 6 s; divergences=0 min_ebfmi=0.5403 max_rhat=1.006 min_ess_bulk=670 worst_rhat=rho seed=10163 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:24:51  [m8] done: elpd_lfo = -1535.03 over 146 predictions, 5 refits, 0 high-k steps used
+2026-10-18 21:24:52  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:25:01  === PSIS-LFO run (m11; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:25:01  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:25:01  [m11] PSIS-LFO start: group 3, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:25:10  [m11] fit on periods 1:40 (to 1989-12-01): 4000 draws, 9 s; divergences=0 min_ebfmi=0.7509 max_rhat=1.004 min_ess_bulk=1437 worst_rhat=sigma_q[3] seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:25:23  [m11] fit on periods 1:63 (to 1995-09-01): 4000 draws, 12 s; divergences=1 min_ebfmi=0.7138 max_rhat=1.004 min_ess_bulk=1261 worst_rhat=rho seed=10063 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:25:40  [m11] fit on periods 1:89 (to 2002-03-01): 4000 draws, 16 s; divergences=0 min_ebfmi=0.7097 max_rhat=1.001 min_ess_bulk=1128 worst_rhat=c seed=10089 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:26:01  [m11] fit on periods 1:115 (to 2008-09-01): 4000 draws, 20 s; divergences=0 min_ebfmi=0.7829 max_rhat=1.003 min_ess_bulk=1024 worst_rhat=tau seed=10115 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:26:26  [m11] fit on periods 1:142 (to 2015-06-01): 4000 draws, 24 s; divergences=0 min_ebfmi=0.6935 max_rhat=1.003 min_ess_bulk=1184 worst_rhat=sigma_q[2] seed=10142 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:26:56  [m11] fit on periods 1:161 (to 2020-03-01): 4000 draws, 29 s; divergences=0 min_ebfmi=0.6354 max_rhat=1.002 min_ess_bulk=922.8 worst_rhat=tau seed=10161 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:27:27  [m11] fit on periods 1:162 (to 2020-06-01): 4000 draws, 30 s; divergences=0 min_ebfmi=0.5482 max_rhat=1.004 min_ess_bulk=669.7 worst_rhat=tau seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:27:57  [m11] fit on periods 1:163 (to 2020-09-01): 4000 draws, 28 s; divergences=0 min_ebfmi=0.4423 max_rhat=1.009 min_ess_bulk=898.8 worst_rhat=rho seed=10163 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:27:58  [m11] done: elpd_lfo = -2469.50 over 146 predictions, 7 refits, 0 high-k steps used
+2026-10-18 21:27:58  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:28:07  === PSIS-LFO run (m13; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 21:28:07  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 21:28:07  [m13] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 21:28:36  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 21:28:47  [m13] fit 1:40 particle schedule (pilot 200 draws, N=2000, 11 s): N_t: base 2000 in 180 periods, raised in 6 (max 100000, in 1 periods), cost x1.34 of N=2000
+2026-10-18 21:31:40  [m13] fit on periods 1:40 (to 1989-12-01): 2000 draws, 212 s; divergences=0 min_ebfmi=0.8684 max_rhat=1.003 min_ess_bulk=1276 worst_rhat=omega[2] seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:33:25  [m13] fit 1:64 particle schedule (pilot 200 draws, N=2000, 11 s): N_t: base 2000 in 182 periods, raised in 4 (max 100000, in 2 periods), cost x1.54 of N=2000
+2026-10-18 21:36:22  [m13] fit on periods 1:64 (to 1995-12-01): 2000 draws, 282 s; divergences=0 min_ebfmi=0.921 max_rhat=1.005 min_ess_bulk=685.6 worst_rhat=phi[3] seed=10064 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:39:04  [m13] fit 1:93 particle schedule (pilot 200 draws, N=2000, 11 s): N_t: base 2000 in 180 periods, raised in 6 (max 100000, in 1 periods), cost x1.49 of N=2000
+2026-10-18 21:42:00  [m13] fit on periods 1:93 (to 2003-03-01): 2000 draws, 338 s; divergences=0 min_ebfmi=0.8846 max_rhat=1.013 min_ess_bulk=472.9 worst_rhat=phi[3] seed=10093 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:46:13  [m13] fit 1:122 particle schedule (pilot 200 draws, N=2000, 11 s): N_t: base 2000 in 177 periods, raised in 9 (max 100000, in 1 periods), cost x1.49 of N=2000
+2026-10-18 21:49:12  [m13] fit on periods 1:122 (to 2010-06-01): 2000 draws, 431 s; divergences=0 min_ebfmi=0.8883 max_rhat=1.012 min_ess_bulk=350.6 worst_rhat=phi[3] seed=10122 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 21:54:36  [m13] fit 1:140 particle schedule (pilot 200 draws, N=2000, 14 s): N_t: base 2000 in 169 periods, raised in 17 (max 100000, in 1 periods), cost x1.31 of N=2000
+2026-10-18 21:57:10  [m13] fit on periods 1:140 (to 2014-12-01): 2000 draws, 477 s; divergences=0 min_ebfmi=0.8371 max_rhat=1.007 min_ess_bulk=427.8 worst_rhat=phi[3] seed=10140 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 22:04:31  [m13] fit 1:160 particle schedule (pilot 200 draws, N=2000, 9 s): N_t: base 2000 in 168 periods, raised in 18 (max 100000, in 1 periods), cost x1.33 of N=2000
+2026-10-18 22:06:36  [m13] fit on periods 1:160 (to 2019-12-01): 2000 draws, 566 s; divergences=1 min_ebfmi=0.8578 max_rhat=1.006 min_ess_bulk=673.8 worst_rhat=phi[1] seed=10160 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 22:11:31  [m13] fit 1:162 particle schedule (pilot 200 draws, N=2000, 10 s): N_t: base 2000 in 171 periods, raised in 15 (max 100000, in 1 periods), cost x1.32 of N=2000
+2026-10-18 22:13:48  [m13] fit on periods 1:162 (to 2020-06-01): 2000 draws, 431 s; divergences=1 min_ebfmi=0.8351 max_rhat=1.008 min_ess_bulk=562.7 worst_rhat=phi[2] seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 22:20:08  [m13] fit 1:177 particle schedule (pilot 200 draws, N=2000, 10 s): N_t: base 2000 in 166 periods, raised in 20 (max 84500, in 1 periods), cost x1.30 of N=2000
+2026-10-18 22:22:22  [m13] fit on periods 1:177 (to 2024-03-01): 2000 draws, 515 s; divergences=4 min_ebfmi=0.8365 max_rhat=1.004 min_ess_bulk=582.5 worst_rhat=phi[2] seed=10177 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 22:22:23  [m13] done: elpd_lfo = -1039.45 over 146 predictions, 7 refits, 0 high-k steps used
+2026-10-18 22:40:06  [m13] filter re-run 1/3 with new seeds: elpd -1039.54 vs main pass -1039.45 (1063 s)
+2026-10-18 22:57:50  [m13] filter re-run 2/3 with new seeds: elpd -1039.52 vs main pass -1039.45 (1064 s)
+2026-10-18 23:15:34  [m13] filter re-run 3/3 with new seeds: elpd -1039.47 vs main pass -1039.45 (1064 s)
+2026-10-18 23:15:35  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 23:15:52  === PSIS-LFO run (m12; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 23:15:52  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 23:15:52  [m12] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 23:16:22  [m12] fit 1:40 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 183 periods, raised in 3 (max 81500, in 1 periods), cost x1.23 of N=2000
+2026-10-18 23:17:00  [m12] fit on periods 1:40 (to 1989-12-01): 2000 draws, 68 s; divergences=0 min_ebfmi=0.9047 max_rhat=1.003 min_ess_bulk=1212 worst_rhat=omega[3] seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:18:07  [m12] fit 1:65 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 182 periods, raised in 4 (max 100000, in 1 periods), cost x1.29 of N=2000
+2026-10-18 23:18:46  [m12] fit on periods 1:65 (to 1996-03-01): 2000 draws, 106 s; divergences=0 min_ebfmi=0.843 max_rhat=1.004 min_ess_bulk=611.6 worst_rhat=omega[2] seed=10065 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:20:23  [m12] fit 1:96 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 181 periods, raised in 5 (max 100000, in 1 periods), cost x1.27 of N=2000
+2026-10-18 23:21:03  [m12] fit on periods 1:96 (to 2003-12-01): 2000 draws, 136 s; divergences=0 min_ebfmi=0.9382 max_rhat=1.004 min_ess_bulk=702.5 worst_rhat=phi[3] seed=10096 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:23:34  [m12] fit 1:135 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 179 periods, raised in 7 (max 100000, in 1 periods), cost x1.28 of N=2000
+2026-10-18 23:24:14  [m12] fit on periods 1:135 (to 2013-09-01): 2000 draws, 191 s; divergences=1 min_ebfmi=0.9067 max_rhat=1.005 min_ess_bulk=1169 worst_rhat=phi[1] seed=10135 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:27:18  [m12] fit 1:142 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 174 periods, raised in 12 (max 100000, in 1 periods), cost x1.30 of N=2000
+2026-10-18 23:27:58  [m12] fit on periods 1:142 (to 2015-06-01): 2000 draws, 224 s; divergences=0 min_ebfmi=0.8389 max_rhat=1.013 min_ess_bulk=488.7 worst_rhat=phi[2] seed=10142 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:31:11  [m12] fit 1:162 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 163 periods, raised in 23 (max 100000, in 1 periods), cost x1.38 of N=2000
+2026-10-18 23:31:55  [m12] fit on periods 1:162 (to 2020-06-01): 2000 draws, 236 s; divergences=0 min_ebfmi=0.8075 max_rhat=1.005 min_ess_bulk=729.4 worst_rhat=phi[1] seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:36:45  [m12] fit 1:168 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 166 periods, raised in 20 (max 100000, in 1 periods), cost x1.34 of N=2000
+2026-10-18 23:37:28  [m12] fit on periods 1:168 (to 2021-12-01): 2000 draws, 333 s; divergences=0 min_ebfmi=0.7425 max_rhat=1.006 min_ess_bulk=496 worst_rhat=phi[1] seed=10168 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:37:28  [m12] done: elpd_lfo = -1095.45 over 146 predictions, 6 refits, 0 high-k steps used
+2026-10-18 23:42:13  [m12] filter re-run 1/3 with new seeds: elpd -1097.74 vs main pass -1095.45 (285 s)
+2026-10-18 23:46:59  [m12] filter re-run 2/3 with new seeds: elpd -1098.58 vs main pass -1095.45 (286 s)
+2026-10-18 23:51:45  [m12] filter re-run 3/3 with new seeds: elpd -1095.84 vs main pass -1095.45 (286 s)
+2026-10-18 23:51:45  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-18 23:52:02  === PSIS-LFO run (m9; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-18 23:52:02  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-18 23:52:02  [m9] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-18 23:52:14  [m9] fit 1:40 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 181 periods, raised in 5 (max 100000, in 1 periods), cost x1.28 of N=2000
+2026-10-18 23:52:56  [m9] fit on periods 1:40 (to 1989-12-01): 2000 draws, 53 s; divergences=0 min_ebfmi=0.9177 max_rhat=1.004 min_ess_bulk=1303 worst_rhat=phi[3] seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:53:22  [m9] fit 1:65 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 182 periods, raised in 4 (max 100000, in 1 periods), cost x1.28 of N=2000
+2026-10-18 23:54:06  [m9] fit on periods 1:65 (to 1996-03-01): 2000 draws, 70 s; divergences=0 min_ebfmi=0.9311 max_rhat=1.005 min_ess_bulk=375.8 worst_rhat=phi[3] seed=10065 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:54:45  [m9] fit 1:106 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 180 periods, raised in 6 (max 100000, in 1 periods), cost x1.28 of N=2000
+2026-10-18 23:55:29  [m9] fit on periods 1:106 (to 2006-06-01): 2000 draws, 82 s; divergences=0 min_ebfmi=0.9196 max_rhat=1.021 min_ess_bulk=160.3 worst_rhat=phi[3] seed=10106 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:56:30  [m9] fit 1:138 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 174 periods, raised in 12 (max 100000, in 1 periods), cost x1.30 of N=2000
+2026-10-18 23:57:15  [m9] fit on periods 1:138 (to 2014-06-01): 2000 draws, 106 s; divergences=1 min_ebfmi=0.8549 max_rhat=1.003 min_ess_bulk=690.4 worst_rhat=phi[2] seed=10138 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-18 23:58:23  [m9] fit 1:162 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 164 periods, raised in 22 (max 100000, in 1 periods), cost x1.39 of N=2000
+2026-10-18 23:59:12  [m9] fit on periods 1:162 (to 2020-06-01): 2000 draws, 116 s; divergences=0 min_ebfmi=0.769 max_rhat=1.007 min_ess_bulk=721 worst_rhat=phi[3] seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 00:00:23  [m9] fit 1:168 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 167 periods, raised in 19 (max 100000, in 1 periods), cost x1.34 of N=2000
+2026-10-19 00:01:11  [m9] fit on periods 1:168 (to 2021-12-01): 2000 draws, 119 s; divergences=0 min_ebfmi=0.8066 max_rhat=1.004 min_ess_bulk=762.4 worst_rhat=omega[1] seed=10168 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 00:02:29  [m9] fit 1:185 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 160 periods, raised in 26 (max 100000, in 1 periods), cost x1.39 of N=2000
+2026-10-19 00:03:19  [m9] fit on periods 1:185 (to 2026-03-01): 2000 draws, 128 s; divergences=1 min_ebfmi=0.8912 max_rhat=1.006 min_ess_bulk=939.3 worst_rhat=phi[1] seed=10185 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 00:03:19  [m9] done: elpd_lfo = -1118.38 over 146 predictions, 6 refits, 0 high-k steps used
+2026-10-19 00:08:44  [m9] filter re-run 1/3 with new seeds: elpd -1117.68 vs main pass -1118.38 (325 s)
+2026-10-19 00:14:09  [m9] filter re-run 2/3 with new seeds: elpd -1118.20 vs main pass -1118.38 (325 s)
+2026-10-19 00:19:30  [m9] filter re-run 3/3 with new seeds: elpd -1115.75 vs main pass -1118.38 (321 s)
+2026-10-19 00:19:31  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 00:19:48  === particle-count check on the COVID targets: m13, m12 (4 cores)
+2026-10-19 00:32:10  [m13] pfcheck fit 1:160 (2 covid targets, 742 s): reference N_t: base 8000 in 27 periods, raised in 135 (max 400000, in 1 periods), cost x1.75 of N=8000
+2026-10-19 00:45:43  [m13] pfcheck fit 1:162 (3 covid targets, 813 s): reference N_t: base 8000 in 25 periods, raised in 140 (max 400000, in 1 periods), cost x1.76 of N=8000
+2026-10-19 00:45:43  [m13] pfcheck: sum over COVID targets: bias N=2000 -0.028, bias schedule -0.015 (vs reference)
+2026-10-19 01:31:40  NOTE: the driver (run_lfo_1980.sh) and its R process (pfcheck m13 m12, working on m12 after 00:45:43) disappeared without an exit status before 01:31 (no END line, no error in run_pfcheck_covid.log, no jetsam/memorystatus kill in the system log). m13's pfcheck checkpoint was complete; the driver is restarted and resumes from the checkpoints.
+2026-10-19 01:31:47  === PSIS-LFO run (m1; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:31:47  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:31:47  [m1] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:31:47  [m1] complete checkpoint found, skipping
+2026-10-19 01:31:48  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:31:54  === PSIS-LFO run (m2; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:31:54  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:31:54  [m2] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:31:54  [m2] complete checkpoint found, skipping
+2026-10-19 01:31:55  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:00  === PSIS-LFO run (m3; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:00  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:00  [m3] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:00  [m3] complete checkpoint found, skipping
+2026-10-19 01:32:01  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:07  === PSIS-LFO run (m5; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:07  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:07  [m5] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:07  [m5] complete checkpoint found, skipping
+2026-10-19 01:32:07  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:13  === PSIS-LFO run (m6; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:13  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:13  [m6] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:13  [m6] complete checkpoint found, skipping
+2026-10-19 01:32:14  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:20  === PSIS-LFO run (m7; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:20  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:20  [m7] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:20  [m7] complete checkpoint found, skipping
+2026-10-19 01:32:20  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:26  === PSIS-LFO run (m8; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:26  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:26  [m8] PSIS-LFO start: group 2, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:26  [m8] complete checkpoint found, skipping
+2026-10-19 01:32:27  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:32  === PSIS-LFO run (m11; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:32  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:32  [m11] PSIS-LFO start: group 3, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:33  [m11] complete checkpoint found, skipping
+2026-10-19 01:32:33  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:39  === PSIS-LFO run (m13; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:39  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:39  [m13] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:39  [m13] complete checkpoint found, skipping
+2026-10-19 01:32:40  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:45  === PSIS-LFO run (m12; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:45  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:45  [m12] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:45  [m12] complete checkpoint found, skipping
+2026-10-19 01:32:46  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:52  === PSIS-LFO run (m9; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 01:32:52  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 01:32:52  [m9] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 01:32:52  [m9] complete checkpoint found, skipping
+2026-10-19 01:32:53  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 01:32:59  === particle-count check on the COVID targets: m13, m12 (4 cores)
+2026-10-19 01:32:59  [m13] pfcheck fit 1:160 taken from output/sample_1980/lfo/pfcheck_m13.rds
+2026-10-19 01:32:59  [m13] pfcheck fit 1:162 taken from output/sample_1980/lfo/pfcheck_m13.rds
+2026-10-19 01:32:59  [m13] pfcheck: sum over COVID targets: bias N=2000 -0.028, bias schedule -0.015 (vs reference)
+2026-10-19 01:36:33  [m12] pfcheck fit 1:142 (2 covid targets, 214 s): reference N_t: base 8000 in 49 periods, raised in 113 (max 400000, in 1 periods), cost x1.52 of N=8000
+2026-10-19 01:40:55  [m12] pfcheck fit 1:162 (3 covid targets, 263 s): reference N_t: base 8000 in 29 periods, raised in 136 (max 400000, in 1 periods), cost x1.84 of N=8000
+2026-10-19 01:40:55  [m12] pfcheck: sum over COVID targets: bias N=2000 -3.630, bias schedule -0.276 (vs reference)
+2026-10-19 01:41:02  === extra reference passes for the 2020Q2 target: m13, m12 (4 cores)
+2026-10-19 01:50:41  [m13] pfref 2020Q2 (fit 1:160) reference pass 2: elpd -20.346 at N_t 400000 (578 s)
+2026-10-19 02:00:23  [m13] pfref 2020Q2 (fit 1:160) reference pass 3: elpd -20.342 at N_t 400000 (582 s)
+2026-10-19 02:03:14  [m12] pfref 2020Q2 (fit 1:142) reference pass 2: elpd -47.434 at N_t 400000 (171 s)
+2026-10-19 02:06:06  [m12] pfref 2020Q2 (fit 1:142) reference pass 3: elpd -45.612 at N_t 400000 (172 s)
+2026-10-19 02:06:06  [m13] pfref: 2020Q2 reference mean -20.347 (se 0.003, 3 passes); schedule mean -20.371, N=2000 mean -20.373; sum over COVID targets vs reference mean: bias N=2000 -0.035, bias schedule -0.022
+2026-10-19 02:06:06  [m12] pfref: 2020Q2 reference mean -46.343 (se 0.556, 3 passes); schedule mean -45.951, N=2000 mean -48.441; sum over COVID targets vs reference mean: bias N=2000 -3.270, bias schedule 0.084
+2026-10-19 02:06:13  === particle-count check on the 2015-2019 targets: m13, m12 (4 cores)
+2026-10-19 02:16:02  [m13] pfcheck fit 1:140 (20 precovid targets, 589 s): reference N_t: base 8000 in 14 periods, raised in 146 (max 34500, in 1 periods), cost x1.38 of N=8000
+2026-10-19 02:16:02  [m13] pfcheck: sum over 2015-2019 targets: bias N=2000 -0.003, bias schedule -0.030 (vs reference)
+2026-10-19 02:18:40  [m12] pfcheck fit 1:135 (2 precovid targets, 158 s): reference N_t: base 8000 in 57 periods, raised in 85 (max 19500, in 1 periods), cost x1.14 of N=8000
+2026-10-19 02:21:49  [m12] pfcheck fit 1:142 (18 precovid targets, 189 s): reference N_t: base 8000 in 51 periods, raised in 109 (max 29500, in 1 periods), cost x1.22 of N=8000
+2026-10-19 02:21:49  [m12] pfcheck: sum over 2015-2019 targets: bias N=2000 -0.023, bias schedule -0.020 (vs reference)
+2026-10-19 02:21:56  === PSIS-LFO run (m4; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 02:21:56  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 02:21:56  [m4] PSIS-LFO start: group 1, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 02:22:09  [m4] fit 1:40 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 181 periods, raised in 5 (max 100000, in 1 periods), cost x1.28 of N=2000
+2026-10-19 02:22:50  [m4] fit on periods 1:40 (to 1989-12-01): 2000 draws, 54 s; divergences=1 min_ebfmi=0.9551 max_rhat=1.003 min_ess_bulk=1395 worst_rhat=tau seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:23:19  [m4] fit 1:81 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 183 periods, raised in 3 (max 100000, in 1 periods), cost x1.28 of N=2000
+2026-10-19 02:24:02  [m4] fit on periods 1:81 (to 2000-03-01): 2000 draws, 71 s; divergences=0 min_ebfmi=0.8749 max_rhat=1.013 min_ess_bulk=225.9 worst_rhat=phi[3] seed=10081 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:24:53  [m4] fit 1:129 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 175 periods, raised in 11 (max 100000, in 1 periods), cost x1.30 of N=2000
+2026-10-19 02:25:36  [m4] fit on periods 1:129 (to 2012-03-01): 2000 draws, 94 s; divergences=1 min_ebfmi=0.8573 max_rhat=1.017 min_ess_bulk=271.5 worst_rhat=phi[3] seed=10129 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:26:33  [m4] fit on 1:146 attempt 1 (seed 10146) fails the refit rule [rhat, ebfmi, ess_bulk]: divergences 12, min E-BFMI 0.011, max R-hat 1.277 (phi[3]), min bulk ESS 11; retrying with a new seed
+2026-10-19 02:27:42  [m4] fit 1:146 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 174 periods, raised in 12 (max 100000, in 1 periods), cost x1.32 of N=2000
+2026-10-19 02:28:27  [m4] fit on periods 1:146 (to 2016-06-01): 2000 draws, 171 s; divergences=1 min_ebfmi=0.8846 max_rhat=1.006 min_ess_bulk=790.4 worst_rhat=omega[2] seed=18065 attempt=2 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:29:32  [m4] fit 1:162 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 163 periods, raised in 23 (max 100000, in 1 periods), cost x1.43 of N=2000
+2026-10-19 02:30:21  [m4] fit on periods 1:162 (to 2020-06-01): 2000 draws, 114 s; divergences=0 min_ebfmi=0.8042 max_rhat=1.005 min_ess_bulk=454 worst_rhat=phi[1] seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:31:39  [m4] fit 1:181 particle schedule (pilot 200 draws, N=2000, 3 s): N_t: base 2000 in 163 periods, raised in 23 (max 100000, in 1 periods), cost x1.42 of N=2000
+2026-10-19 02:32:28  [m4] fit on periods 1:181 (to 2025-03-01): 2000 draws, 126 s; divergences=0 min_ebfmi=0.7901 max_rhat=1.011 min_ess_bulk=647.7 worst_rhat=phi[1] seed=10181 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:32:28  [m4] done: elpd_lfo = -1120.14 over 146 predictions, 5 refits, 0 high-k steps used
+2026-10-19 02:37:04  [m4] filter re-run 1/3 with new seeds: elpd -1119.31 vs main pass -1120.14 (276 s)
+2026-10-19 02:41:39  [m4] filter re-run 2/3 with new seeds: elpd -1123.24 vs main pass -1120.14 (275 s)
+2026-10-19 02:46:15  [m4] filter re-run 3/3 with new seeds: elpd -1122.24 vs main pass -1120.14 (276 s)
+2026-10-19 02:46:16  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 02:46:33  === PSIS-LFO run (m10; 4 cores): window from 1990-03-01, k threshold 0.7, refit cap 12, refits 1000+1000 x 4 chains, rule div<=1% R-hat<=1.05 E-BFMI>=0.2 bulk ESS>=100 (4 attempts), RBPF N_t 2000-100000 (ESS target 500), 3 re-runs
+2026-10-19 02:46:33  === sample from 1980-03-01 (LATENTGDP_START), output root output/sample_1980; initial training 40 quarters 1980-03-01-1989-12-01
+2026-10-19 02:46:33  [m10] PSIS-LFO start: group 2, train on periods 1:40 (to 1989-12-01), 146 one-step predictions 1990-03-01-2026-06-01
+2026-10-19 02:46:56  [m10] fit 1:40 particle schedule (pilot 200 draws, N=2000, 10 s): N_t: base 2000 in 175 periods, raised in 11 (max 100000, in 2 periods), cost x1.56 of N=2000
+2026-10-19 02:48:17  [m10] fit on periods 1:40 (to 1989-12-01): 1000 draws, 103 s; divergences=0 min_ebfmi=0.9776 max_rhat=1.004 min_ess_bulk=1486 worst_rhat=omega[1] seed=10040 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:48:46  [m10] fit 1:55 particle schedule (pilot 200 draws, N=2000, 10 s): N_t: base 2000 in 177 periods, raised in 9 (max 100000, in 2 periods), cost x1.61 of N=2000
+2026-10-19 02:50:10  [m10] fit on periods 1:55 (to 1993-09-01): 1000 draws, 113 s; divergences=0 min_ebfmi=0.9088 max_rhat=1.004 min_ess_bulk=801.9 worst_rhat=omega[2] seed=10055 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:50:52  [m10] fit 1:96 particle schedule (pilot 200 draws, N=2000, 10 s): N_t: base 2000 in 176 periods, raised in 10 (max 100000, in 2 periods), cost x1.58 of N=2000
+2026-10-19 02:52:15  [m10] fit on periods 1:96 (to 2003-12-01): 1000 draws, 124 s; divergences=0 min_ebfmi=0.927 max_rhat=1.004 min_ess_bulk=689.4 worst_rhat=phi[3] seed=10096 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:53:19  [m10] fit 1:128 particle schedule (pilot 200 draws, N=2000, 10 s): N_t: base 2000 in 169 periods, raised in 17 (max 100000, in 1 periods), cost x1.48 of N=2000
+2026-10-19 02:54:37  [m10] fit on periods 1:128 (to 2011-12-01): 1000 draws, 143 s; divergences=3 min_ebfmi=0.8435 max_rhat=1.018 min_ess_bulk=472.9 worst_rhat=omega[2] seed=10128 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:56:01  [m10] fit 1:138 particle schedule (pilot 200 draws, N=2000, 10 s): N_t: base 2000 in 161 periods, raised in 25 (max 100000, in 1 periods), cost x1.40 of N=2000
+2026-10-19 02:57:15  [m10] fit on periods 1:138 (to 2014-06-01): 1000 draws, 157 s; divergences=0 min_ebfmi=0.8046 max_rhat=1.006 min_ess_bulk=674.3 worst_rhat=omega_g seed=10138 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 02:59:08  [m10] fit 1:155 particle schedule (pilot 200 draws, N=2000, 10 s): N_t: base 2000 in 160 periods, raised in 26 (max 100000, in 1 periods), cost x1.38 of N=2000
+2026-10-19 03:00:20  [m10] fit on periods 1:155 (to 2018-09-01): 1000 draws, 185 s; divergences=0 min_ebfmi=0.8914 max_rhat=1.003 min_ess_bulk=1122 worst_rhat=mu_h[1] seed=10155 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 03:02:15  [m10] fit 1:162 particle schedule (pilot 200 draws, N=2000, 11 s): N_t: base 2000 in 164 periods, raised in 22 (max 79000, in 1 periods), cost x1.30 of N=2000
+2026-10-19 03:03:28  [m10] fit on periods 1:162 (to 2020-06-01): 1000 draws, 188 s; divergences=1 min_ebfmi=0.8605 max_rhat=1.004 min_ess_bulk=866.2 worst_rhat=omega[2] seed=10162 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 03:05:47  [m10] fit 1:171 particle schedule (pilot 200 draws, N=2000, 11 s): N_t: base 2000 in 162 periods, raised in 24 (max 95000, in 1 periods), cost x1.36 of N=2000
+2026-10-19 03:07:03  [m10] fit on periods 1:171 (to 2022-09-01): 1000 draws, 215 s; divergences=0 min_ebfmi=0.8374 max_rhat=1.011 min_ess_bulk=761.1 worst_rhat=phi[1] seed=10171 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 03:09:38  [m10] fit 1:180 particle schedule (pilot 200 draws, N=2000, 11 s): N_t: base 2000 in 162 periods, raised in 24 (max 65500, in 1 periods), cost x1.28 of N=2000
+2026-10-19 03:10:52  [m10] fit on periods 1:180 (to 2024-12-01): 1000 draws, 228 s; divergences=1 min_ebfmi=0.905 max_rhat=1.007 min_ess_bulk=552.5 worst_rhat=phi[1] seed=10180 attempt=1 cached=FALSE fails= below_rule=FALSE
+2026-10-19 03:10:52  [m10] done: elpd_lfo = -1415.86 over 146 predictions, 8 refits, 0 high-k steps used
+2026-10-19 03:22:27  [m10] filter re-run 1/3 with new seeds: elpd -1415.50 vs main pass -1415.86 (696 s)
+2026-10-19 03:34:01  [m10] filter re-run 2/3 with new seeds: elpd -1415.00 vs main pass -1415.86 (694 s)
+2026-10-19 03:45:37  [m10] filter re-run 3/3 with new seeds: elpd -1415.30 vs main pass -1415.86 (696 s)
+2026-10-19 03:45:38  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 03:45:55  === seed-selection check of retried refits: m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13 (4 cores)
+2026-10-19 03:45:55  [m1] retrycheck: no retried fits
+2026-10-19 03:45:55  [m2] retrycheck: no retried fits
+2026-10-19 03:45:55  [m3] retrycheck: no retried fits
+2026-10-19 03:46:50  [m4] retrycheck fit 1:146 attempt 1 (seed 10146) re-created: divergences 12, min E-BFMI 0.011, max R-hat 1.277 (phi[3]), min bulk ESS 11
+2026-10-19 03:49:05  [m4] retrycheck fit 1:146 (16 targets, 190 s): pooled 8 chains max R-hat 1.152 (phi[3]), min bulk ESS 35; sum elpd kept -149.060, first attempt -145.794, pooled -146.613 (main pass -146.156)
+2026-10-19 03:49:05  [m5] retrycheck: no retried fits
+2026-10-19 03:49:05  [m6] retrycheck: no retried fits
+2026-10-19 03:49:05  [m7] retrycheck: no retried fits
+2026-10-19 03:49:05  [m8] retrycheck: no retried fits
+2026-10-19 03:49:05  [m9] retrycheck: no retried fits
+2026-10-19 03:49:05  [m10] retrycheck: no retried fits
+2026-10-19 03:49:05  [m11] retrycheck: no retried fits
+2026-10-19 03:49:05  [m12] retrycheck: no retried fits
+2026-10-19 03:49:05  [m13] retrycheck: no retried fits
+2026-10-19 03:49:13  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 03:49:37  === particle-count check on the COVID targets: m9, m4 (4 cores)
+2026-10-19 03:53:43  [m9] pfcheck fit 1:138 (2 covid targets, 245 s): reference N_t: base 8000 in 53 periods, raised in 109 (max 400000, in 1 periods), cost x1.52 of N=8000
+2026-10-19 03:58:34  [m9] pfcheck fit 1:162 (3 covid targets, 291 s): reference N_t: base 8000 in 35 periods, raised in 130 (max 400000, in 1 periods), cost x1.81 of N=8000
+2026-10-19 03:58:34  [m9] pfcheck: sum over COVID targets: bias N=2000 -2.403, bias schedule -0.238 (vs reference)
+2026-10-19 04:02:46  [m4] pfcheck fit 1:146 (2 covid targets, 251 s): reference N_t: base 8000 in 56 periods, raised in 106 (max 400000, in 1 periods), cost x1.56 of N=8000
+2026-10-19 04:07:58  [m4] pfcheck fit 1:162 (3 covid targets, 312 s): reference N_t: base 8000 in 35 periods, raised in 130 (max 400000, in 1 periods), cost x1.94 of N=8000
+2026-10-19 04:07:58  [m4] pfcheck: sum over COVID targets: bias N=2000 -2.560, bias schedule 1.303 (vs reference)
+2026-10-19 04:08:05  === extra reference passes for the 2020Q2 target: m9, m4 (4 cores)
+2026-10-19 04:11:12  [m9] pfref 2020Q2 (fit 1:138) reference pass 2: elpd -46.146 at N_t 400000 (187 s)
+2026-10-19 04:14:23  [m9] pfref 2020Q2 (fit 1:138) reference pass 3: elpd -49.242 at N_t 400000 (191 s)
+2026-10-19 04:17:37  [m4] pfref 2020Q2 (fit 1:146) reference pass 2: elpd -50.167 at N_t 400000 (195 s)
+2026-10-19 04:21:01  [m4] pfref 2020Q2 (fit 1:146) reference pass 3: elpd -50.550 at N_t 400000 (204 s)
+2026-10-19 04:21:01  [m9] pfref: 2020Q2 reference mean -48.348 (se 1.108, 3 passes); schedule mean -49.602, N=2000 mean -50.725; sum over COVID targets vs reference mean: bias N=2000 -3.712, bias schedule -1.547
+2026-10-19 04:21:01  [m4] pfref: 2020Q2 reference mean -50.735 (se 0.392, 3 passes); schedule mean -49.720, N=2000 mean -52.250; sum over COVID targets vs reference mean: bias N=2000 -3.312, bias schedule 0.551
+2026-10-19 04:21:09  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp
+2026-10-19 04:54:27  variance decomposition skipped (sample start 1980-03-01; output root output/sample_1980): use R/02_fit_models.R --vardecomp

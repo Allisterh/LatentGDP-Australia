@@ -1,0 +1,13 @@
+Compiling Stan functions (temporary copies)...
+Test passed with 19 successes 🎊.
+Test passed with 4 successes 🥳.
+Test passed with 6 successes 🥇.
+Test passed with 10 successes 🎊.
+Test passed with 8 successes 😸.
+
+  brute force log p(y|theta) = -42.7451 (se 0.0050); RBPF = -42.7407 (sd over runs 0.0220)
+Test passed with 1 success 😀.
+Test passed with 4 successes 🥳.
+Test passed with 5 successes 😀.
+
+All m12 tests finished.

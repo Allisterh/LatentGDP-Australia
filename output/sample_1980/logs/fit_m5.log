@@ -1,0 +1,74 @@
+sample start 1980-03-01; output root output/sample_1980 
+
+===== m5 (T = 186) =====
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 2 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 3 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 4 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 4 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 2 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 3 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 1 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 4 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 4 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 2 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 1 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 3 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 3 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 2 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 1 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 3 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 2 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 4 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 2 finished in 19.8 seconds.
+Chain 4 finished in 19.8 seconds.
+Chain 1 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 1 finished in 25.5 seconds.
+Chain 3 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 3 finished in 25.8 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 22.7 seconds.
+Total execution time: 25.9 seconds.
+
+# A tibble: 13 × 10
+   variable    mean median     sd    mad      q5     q95  rhat ess_bulk ess_tail
+   <chr>      <dbl>  <dbl>  <dbl>  <dbl>   <dbl>   <dbl> <dbl>    <dbl>    <dbl>
+ 1 mu_bar     2.81   2.80  0.313  0.310   2.30    3.33   1.00     2029.    3292.
+ 2 c          2.35   2.35  0.337  0.341   1.80    2.91   1.00     1901.    3049.
+ 3 rho        0.163  0.164 0.0793 0.0797  0.0321  0.294  1.00     1675.    2599.
+ 4 tau        3.55   3.54  0.213  0.213   3.22    3.91   1.00     2565.    4284.
+ 5 sigma[1]   2.27   2.26  0.173  0.171   1.99    2.56   1.00     4541.    4618.
+ 6 sigma[2]   2.76   2.76  0.183  0.183   2.47    3.08   1.00     6739.    5693.
+ 7 sigma[3]   2.02   2.02  0.171  0.171   1.75    2.31   1.00     3908.    4969.
+ 8 psi[1]    -0.437 -0.438 0.0811 0.0823 -0.567  -0.301  1.00     6046.    6251.
+ 9 psi[2]    -0.401 -0.402 0.0763 0.0769 -0.526  -0.274  1.000    8184.    6096.
+10 psi[3]    -0.168 -0.170 0.107  0.108  -0.341   0.0102 1.00     4143.    4741.
+11 eps_sd[1]  2.54   2.53  0.209  0.203   2.21    2.89   1.00     5557.    5686.
+12 eps_sd[2]  3.03   3.02  0.226  0.221   2.68    3.42   1.00     7106.    6061.
+13 eps_sd[3]  2.06   2.06  0.181  0.180   1.77    2.37   1.00     3577.    4576.
+  model   T chains draws adapt_delta max_treedepth divergences treedepth_hits
+1    m5 186      4  8000        0.99            10           0              0
+  min_ebfmi max_rhat_hyper worst_rhat_var min_ess_bulk_hyper min_ess_tail_hyper
+1 0.5567173       1.001971            tau           1674.796           2598.554
+  max_rhat_mu min_ess_bulk_mu wall_secs        fitted_at
+1    1.001683        6142.788        28 2026-10-18 07:43
+
+Diagnostics written to output/sample_1980/tables/fit_diagnostics.csv
+  model   T chains draws adapt_delta max_treedepth divergences treedepth_hits
+1    m1 186      4  8000        0.80            10           0              0
+2    m2 186      4  8000        0.80            10           0              0
+3    m5 186      4  8000        0.99            10           0              0
+  min_ebfmi max_rhat_hyper worst_rhat_var min_ess_bulk_hyper min_ess_tail_hyper
+1 0.7612291       1.000358       sigma[1]           4140.675           4635.368
+2 0.5432052       1.000838            tau           2144.824           3254.721
+3 0.5567173       1.001971            tau           1674.796           2598.554
+  max_rhat_mu min_ess_bulk_mu wall_secs        fitted_at
+1    1.003104       10707.695         3 2026-10-18 07:42
+2    1.003271        6268.384         5 2026-10-18 07:43
+3    1.001683        6142.788        28 2026-10-18 07:43

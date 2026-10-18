@@ -2,9 +2,15 @@
 
 This is the research record. Sections dated 2026-10 replace earlier results
 that turned out to be wrong; the superseded claims are noted where they were
-made so the history stays readable. The newest round is "Round of
-2026-10-17" below: it adds m12, which is now the production model, and
-supersedes the 2026-10-16 comparison tables and the m3 and m10 sections.
+made so the history stays readable. The newest section is "1980Q1 sample
+(RDP 2014-12 alignment)" below. It re-runs the whole research suite on data
+starting in 1980 Q1 and leaves production on the full sample. It does not
+supersede the full-sample results: those stay as recorded. It does say which
+full-sample conclusions survive the later start. The round before it, "Round
+of 2026-10-18", added m13 (m12 + latent SV), which is now the production
+model. "Round of 2026-10-17" added m12 (production from 2026-10-17 to
+2026-10-18) and superseded the 2026-10-16 comparison tables and the m3 and
+m10 sections.
 
 ## Paper
 
@@ -42,7 +48,7 @@ current vintage.
 ## Fits (current data, `R/02_fit_models.R` and `R/fit_m11.R`)
 
 Settings for every fit: 4 chains x (2000 warmup + 2000 draws), seed 1. The
-table shows posterior means. The diagnostics for m1-m10 and m12 come from
+table shows posterior means. The diagnostics for m1-m10, m12 and m13 come from
 `output/tables/fit_diagnostics.csv`; m11's come from the `R/fit_m11.R` run
 log, because that script does not write to the table:
 - **div** is divergent transitions out of 8000 draws.
@@ -63,7 +69,8 @@ log, because that script does not write to the table:
 | m9  | 267 | 3.08 | 0.06 | 4.01 | -    | -    | -    | 1 | 0.90 | 1.002 | production until 2026-10-17; rho_EI = 0.14 |
 | m10 | 191 | 2.76 | 0.44 | 1.59 | -    | -    | -    | 4 | 0.86 | 1.002 | re-specified 2026-10-17: latent SV; tau = exp(mu_g/2) |
 | m10 *(superseded, constant tau)* | 191 | 2.98 | 0.39 | 2.19 | -    | -    | -    | 1 | 0.84 | 1.011 | multimodal posterior; min tail ESS 88 |
-| m12 | 267 | 3.10 | 0.09 | 3.99 | -    | -    | -    | 3 | 0.86 | 1.002 | production from 2026-10-17; m9 + AR(1) errors; psi = (-0.47, -0.34, -0.16) |
+| m12 | 267 | 3.10 | 0.09 | 3.99 | -    | -    | -    | 3 | 0.86 | 1.002 | production 2026-10-17 to 2026-10-18; m9 + AR(1) errors; psi = (-0.47, -0.34, -0.16) |
+| m13 | 267 | 2.77 | 0.27 | 2.54 | -    | -    | -    | 4 | 0.85 | 1.002 | production from 2026-10-18; m12 + latent SV; tau = exp(mu_g/2); psi = (-0.46, -0.36, -0.19) |
 | m11 | 193 q / 580 m | - | 0.49 | 4.48 | 2.87 | 3.09 | 1.86 | 0 | 0.45 | 1.002 | monthly latent; sig = sigma_q |
 
 **m11.** Its parameters are at monthly frequency and do not compare directly
@@ -96,6 +103,1109 @@ single signal of true growth. Expenditure has the largest sd on the full
 sample. On the post-1978 samples (m8, m11), Income's is slightly larger than
 Expenditure's.
 
+## 1980Q1 sample (RDP 2014-12 alignment), 2026-10-18/19
+
+The whole research suite was re-run on data starting in 1980 Q1:
+- every model's fit (m1-m13);
+- the m13 production gate on two seeds;
+- the per-draw variance decomposition;
+- PSIS-LFO-CV.
+
+Fits ran on 2026-10-18 and the LFO from 21:16 on 2026-10-18 to 04:21 on
+2026-10-19. The data vintage is the 2026 Q2 release used everywhere else.
+**Production is unchanged**: it still fits m13 on the full sample (1959 Q4 -
+2026 Q2). Every 1980-sample output is under `output/sample_1980/`, and no
+full-sample output (`output/fit_*.rds`, `output/lfo/`, `output/tables/`,
+`output/figures/`, `output/fit_production.rds`, `docs/`) was changed. All
+numbers below come from `output/sample_1980/tables/` unless another source
+is named.
+
+### Why 1980 Q1
+
+RBA RDP 2014-12 (Rees, Lancaster & Finlay 2014, "Estimating the Australian
+Output Gap and Other State-Space Refinements to GDP Measurement"), section
+3.2:
+
+> "Our data span 1980:Q1-2013:Q2. The starting date reflects the fact that,
+> while Australian national accounts data are available on a quarterly basis
+> from 1959:Q3, the quality of the underlying data sources has changed over
+> time, so that the pattern of measurement errors in the early years of each
+> GDP series may be unrepresentative of their current performance."
+
+The paper uses that one sample for all its models. Our full-sample runs
+start in 1959 Q4, so their measurement-error parameters are partly estimated
+from the period the paper deliberately leaves out. Only the start date is
+aligned with the paper. Two differences remain:
+- **The fourth signal.** The RDP's fourth signal is the **unemployment
+  rate**. Our m8 and m10 use **hours worked** (ABS 5206.0 Table 1). This was
+  not changed. m11 (monthly employment, 6202.0) is our own extension.
+- **The end date.** The paper's data end in 2013 Q2 (its vintage). Ours end
+  in 2026 Q2 (the current vintage).
+
+### Definitions
+
+- **Sample.** The first growth observation is 1980 Q1 (dated 1980-03-01),
+  400 × (log level 1980 Q1 - log level 1979 Q4). The last is 2026 Q2. T = 186
+  for every model.
+  - The 3-measure models lose 1959 Q4 - 1979 Q4 (81 quarters; T 267 -> 186).
+  - m8 and m10 lose 1978 Q4 - 1979 Q4 (5 quarters; T 191 -> 186).
+  - m11 uses months from 1980-01, so 1980 Q1 is complete: T_m = 558 months,
+    T_q = 186 quarters.
+  - In this sample 2020 Q2 is t = 162.
+- **Data on this sample** (annualised %):
+  - means: E 2.87, I 2.91, P 2.91;
+  - sd: E 4.46, I 4.66, P 4.09; headline sd 3.88 (full sample 4.54);
+  - pairwise correlations 0.64-0.71.
+
+  GDP(I), not GDP(E), is now the most variable measure in raw terms: its
+  variance is 1.44 times the headline's, against 1.32 for E and 1.11 for P.
+  On the full sample the ratios are 1.75, 1.26 and 1.09.
+- **LFO.**
+  - The evaluation window is unchanged: 1990 Q1 - 2026 Q2, 146 one-step
+    predictions, the same targets as the full-sample run.
+  - Initial training is the 40 quarters 1980 Q1 - 1989 Q4 (full sample:
+    121 quarters, 1959 Q4 - 1989 Q4).
+  - The method is unchanged:
+    - the refit rule: divergences <= 1%, R-hat <= 1.05, E-BFMI >= 0.2, bulk
+      ESS >= 100;
+    - a refit when Pareto k exceeds 0.7;
+    - up to 4 attempts;
+    - the particle schedule of 2000 to 100000 particles;
+    - 4 filter passes for each SV model;
+    - a Newey-West lag of 8;
+    - the retry (seed-selection) sensitivity.
+  - The refit cache (`REFIT_CACHE`, which holds full-sample fits) is
+    disabled whenever `LATENTGDP_START` is set.
+  - In this run "1:i" counts rows of the 1980 sample: 1:146 is data to
+    2016 Q2, not the full-sample 1:146 (data to 1996 Q2).
+
+### How to reproduce
+
+`R/sample_window.R` reads two optional environment variables, which the
+research scripts (`R/02_fit_models.R`, `R/fit_m11.R`, `R/fit_m12.R`,
+`R/fit_m13.R`, `R/03_compare.R`, `R/04_figures.R`) use:
+- `LATENTGDP_START` is the date of the first growth observation
+  (`1980-03-01` = 1980 Q1);
+- `LATENTGDP_OUT` is the output root.
+
+With both unset the scripts behave exactly as before. That was checked: the
+Stan data lists are `identical()` and serialize-identical to the old code
+path. A default `R/03_compare.R summary` run in a sandbox regenerated the 8
+tables that summary mode writes (`lfo_fit_diagnostics`, `lfo_pointwise`,
+`lfo_refit_attempts`, `lfo_retry_sensitivity_summary`, `model_comparison`,
+`model_comparison_pairwise`, `model_comparison_subperiod`,
+`variance_decomposition`) byte-identical. The other 8 files of
+`output/tables/` are written by other modes or scripts (`fit_diagnostics`,
+the two particle-filter checks, `lfo_retry_sensitivity`, `m10_mode_check`,
+`m12_gate_seeds`, `m13_gate_seeds`, `m3_identification`). That run did not
+reproduce them; it only left them unchanged.
+
+**Guard.** `R/sample_window.R` stops as soon as it is sourced if
+`LATENTGDP_START` is set and the output root is `output/`. That covers
+`LATENTGDP_OUT` unset or set to `output`, `output/`, `./output` or the
+absolute path. Every research script that uses it (`R/02_fit_models.R`,
+`R/fit_m11.R`, `R/fit_m12.R`, `R/fit_m13.R`, `R/03_compare.R`,
+`R/04_figures.R`) therefore refuses to write a truncated-sample fit or
+table into `output/`, and it stops before creating any directory.
+- **Before 2026-10-19 only `R/03_compare.R` had this check.** In a sandbox,
+  `LATENTGDP_START=1980-03-01 Rscript R/02_fit_models.R m1` without
+  `LATENTGDP_OUT` wrote `output/fit_m1.rds` with T = 186 and replaced m1's
+  row in `output/tables/fit_diagnostics.csv`.
+- **That never happened in the real tree.** The 87 full-sample files under
+  `output/` (fits, `lfo/`, `tables/`, `figures/`) and the production files
+  still match their checksums from before the 1980 run.
+- **Tested in a sandbox.** All six scripts exit with the error for all five
+  spellings of the root, and no file is written. With both variables unset,
+  `sw_out()`, `sw_is_default()` and the trimmed data are unchanged. A
+  separate root without `LATENTGDP_START` is still allowed.
+
+The production scripts never source `R/sample_window.R`.
+
+```bash
+cd /Users/davidstephan/Documents/latentgdp/LatentGDP
+# Fits, gate, variance decomposition, figures 01-06 (sequential, resumable;
+# logs in output/sample_1980/logs/):
+nohup bash output/sample_1980/run_1980.sh >> output/sample_1980/logs/driver.log 2>&1 &
+# LFO (sequential, resumable from checkpoints in output/sample_1980/lfo/):
+nohup bash output/sample_1980/lfo/run_lfo_1980.sh >> output/sample_1980/lfo/driver.log 2>&1 &
+bash output/sample_1980/lfo/run_lfo_1980_extra.sh     # COVID particle checks for m9, m4
+# or step by step:
+export LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980
+Rscript R/02_fit_models.R m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m12
+Rscript R/fit_m13.R && Rscript R/fit_m13.R --seed=2 && Rscript R/02_fit_models.R --diag-only m13
+Rscript R/fit_m11.R && Rscript R/02_fit_models.R --diag-only m11
+Rscript R/02_fit_models.R --vardecomp
+Rscript R/03_compare.R m1 ...; Rscript R/03_compare.R summary   # see run_lfo_1980.sh for the order
+Rscript R/04_figures.R
+unset LATENTGDP_START LATENTGDP_OUT        # back to the full sample in output/
+```
+
+Compute: the 13 fits' wall times sum to about 42 minutes, or about 55 with
+m13's seed-2 fit (809 s), excluding compilation. m13 (1042 s) and m12
+(629 s) are the longest. The LFO took about 7 h 05 min, including all
+re-runs and particle checks.
+
+### Fits and diagnostics
+
+Every fit uses 4 chains × (2000 warmup + 2000 draws) and seed 1
+(`tables/fit_diagnostics.csv`). The columns are:
+- **div**: divergent transitions out of 8000;
+- **E-BFMI**: the minimum over chains;
+- **R-hat**: the maximum over hyperparameters, with the variable that has it;
+- **ESS**: the minimum bulk / tail ESS over hyperparameters;
+- **s**: wall seconds (CmdStan's sampling total for m13).
+
+| model | adapt_delta / treedepth | div | E-BFMI | R-hat | ESS | s |
+|---|---|---|---|---|---|---|
+| m1 | 0.8 / 10 | 0 | 0.761 | 1.0004 (sigma[1]) | 4141 / 4635 | 3 |
+| m2 | 0.8 / 10 | 0 | 0.543 | 1.0008 (tau) | 2145 / 3255 | 5 |
+| m3 | 0.99 / 10 | 0 | 0.949 | 1.0021 (Omega[3,1]) | 2353 / 2841 | 29 |
+| m4 | 0.99 / 12 | **9** | 0.830 | 1.0015 (phi[2]) | 1742 / 2497 | 140 |
+| m5 | 0.99 / 10 | 0 | 0.557 | 1.0020 (tau) | 1675 / 2599 | 28 |
+| m6 | 0.99 / 10 | 0 | 0.435 | 1.0048 (rho) | 1214 / 1918 | 53 |
+| m7 | 0.99 / 10 | 0 | 0.476 | 1.0027 (tau) | 1558 / 3207 | 16 |
+| m8 | 0.99 / 10 | 0 | 0.565 | 1.0030 (rho) | 1370 / 2401 | 11 |
+| m9 | 0.99 / 12 | 1 | 0.848 | 1.0063 (phi[1]) | 1273 / 2609 | 196 |
+| m10 | 0.99 / 12 | 2 | 0.878 | 1.0033 (omega[3]) | 1658 / 749 | 298 |
+| m11 | 0.99 / 12 | 0 | **0.380** | 1.0007 (c) | 1312 / 2055 | 50 |
+| m12 | 0.99 / 12 | 1 | 0.845 | 1.0038 (phi[1]) | 513 / 1687 | 629 |
+| m13 | 0.99 / 12 | 0 | 0.882 | 1.0013 (rho_EI) | 1315 / 882 | 1042 |
+
+- **mu and treedepth.** Max R-hat on mu is at most 1.0033 in every model,
+  and min bulk ESS on mu is at least 2484 (m3). There are no max-treedepth
+  hits.
+- **m4** has 9 divergences out of 8000 (0.11%; 5 on the full sample). That
+  is above the production gate's 0.1%, but m4 is not gated.
+- **m11**'s E-BFMI of 0.38 (0.45 on the full sample) is above 0.3 but the
+  lowest of the suite.
+- **m12**'s min bulk ESS of 513 (phi[1]) is the lowest; it is above the
+  gate's 400.
+
+### m13 gate on the 1980 sample
+
+`R/fit_m13.R` applies exactly `R/fit_production.R`'s gate. The code was
+compared line by line: the same thresholds, NA handling and E-BFMI floor
+(`tables/m13_gate_seeds.csv`). **Both seeds pass.**
+
+| Check | seed 1 | seed 2 | Gate |
+|---|---|---|---|
+| divergences | 0 of 8000 | 1 of 8000 (0.0125%) | < 0.1% |
+| E-BFMI by chain | 0.948, 0.926, 0.900, 0.882 | 0.903, 0.957, 0.862, 0.897 | min >= 0.3 |
+| max R-hat, hyperparameters | 1.0013 (rho_EI) | 1.0056 (phi[1]) | <= 1.01 |
+| max R-hat, mu / h / g | 1.0013 / 1.0015 / 1.0017 | 1.0009 / 1.0031 / 1.0019 | <= 1.05 |
+| min bulk / tail ESS, hyperparameters | 1315 / 882 (phi[1]) | 1094 / 782 (phi[1]) | >= 400 |
+| min bulk / tail ESS, mu | 5531 / 6268 | 5059 / 6040 | >= 400 |
+| max-treedepth hits | 0 | 0 | - |
+| sampling time (4 parallel chains) | 1042 s (wall 1048 s; chains 739-1042 s) | 802 s (wall 809 s; chains 621-802 s) | <= 30 min |
+
+### Posterior: what changes with the later start
+
+Posterior means, full sample -> 1980 sample
+(`tables/posterior_comparison_full_vs_1980.csv`; m13's tau_t path is from
+`logs/compare_full_vs_1980.log`).
+
+**1. Constant-variance models (m1, m2, m3, m5, m6, m7).** The GDP(E)
+measurement-error sd falls sharply. That is what the paper's rationale
+predicts: the early decades' measurement errors inflated it.
+
+| | m1 | m2 | m3 | m5 (innovation sd) | m6 | m7 |
+|---|---|---|---|---|---|---|
+| sig_E | 4.08 -> 2.53 | 4.10 -> 2.55 | 4.35 -> 2.62 | 3.53 -> 2.27 | 4.20 -> 2.63 | 4.14 -> 2.62 |
+| sig_I | 3.25 -> 3.00 | 3.26 -> 3.02 | 3.13 -> 3.00 | 2.98 -> 2.76 | 3.36 -> 3.10 | 3.26 -> 3.05 |
+| sig_P | 2.65 -> 2.07 | 2.64 -> 2.04 | 2.43 -> 1.85 | 2.52 -> 2.02 | 2.56 -> 1.96 | 2.64 -> 1.98 |
+| tau | 4.01 -> 3.57 | 4.02 -> 3.56 | 4.04 -> 3.61 | 4.00 -> 3.55 | 3.99 -> 3.56 | 3.54 -> 2.62 |
+| rho | - | 0.04 -> 0.14 | 0.06 -> 0.14 | 0.08 -> 0.16 | 0.05 -> 0.15 | 0.10 -> 0.34 |
+| mu_bar | 3.23 -> 2.90 | 3.12 -> 2.82 | 3.13 -> 2.82 | 3.13 -> 2.81 | 3.13 -> 2.83 | 3.26 -> 3.02 |
+
+- **The noisiest measure.** Income, not Expenditure, now has the largest
+  error sd, as on the post-1978 samples (m8, m11). Production is still the
+  cleanest signal in every specification.
+- **m5.** psi goes from (-0.51, -0.43, -0.18) to (-0.44, -0.40, -0.17).
+- **m7.** kappa_1 (2020 Q2) rises from 8.4 to 11.3.
+- **m6.** rho_EI goes from 0.09 to 0.08.
+
+**2. Measurement SV with a constant latent sd (m4, m9, m12): COVID becomes
+common measurement error.** On the 1980 sample these three fits put the
+2020 Q2 collapse into the measurement errors:
+- **2020 Q2.** The posterior mean of mu in 2020 Q2 is +0.20 (m4), +0.25
+  (m9) and -0.99 (m12), with 90% intervals about [-4, +4] (m12
+  [-5.0, 2.8]). The full-sample fits put it near the headline -28: the
+  full-sample and 1980 mean paths differ by up to 27.4 pp (m4, m9) and
+  26.2 pp (m12) on the common quarters, and the paths' correlation is only
+  0.77-0.80. The three measurement sds in that quarter are 9-13 (posterior
+  means).
+- **Parameters.** tau falls from about 4.0 to 2.05 / 2.03 / 2.16, and rho
+  rises from 0.05 / 0.06 / 0.09 to 0.40 / 0.41 / 0.43.
+- **m12.** phi_E falls from 0.98 to 0.01 (90% [-0.65, 0.80]), omega_E rises
+  from 0.24 to 0.80, rho_EI goes from 0.175 to 0.27 and psi_E from -0.47 to
+  -0.37. m4's and m9's phi_E fall to 0.58 and 0.55.
+- **phi_E is prior-dominated on this sample** (added 2026-10-19; from the
+  `fits$dm` draws in `lfo/lfo_{m4,m9,m12,m13}.rds` and the final fits).
+  The prior on phi is Uniform(-1, 1), from its bounds: mean 0, 90%
+  [-0.9, 0.9].
+  - **Up to 2020 Q2.** In every 1980 LFO refit of m4, m9, m12 and m13
+    trained up to 2020 Q2 (i = 40 to 162), the posterior mean of phi[1] is
+    between -0.28 and +0.12, with 90% intervals of about [-0.8, 0.8]. That
+    is essentially the prior. Before 2020 omega_E is also small (0.20-0.30),
+    so GDP(E)'s log-variance barely moves and its persistence is not
+    identified.
+  - **When 2020 Q2 enters the training data** (i = 162), omega_E jumps to
+    0.64-0.78 in m4, m9 and m12, while phi_E stays near 0. E's "SV" then
+    acts as i.i.d. heavy-tailed noise, not persistent volatility. That is
+    the mechanism that lets these fits absorb 2020 Q2 as common measurement
+    error. m13's omega_E stays at 0.29-0.33.
+  - **Later refits.** phi[1] rises to 0.41-0.53 only in the later refits
+    (m9 1:168 and 1:185, m4 1:181, m13 1:177). m12's last refit (1:168) is
+    still -0.15.
+  - **Full sample.** Every LFO refit has phi[1] 0.70-0.98.
+  - **Final fits, phi_E mean [90%] / omega_E, full -> 1980:**
+    - m4: 0.98 / 0.24 -> 0.58 [0.12, 0.86] / 0.67;
+    - m9: 0.98 / 0.23 -> 0.55 [0.04, 0.86] / 0.63;
+    - m12: 0.98 / 0.24 -> 0.015 [-0.65, 0.80] / 0.80;
+    - m13: 0.98 / 0.25 -> 0.84 [0.11, 0.99] / 0.27.
+
+    m13's phi_E has a long left tail, and phi[1] has the lowest bulk / tail
+    ESS of m13's hyperparameters on both gate seeds (1315 / 882 and
+    1094 / 782).
+  - **What this means for the comparisons.** The 1980-sample measurement-SV
+    comparisons (m4 - m2, m9 - m6, m12 - m5) mostly measure the value of a
+    heavier-tailed, roughly i.i.d. GDP(E) error plus persistent SV in I and
+    P (phi_I and phi_P about 0.9 in the 1980 fits of m4 and m12). They do not measure persistent GDP(E)
+    volatility.
+- **Not a stranded mode.** This is the same failure as the old constant-tau
+  m10 ("mode A", below). For each of m9, m4 and m12, four extra chains were
+  run on the 1980 data. They started from full-sample posterior draws, where
+  COVID is in mu (mu in 2020 Q2 about -25 to -28, tau about 4), with h_raw
+  sliced to the 1980 quarters. The sampler settings were the production
+  ones (adapt_delta 0.99, max_treedepth 12, 2000 + 2000, seed 11). In all
+  three models all 4 chains moved to the measurement-error solution:
+
+  | model | chains' mu (2020 Q2) | tau | lp__ by chain | reference 1980 fit lp__, tau, mu | div | min E-BFMI |
+  |---|---|---|---|---|---|---|
+  | m9 | 0.2 to 0.3 | 2.02-2.04 | -1664 to -1666 | -1665.4, 2.03, 0.25 | 5 | 0.83 |
+  | m4 | 0.2 to 0.3 | 2.04-2.06 | -1665 to -1667 | -1665.9, 2.05, 0.20 | 0 | 0.80 |
+  | m12 | -0.9 to -1.0 | 2.15-2.18 | -1643 to -1644 | -1643.3, 2.16, -0.99 | 1 | 0.81 |
+
+  - **Warmup draws** were saved for m4 and m12. Every chain left the
+    COVID-in-mu region within the first 8-52 warmup iterations (first
+    iteration with mu in 2020 Q2 above -10: m4 11, 14, 8, 52; m12 21, 10,
+    10, 34). The chains never came back. So that configuration is not a
+    competing local mode at this posterior. It is a region the sampler
+    leaves at once.
+  - **Mixing.** m12's phi[1] again mixes worst (bulk ESS 409, R-hat 1.01;
+    reference fit 513).
+  - **Limits.** This is still one alternative starting region per model,
+    and it is evidence about the sampler, not a proof that no other mode
+    exists. The m9 check (`wf4_scratch/fits/m9_mode_check.R`) and the m4 /
+    m12 checks (`wf4_scratch/repair/mode_check.R`, logs `mode_m4.log`,
+    `mode_m12.log`) are in the session scratch directory, not the repo.
+- **Checked here.** The 2020 Q2 values were recomputed from
+  `output/sample_1980/fit_{m4,m9,m12,m13,m10}.rds` for this note.
+
+**3. m13 (production model): COVID stays latent.**
+- **2020 Q2.** mu in 2020 Q2 is -27.9 [-29.0, -26.8] (full sample -27.9).
+  The measurement sds in that quarter are 0.9-1.6.
+- **The path.** The mean path has correlation 0.9985 with the full-sample
+  path, a mean absolute difference of 0.13 pp (annualised) and at most
+  1.03 pp.
+
+| m13 (posterior means) | full | 1980 |
+|---|---|---|
+| tau = exp(mu_g / 2) | 2.54 | 1.87 |
+| mu_g, phi_g, omega_g | 1.81, 0.90, 0.63 | 1.20, 0.82, 0.89 |
+| rho, mu_bar | 0.27, 2.77 | 0.39, 2.63 |
+| psi (E, I, P) | -0.46, -0.35, -0.19 | -0.43, -0.35, -0.18 |
+| rho_EI | 0.12 | 0.09 |
+| long-run measurement sd eps_sd_bar (E, I, P) | 3.36, 2.59, 2.20 | 2.50, 2.61, 2.01 |
+| mu_h[E]; phi[E] (90%) | 2.08; 0.975 | 1.58; 0.84 [0.11, 0.99] |
+
+**tau_t** (posterior median [90%], full -> 1980):
+
+| quarter | full | 1980 |
+|---|---|---|
+| 1982 Q4 | 5.08 [3.03, 8.89] | 5.12 [2.88, 10.10] |
+| 2008 Q4 | 1.37 | 1.32 |
+| 2015 Q1 | 0.77 | 0.67 |
+| 2019 Q4 | 4.53 | 3.11 |
+| 2020 Q2 | 11.95 [8.32, 19.07] | 13.67 [9.09, 24.06] |
+| 2026 Q2 | 1.25 | 1.03 |
+
+The average of the posterior-median tau_t over 1993 Q1 - 2019 Q4 is 1.64 on
+the full sample and 1.46 on the 1980 sample. In 1980 Q1 tau_t is 3.01
+against 1.62, but 1980 Q1 is period 1 of the 1980 sample, set by the initial
+condition. The latent-volatility profile is the same: high in the early
+1980s, low in the 2000s-2010s, a large real shock at COVID. The 1980 fit
+has a lower long-run level and less persistent, more variable latent
+volatility.
+
+**4. m8, m10, m11: essentially unchanged.** The hours sample loses only
+1978 Q4 - 1979 Q4.
+- **m10.** tau 1.59 -> 1.56, rho 0.43 -> 0.45, omega_g 0.94 -> 0.96, mu in
+  2020 Q2 -28.2. Its 4 chains agree (lp__ -2260 to -2262), with no sign of
+  two modes. The mean path has correlation 0.9998 with the full-sample path.
+- **m8.** sig_E 2.86 -> 2.66; path correlation 0.9996.
+- **m11.** beta_emp 0.61 -> 0.65; path correlation 0.9994.
+
+**5. m3: still weakly identified, but less so**
+(`logs/compare_full_vs_1980.log`, computed as in `R/diag_m3_ident.R`):
+- corr(tau, mean off-diagonal Omega) goes from -0.70 to -0.54;
+- Omega means go from (0.07, 0.04, -0.23) to (0.03, -0.07, -0.14);
+- the posterior sd of Omega is 49 / 71 / 67% of the prior sd (full sample
+  46 / 57 / 83%);
+- min bulk / tail ESS goes from 882 / 438 to 2353 / 2841, and E-BFMI is
+  0.95.
+
+### Variance decomposition (1980 sample)
+
+`tables/variance_decomposition.csv` gives the per-draw var(mu) /
+var(headline): the median and 5-95%. Note that "excl. COVID" here drops
+2020 Q1 - 2021 Q1 (5 quarters; the LFO tables' "excl. COVID" drops
+2020 Q2 - 2021 Q1).
+
+| Series | 1980 Q1 - 2026 Q2 (T 186) | excl. 2020 Q1 - 2021 Q1 (T 181) | full-sample fit, for reference |
+|---|---|---|---|
+| m1 | 0.850 [0.768, 0.936] | 0.925 | 0.786 (1959-2026) |
+| m2 | 0.850 [0.765, 0.938] | 0.929 | 0.785 |
+| m3 | 0.893 [0.716, 0.982] | 0.950 | 0.831 |
+| m4 | **0.328** [0.254, 0.416] | 0.552 | 0.798 |
+| m5 | 0.852 [0.773, 0.930] | 0.926 | 0.783 |
+| m6 | 0.851 [0.762, 0.940] | 0.934 | 0.779 |
+| m7 | 0.509 [0.422, 0.584] | 0.781 | 0.614 |
+| m9 | **0.323** [0.240, 0.414] | 0.546 | 0.785 |
+| m12 | **0.373** [0.300, 0.462] | 0.611 | 0.779 (excl. COVID 0.727) |
+| **m13** | **0.872 [0.811, 0.938]** | **0.776 [0.675, 0.883]** | 0.790 [0.705, 0.889] (excl. 0.731); on exactly 1980 Q1 - 2026 Q2 0.883 [0.819, 0.950] (excl. 0.793) |
+| m8 | 0.853 [0.769, 0.936] | 0.850 | 0.848 (1978 Q4 - 2026 Q2) |
+| m10 | 0.784 [0.719, 0.854] | 0.607 | 0.747 (excl. 0.558) |
+| m11 | 0.856 [0.772, 0.941] | 0.883 | 0.846 (1978-2026) |
+
+- **m13: the quarters, not the fit.** m13's ratio rises from 0.79 to 0.87.
+  This is entirely a change of quarters, not of estimates. The full-sample
+  m13 fit restricted to exactly the same quarters (1980 Q1 - 2026 Q2) gives
+  0.883 [0.819, 0.950], or 0.793 excluding COVID. That is slightly above the
+  1980 fit's 0.872 and 0.776. Over 1978 Q4 - 2026 Q2 it gives 0.855 (0.755).
+  (Recomputed 2026-10-19 from `output/fit_m13.rds` mu draws; not in the
+  tables.)
+  On the 1980 sample m13 attributes about 13% of headline variance to
+  measurement error, or about 22% excluding COVID.
+- **m4, m9 and m12** fall to 0.32-0.37. This is not a finding about
+  measurement error. It reflects the failure in section 2 above: COVID is
+  counted as measurement error.
+
+### LFO on the 1980 sample
+
+Group 1 (E, I, P; `tables/model_comparison.csv`; full-sample scores from
+`tables/lfo_full_vs_sample_models.csv`):
+
+| model | elpd_lfo 1980 | full sample | change | diff vs m13 | SE iid / NW | refits | weak mixing | MCSE |
+|---|---|---|---|---|---|---|---|---|
+| **m13** | **-1039.50** | -1045.82 | +6.3 | 0 | - | 7 | 1 | 0.02 |
+| m12 | -1096.90 | -1105.47 | +8.6 | -57.40 | 27.2 / 36.6 | 6 | 0 | 0.75 |
+| m9 | -1117.50 | -1122.24 | +4.7 | -78.01 | 30.6 / 40.4 | 6 | 2 | 0.60 |
+| m7 | -1120.42 | -1177.54 | +57.1 | -80.93 | 12.2 / 19.0 | 6 | 0 | exact |
+| m4 | -1121.23 | -1123.72 | +2.5 | -81.74 | 31.1 / 42.3 | 5 (1 retried) | 2 | 0.91 |
+| m5 | -1134.18 | -1168.84 | +34.7 | -94.68 | 33.8 / 42.9 | 5 | 0 | exact |
+| m1 | -1149.40 | -1195.66 | +46.3 | -109.90 | 31.8 / 35.7 | 4 | 0 | exact |
+| m2 | -1154.59 | -1196.25 | +41.7 | -115.09 | 33.8 / 42.9 | 5 | 0 | exact |
+| m6 | -1156.36 | -1195.59 | +39.2 | -116.87 | 34.3 / 43.7 | 4 | 0 | exact |
+| m3 | -1158.29 | -1195.93 | +37.6 | -118.79 | 36.5 / 45.0 | 5 | 0 | exact |
+
+The group 1 order is m13, m12, m9, m7, m4, m5, m1, m2, m6, m3. On the full
+sample it was m13, m12, m9, m4, m5, m7, m6, m1, m3, m2.
+
+Group 2 (with hours) and the other targets:
+- **Group 2.** m10 -1415.42 (full -1417.72) and m8 -1535.03 (full
+  -1541.96). m10 - m8 is +119.62 (SE 53.0 iid, 65.0 NW, z 1.84).
+- **Group 3.** m11 joint -2469.50 (full -2469.88).
+- **GDP-only target.**
+  - m10 -1057.97 (full -1058.44), m11 -1120.04 (full -1113.36), m8 -1159.28
+    (full -1160.69).
+  - The top five are m13, m10, m12, m9, m11. On the full sample they were
+    m13, m10, m12, m11, m9.
+
+**Key differences, whole window** (`tables/lfo_full_vs_sample.csv`; SE iid /
+Newey-West lag 8; "change" is 1980 minus full, with its NW SE). The nested
+measurement-SV pairs m4 - m2 and m9 - m6 were added to the 1980-only tables
+on 2026-10-19 (`R/03_compare.R summary` rerun from the existing checkpoints).
+That run only added rows: no row of any 1980 table changed, and no
+full-sample table was touched.
+
+| a - b | target | full sample | 1980 sample | change (NW SE) |
+|---|---|---|---|---|
+| m4 - m2 (measurement SV, nested) | group 1 | +72.5 (12.1 / 19.1), z 3.79 | **+33.4** (9.4 / 15.8), **z 2.11** | -39.2 (14.2) |
+| m9 - m6 (measurement SV, nested) | group 1 | +73.3 (12.2 / 19.9), z 3.69 | **+38.9** (9.7 / 15.1), **z 2.58** | -34.5 (15.3) |
+| m12 - m5 (measurement SV + structural E/I, with AR(1) errors) | group 1 | +63.4 (14.3 / 20.7), z 3.06 | +37.3 (13.3 / 15.1), z 2.47 | -26.1 (20.5) |
+| m9 - m5 (not nested: adds SV, drops AR(1) errors) | group 1 | +46.6 (12.5 / 19.7), z 2.37 | +16.7 (9.3 / 14.7), z 1.13 | -29.9 (14.3) |
+| m4 - m1 (not nested: adds SV and latent AR(1)) | group 1 | +71.9 (12.0 / 19.4), z 3.71 | +28.2 (10.4 / 19.4), z 1.46 | -43.8 (13.8) |
+| m5 - m2 (serial errors) | group 1 | +27.4 (2.9 / 2.0), z 14.0 | +20.4 (3.6 / 2.2), z 9.40 | -7.0 (1.0) |
+| m12 - m9 (serial errors, with SV) | group 1 | +16.8 (6.7 / 6.1), z 2.74 | +20.6 (7.9 / 5.5), z 3.72 | +3.8 (8.8) |
+| m13 - m12 (latent SV) | group 1 | +59.6 (24.7 / 28.9), z 2.06 | +57.4 (27.2 / 36.6), **z 1.57** | -2.2 (11.1) |
+| m9 - m4 (structural, SV) | group 1 | +1.5 (1.5 / 2.2), z 0.68 | +3.7 (1.6 / 2.4), z 1.58 | +2.2 (4.2) |
+| m6 - m2 (structural, constant) | group 1 | +0.66 (0.34 / 0.38), z 1.74 | -1.77 (0.89 / 1.01), z -1.76 | -2.4 (1.2) |
+| m7 - m1 (COVID scale) | group 1 | +18.1 (18.4 / 16.7), z 1.08 | +29.0 (33.8 / 28.4), z 1.02 | +10.9 (12.6) |
+| m13 - m5 (all three features) | group 1 | +123.0 (15.3 / 25.7), z 4.78 | +94.7 (33.8 / 42.9), z 2.20 | -28.3 (25.8) |
+| m13 - m7 | group 1 | +131.7 (12.2 / 20.7), z 6.35 | +80.9 (12.2 / 19.0), z 4.25 | -50.8 (13.3) |
+| m10 - m8 | group 2 | +124.2 (53.5 / 64.7), z 1.92 | +119.6 (53.0 / 65.0), z 1.84 | -4.6 (2.0) |
+| m10 - m8 | GDP-only | +102.2 (35.4 / 45.6), z 2.24 | +101.3 (37.9 / 48.6), z 2.08 | -0.9 (4.0) |
+| m13 - m10 | GDP-only | +12.6 (6.9 / 5.5), z 2.30 | +18.5 (4.6 / 3.3), z 5.66 | +5.9 (3.9) |
+| m13 - m11 | GDP-only | +67.5 (12.7 / 18.4), z 3.67 | +80.6 (25.0 / 24.6), z 3.27 | +13.0 (13.4) |
+| m10 - m12 | GDP-only | +47.0 (28.5 / 30.1), z 1.56 | +38.9 (29.0 / 36.9), z 1.05 | -8.1 (10.4) |
+
+**By sub-period**, 1980 sample, with full sample in brackets (NW SE for the
+long periods; with n = 4 in 2020 the NW SE is not meaningful):
+
+| a - b | 1990-99 | 2000-07 | 2008-19 | 2020 | 2021-22 | 2023-26 | pre-2020 (n 120) | excl. 2020 Q2 - 2021 Q1 (n 142) |
+|---|---|---|---|---|---|---|---|---|
+| m13 - m12 | -0.4 [+1.3] | +0.4 [+4.0] | +6.4 [+14.8] | +32.4 [+30.1] | +12.3 [+2.5] | +6.4 [+7.0] | +6.4, SE 2.75, z 2.31 [+20.1, z 4.14] | +22.6, SE 10.5 [+28.5, SE 6.0] |
+| m9 - m5 (not nested) | -3.7 [-2.1] | -1.2 [+6.2] | +8.1 [+25.4] | +5.1 [-8.7] | -8.3 [+3.1] | +16.5 [+22.7] | +3.3, SE 6.2 [+29.6, SE 11.2] | +12.5, SE 14.6 [+56.8, SE 17.7] |
+| m4 - m2 (measurement SV) | +1.6 [+5.9] | +3.4 [+12.0] | +14.5 [+31.5] | +4.1 [-7.5] | -8.8 [+5.3] | +18.6 [+25.2] | +19.4, SE 6.4, z 3.02 [+49.5, z 4.68] | +30.2, SE 15.6, z 1.93 [+81.6] |
+| m9 - m6 (measurement SV) | +2.0 [+5.6] | +3.7 [+13.3] | +15.7 [+33.6] | +6.4 [-8.8] | -7.4 [+4.3] | +18.4 [+25.4] | +21.4, SE 6.6, z 3.22 [+52.5, z 4.78] | +33.4, SE 14.9, z 2.24 [+83.6] |
+| m4 - m1 (not nested) | +2.8 [+6.1] | +4.3 [+12.2] | +16.3 [+31.5] | -4.4 [-8.3] | -9.5 [+5.1] | +18.7 [+25.3] | +23.4, SE 7.1 [+49.7] | +33.1, SE 16.4, z 2.02 [+81.7] |
+| m5 - m2 | +5.3 [+7.6] | +5.0 [+7.1] | +6.8 [+8.4] | +0.3 [+0.2] | +1.0 [+1.3] | +1.9 [+2.7] | +17.2, SE 2.1 [+23.1] | +20.0, SE 2.1 [+27.0] |
+| m12 - m9 | +5.7 [+6.7] | +6.0 [+9.2] | +2.9 [+3.9] | +5.2 [-4.2] | +0.5 [+0.4] | +0.4 [+0.7] | +14.5, SE 2.8 [+19.9] | +16.4, SE 3.0 [+20.5] |
+| m13 - m10 (GDP-only) | +3.5 [-0.5] | +6.4 [+7.0] | +4.7 [+6.3] | -1.1 [-2.3] | +2.6 [+1.8] | +2.5 [+0.4] | +14.6, SE 2.8 [+12.7] | +19.2, SE 3.2 [+14.9] |
+| m10 - m12 (GDP-only) | -3.9 [+1.9] | -6.0 [-3.0] | +1.7 [+8.5] | +33.5 [+32.4] | +9.7 [+0.7] | +3.9 [+6.6] | -8.2, SE 3.9 [+7.4] | +3.4, SE 9.5 [+13.6] |
+
+**m13 - m12 in detail.**
+- **Where the margin comes from.** 2020 Q2 alone is worth +25.6. m13 is
+  ahead in 107 of 146 quarters (full sample 122), with a median gain per
+  quarter of +0.04.
+- **Largest single quarters.** Gains: 2020 Q2 +25.6, 2020 Q4 +7.4,
+  2021 Q4 +4.7. Losses: 2016 Q3 -1.7, 2020 Q1 -0.9, 2008 Q4 -0.2.
+- **Lag sensitivity.** The NW z is 1.78 / 1.57 / 1.49 / 1.45 at lags
+  4 / 8 / 12 / 16 (iid z 2.11).
+- **MCSE.** The MCSE of the difference is 0.75 (m12's 4 passes disagree,
+  almost all in 2020 Q2).
+
+**Refits and fit quality** (`tables/lfo_fit_diagnostics.csv`,
+`tables/lfo_refit_attempts.csv`).
+- **All 86 stored fits meet the refit rule** (13 initial fits and 73
+  refits). Every initial fit passed on its first attempt, so no training
+  window was lengthened. No high-k step was used without a refit (largest
+  k used 0.699).
+- **One failed attempt.** m4's refit on 1:146 (data to 2016 Q2) failed
+  attempt 1: 12 divergences, E-BFMI 0.011, R-hat 1.28, bulk ESS 11. It
+  passed attempt 2 (1 divergence, E-BFMI 0.88, R-hat 1.006, ESS 790).
+- **Weak mixing.** Five fits meet the rule but have bulk ESS below 400:
+  m4 1:81 (226) and 1:129 (271), m9 1:65 (376) and 1:106 (160), and m13
+  1:122 (351). None has E-BFMI below 0.3.
+- **m13's fits.** m13 has 8 fits: 1:40, 64, 93, 122, 140, 160, 162 and 177
+  (data to 1989 Q4, 1995 Q4, 2003 Q1, 2010 Q2, 2014 Q4, 2019 Q4, 2020 Q2
+  and 2024 Q1).
+
+**Retry (seed-selection) sensitivity**
+(`tables/lfo_retry_sensitivity_summary.csv`). Only m4's 1:146 fit was
+retried, so only the 16 targets it serves are rescored:
+- m9 - m4 is +3.73 as reported, +0.46 with first attempts only and +1.28
+  pooled;
+- m13 - m4 is +81.7, +78.5 and +79.3 (NW z 1.93, 2.00, 1.98);
+- m13 - m12 is unaffected (neither model was retried).
+
+The retried attempt was re-created and reproduced its logged diagnostics
+exactly.
+
+**Particle filter.**
+- **Pass totals.** Every SV model has 4 passes:
+  - m13: -1039.45 / -1039.54 / -1039.52 / -1039.47 (MCSE 0.02);
+  - m12: -1095.45 / -1097.74 / -1098.58 / -1095.84 (MCSE 0.75);
+  - m9: -1118.38 / -1117.68 / -1118.20 / -1115.75 (MCSE 0.60);
+  - m4: -1120.14 / -1119.31 / -1123.24 / -1122.24 (MCSE 0.91);
+  - m10: MCSE 0.18.
+- **Bias over COVID.** Bias against high-particle references
+  (`tables/lfo_pf_covid_check.csv`), summed over 2020 Q1 - 2021 Q1, for the
+  schedule against the mean of 3 reference passes at 2020 Q2:
+
+  | | m13 | m12 | m9 | m4 |
+  |---|---|---|---|---|
+  | schedule | -0.02 | +0.08 | -1.55 | +0.55 |
+  | fixed N = 2000 | -0.03 | -3.27 | -3.71 | -3.31 |
+- **Bias over 2015-19.** The schedule's bias over the 20 targets
+  2015-2019 (`tables/lfo_pf_precovid_check.csv`) is -0.030 (m13) and -0.020
+  (m12).
+- **The 2020 Q2 problem.** For the three models that treat COVID as
+  measurement error, the 2020 Q2 predictive density is hard to estimate.
+  The run-to-run sd at N = 100000 is 1.5 (m12), 1.2 (m9) and 1.8 (m4) nats.
+  The 400000-particle reference passes have se 0.56, 1.11 and 0.39, against
+  0.003 for m13. Comparisons that involve m4, m9 or m12 therefore carry
+  about 1-2 nats of particle uncertainty from that one quarter. That is
+  small against m13 - m12 (57 nats) but not against m9 - m4 (3.7 nats).
+- **Not run.** The 2015-19 checks were run for m13 and m12 only. No COVID
+  check was run for m10 on this sample.
+
+**Process.**
+- **The job vanished once.** The LFO driver and its R process disappeared
+  without an exit status between 00:46 and 01:31 on 2026-10-19, during the
+  m12 COVID particle check. The system log shows no jetsam or memorystatus
+  kill, so the cause is unknown. This is logged in
+  `output/sample_1980/lfo/lfo_log.txt`. The driver was restarted, resumed
+  from its checkpoints, and the m12 check then completed in 8 minutes.
+- **The budget was overrun.** Compute took about 7 h 05 min against a
+  planned 5 h. Nothing in the protocol was cut, and COVID checks for m9 and
+  m4 were added (`run_lfo_1980_extra.sh`).
+- **The fits driver was interrupted once.** `run_1980.sh` ran m1-m9 and
+  both m13 seeds from 07:42 on 2026-10-18. At 08:27:09 the m10 fit received
+  SIGTERM (exit 143; `logs/driver.log`). The driver then logged "start
+  fit_m12", and that fit and the driver vanished with no end line. The
+  cause is not recorded. The driver was restarted at 20:37. It skipped the
+  finished steps (the fit file and its diagnostics row both exist) and then
+  ran m10, m12, m11, the m11 diagnostics row, the variance decomposition and
+  figures 01-06 (DRIVER DONE 20:54:58). So m10, m12 and m11 were fitted
+  about 12 hours after the others. `R/02_fit_models.R` was edited
+  in between and again after the restart (mtime 20:55). Results are not
+  affected:
+  - the m1 refit with the current code is bit-identical;
+  - the Stan data lists match;
+  - a sandbox re-run of the 1980 variance decomposition with the current
+    `R/02_fit_models.R` is byte-identical;
+  - a sandbox re-run of m1's 1980 LFO with the current `R/03_compare.R`
+    gives identical pointwise values (max |diff| 0). That file was edited
+    at 21:16:25, after m1's checkpoint at 21:16:19.
+- **Figure 07** (`figures/07_lfo_cumulative_elpd.png`) was first drawn in a
+  sandbox output root so that figures 01-06 were not touched, and its
+  subtitle did not say "1980 sample". On 2026-10-19 `R/04_figures.R` was
+  changed to append the sample note to the subtitles of figures 04, 06 and
+  07 too (01 and 02 already had it; 05 already names its sample start). The
+  note is empty on the full sample, so the full-sample figures are
+  unchanged. All seven 1980 figures were redrawn in
+  `output/sample_1980/figures/` from the same fits and tables.
+
+### Which full-sample conclusions survive the 1980 start
+
+The targets are identical (146 quarters, 1990 Q1 - 2026 Q2). What differs is
+the training data: 40 against 121 quarters of initial training, with no
+1960s-70s. So each "change" mixes the effect of dropping the early data with
+the effect of estimating parameters from less history. All of this is
+pseudo-real-time on the current vintage, one step ahead.
+
+**Survive**
+- **m13 is the best model** on every target: group 1, and GDP-only, ahead
+  of m10 by +18.5 (z 5.66; full sample +12.6, z 2.30). Its posterior path
+  barely moves (correlation 0.9985). On the 1980 sample it is the only model
+  with measurement SV (m4, m9, m12, m13) that keeps COVID in the latent
+  series. It is not the only 3-measure model that does:
+  - the constant-variance models m1, m2, m3, m5 and m6 also keep most of
+    2020 Q2 in latent growth on both samples. Their posterior mean of mu in
+    2020 Q2 is -23.5 to -24.4 on the 1980 sample (-22.5 to -23.4 on the full
+    sample), against -27.9 for m13 and a headline of about -28;
+  - m7 moves 2020 Q2 into its COVID variance scale by design (mu +3.6; full
+    sample +1.7).
+
+  (Corrected 2026-10-19. An earlier version said m13 is "the only 3-measure
+  model that keeps COVID in the latent series on both samples".)
+- **Serially correlated measurement errors**, the most robust feature:
+  - m5 - m2 is +20.4 (z 9.4; full sample +27.4, z 14.0);
+  - m12 - m9 is +20.6 (z 3.72; full sample +16.8, z 2.74), +14.5 before
+    2020;
+  - m5 - m2 is positive in every sub-period on both samples. m12 - m9 is
+    positive in every sub-period except 2020 on the full sample (-4.2);
+  - m13's psi is nearly unchanged at (-0.43, -0.35, -0.18).
+- **The structural E/I restriction is still not supported.** m9 - m4 is
+  +3.7 (z 1.58), but +0.5 with first attempts only and +1.3 pooled, within
+  about 2 nats of particle uncertainty. m6 - m2 turns slightly negative
+  (-1.77, z -1.76).
+- **Hours model.** m10 - m8 is +119.6 (z 1.84; full sample +124.2,
+  z 1.92), and m10's posterior is essentially unchanged.
+- **Production is the cleanest single signal** (smallest error sd) in
+  every specification.
+
+**Weaken**
+- **Latent SV (m13 - m12).** The point estimate holds: +57.4 against +59.6.
+  The evidence is weaker:
+  - the NW SE rises to 36.6, so z is 1.57 (1.45-1.78 over lags 4-16);
+  - before 2020 the gain falls from +20.1 (z 4.1) to +6.4 (z 2.3);
+  - outside 2020 Q2 - 2021 Q1 it falls from +28.5 to +22.6 (SE 10.5).
+    Outside all of 2020-22, which also removes m12's post-COVID
+    misspecification on this sample, it falls from +27.1 (NW SE 5.9, z 4.59)
+    to +12.7 (NW SE 4.9, z 2.59);
+  - m13 is ahead in 107 of 146 quarters (full sample 122);
+  - the 1980 margin leans on 2020 (+32.4) and 2021-22 (+12.3, against +2.5
+    on the full sample), where m12's 1980 fit mis-handles COVID, so part of
+    the margin scores that specification failure rather than a general
+    gain;
+  - **the production switch rule's z_NW >= 2 condition over m12 would not
+    be met on this sample**.
+- **All three features together (m13 - m5).** +94.7 (z 2.20) against
+  +123.0 (z 4.78).
+- **SV in the measurement errors: the gain roughly halves but is still
+  supported.** Two comparisons add only measurement SV to an otherwise
+  identical model (nested): m4 - m2 (independent errors) and m9 - m6
+  (structural E/I correlation). A third, m12 - m5, adds SV and the
+  structural restriction to a model with AR(1) errors. The restriction
+  alone is worth little (m9 - m4 +3.7, m6 - m2 -1.8). Group 1, NW lag 8:
+
+  | a - b | full sample | 1980 sample | 1980, pre-2020 (full) | 1980, excl. 2020-22 |
+  |---|---|---|---|---|
+  | m4 - m2 | +72.5, z 3.79 | +33.4, z 2.11 | +19.4, z 3.02 (+49.5) | +38.0, z 2.88 |
+  | m9 - m6 | +73.3, z 3.69 | +38.9, z 2.58 | +21.4, z 3.22 (+52.5) | +39.9, z 3.05 |
+  | m12 - m5 | +63.4, z 3.06 | +37.3, z 2.47 | +17.8, z 3.54 (+49.4) | +34.8, z 3.00 |
+
+  - **Seed selection.** With first attempts only, m4 - m2 is +36.6
+    (z 2.28), and +35.8 (z 2.25) pooled
+    (`tables/lfo_retry_sensitivity_summary.csv`). m9 and m6 had no retried
+    fit.
+  - **Correction.** An earlier version of this note said the gain "largely
+    disappears". That rested on m9 - m5 (+46.6, z 2.37 -> +16.7, z 1.13)
+    and m4 - m1 (+71.9, z 3.71 -> +28.2, z 1.46). Neither is nested. m9 has
+    SV but not m5's AR(1) errors, so m9 - m5 nets the SV gain against losing
+    serial correlation, which is worth +20.6 on this sample (m12 - m9). m4 -
+    m1 also adds a latent AR(1), worth -5.2 on this sample (m2 - m1; -0.6
+    on the full sample).
+  - **Caveats.** On the 1980 sample m4, m9 and m12 treat COVID as
+    measurement error ("Posterior", section 2), so their 2020 and 2021-22
+    scores partly reflect that failure. The nested gains are +4.1 / +6.4 in
+    2020 and -8.8 / -7.4 in 2021-22. GDP(E)'s measurement SV is also not
+    persistent on this sample (phi_E is prior-dominated; same section), so
+    what SV adds for E there is mostly a heavier-tailed error, not
+    persistent volatility.
+  - **Why it halves.** Before 2020 every model gains from the later start,
+    but the constant-variance models gain about twice as much: m1 +51.6, m2
+    +55.2 and m5 +49.3, against m4 +25.2, m9 +23.1 and m12 +17.7 (1980
+    minus full, pre-2020 sums). Their error variances, GDP(E)'s above all,
+    are no longer inflated by the early decades.
+  - **The whole-window totals exaggerate this asymmetry.** They are +35 to
+    +46 for the constant-variance models and +2.5 to +8.6 for the SV models,
+    but they also contain two other periods:
+    - 2020, where both kinds of model lose from the later start: m1 -16.5,
+      m5 -24.1, m4 -12.6, m9 -10.3, m12 -0.9;
+    - 2021-22, where only the SV models lose: m4 -12.3, m9 -9.9, m12 -9.9,
+      against m1 +2.3 and m5 +1.4.
+  - So about half of the full-sample measurement-SV gain came from pre-1980
+    training data. That is the paper's point about unrepresentative early
+    measurement errors. The other half does not depend on the start date.
+    It is largest in 2008-19 and 2023-26 (m9 - m6 +15.7 and +18.4).
+
+**Change or reverse**
+- **m7 (constant variance plus a COVID scale) rises from 6th to 4th** in
+  group 1, level with m9 and m4 (-1120.4 against -1117.5 and -1121.2).
+- **The variance decompositions of m4, m9 and m12 break down.** They fall
+  to 0.32-0.37 because these fits count COVID as measurement error. The
+  full-sample statement that "the other specifications give 78-83%" does
+  not hold on this sample.
+- **m13's variance ratio.** It is 0.87 [0.81, 0.94] (0.78 excluding
+  2020 Q1 - 2021 Q1) against 0.79 on the full sample. The difference is
+  entirely which quarters are covered. Over exactly 1980 Q1 - 2026 Q2 the
+  full-sample fit gives 0.883 [0.819, 0.950] (0.793 excluding COVID),
+  slightly above the 1980 fit (see "Variance decomposition"). The
+  "about a fifth is measurement error" figure is specific to the full
+  sample; on 1980-2026 it is about an eighth, or about a fifth excluding
+  COVID.
+- **m10 against m12 (GDP-only).** m10 - m12 falls from +47.0 to +38.9
+  (z 1.05), and before 2020 m10 is now behind m12 (-8.2). As before, none of
+  the labour-model gaps measures the value of the labour data.
+
+### Production: unchanged, and the recommendation
+
+Production still fits m13 on the full sample. This round changed no
+production file.
+
+**Recommendation (comparison author): keep production on m13, unchanged
+(full sample; do not move to 1980 Q1).** Reasons:
+- On the 1980 sample m13 is still the best model on every target. It is
+  also the only model with measurement SV that keeps COVID in the latent
+  series. The constant-variance models also keep most of it there, but
+  they score 95-119 nats worse in group 1. (Corrected 2026-10-19: this
+  reason first said "the only 3-measure model", which is false.)
+- If anyone wants to firm up the latent-SV evidence, the useful next step
+  is a test that does not reuse this evaluation window, such as real-time
+  scoring of the next ABS releases. Re-scoring on yet another sample would
+  not settle it.
+
+That recommendation does not separately argue the sample-start question.
+Two facts from the tables bear on it (added by the documentation editor):
+- **Prediction.** m13 trained from 1980 Q1 scores +6.3 nats better on the
+  same 146 targets than m13 trained from 1959 Q4 (-1039.50 against
+  -1045.82; NW SE 3.74, so z 1.69; `tables/lfo_full_vs_sample_models.csv`).
+  That is below the z_NW >= 2 bar that every production switch has used.
+  The gain is mostly in 1990-99 (+4.5, NW SE 2.31, z 1.96). Those are the
+  targets nearest the dropped 1960s-70s data, and the 1980 run's training
+  sets are shortest there. From 2000 on the gain is about zero: +1.8 over
+  2000-2026 (NW SE 2.51, z 0.72) and +1.3 over 2008-2026 (z 0.63). For
+  current production the start date hardly matters for prediction.
+- **The estimate.** The two fits' latent paths differ by 0.13 pp
+  (annualised) on average, at most 1.03 pp.
+- **The variance ratio.** The published ratio would move from 0.79 to 0.87
+  only because it would be reported over 1980-2026 instead of 1959-2026.
+  Over exactly 1980 Q1 - 2026 Q2 the full-sample fit gives 0.883
+  [0.819, 0.950] (0.793 excluding 2020 Q1 - 2021 Q1). The 1980 fit gives
+  0.872 (0.776). The estimation start changes neither the path nor the
+  ratio materially. (An earlier version said moving the start "would
+  change the published variance ratio (0.79 -> 0.87) more than it changes
+  the path". That mixed up the estimation start with the reporting window.)
+
+### Open items (1980 sample)
+
+- **Version control (fixed 2026-10-19).** `.gitignore` now has
+  `output/sample_*/**/*.rds`. That covers the 45 fit objects, LFO
+  checkpoints and particle-check files under `output/sample_1980/` (about
+  1.7 GB; several are over GitHub's 100 MB limit). `git check-ignore`
+  matches `output/sample_1980/fit_m1.rds` and
+  `output/sample_1980/lfo/lfo_m1.rds`. The 72 files that are meant to be
+  kept (tables, logs, figures, driver scripts; 3.1 MB) are still untracked
+  but not ignored.
+- **Tests.** The unit tests (283 expectations in 4 files, all pass) test
+  only the full-sample fits in `output/`. There are no 1980-sample checks.
+- **Multimodality.** One alternative starting region (COVID in mu, from
+  full-sample draws) has now been tried for each of m4, m9 and m12. In all
+  three, every chain left it within about 50 warmup iterations and matched
+  the reference fit ("Posterior", section 2). Other regions, such as tempered
+  or optimisation-based searches, were not tried.
+- **Particle checks not run:** the 2015-19 particle checks for m9, m4 and
+  m10, and a COVID check for m10.
+- **m11 retries.** `run_retrycheck()` in `R/03_compare.R` scores m11
+  without `ll_post_m11`. This is pre-existing code, not exercised here (m11
+  had no retried fit), but it would be wrong if an m11 refit is ever
+  retried.
+- **Post hoc.** m13 was proposed after the re-specified m10's results were
+  seen on this same evaluation window. Re-scoring on the 1980 sample reuses
+  that window, so it is not independent evidence.
+
+## Round of 2026-10-18: m13 (m12 + latent SV) and the production switch m12 -> m13
+
+The data vintage is unchanged (2026 Q2, T = 267). The scores of every
+earlier model are unchanged; m13 is added to group 1. The 2026-10-17 round
+below stays valid except where this section marks it superseded.
+
+### Summary
+
+- **m13** = m12 + stochastic volatility on the latent innovation (the
+  feature that the re-specified m10 added). It is the best model on every
+  comparison: group 1 -1045.82 against -1105.47 for m12 (+59.65, Newey-West
+  SE 28.89, z 2.06), and on the GDP-only target it is ahead of m10 by +12.62
+  (NW SE 5.48, z 2.30).
+- **Production switched from m12 to m13**, under a rule fixed before m13's
+  LFO results were known and stricter than the m9 -> m12 rule (below).
+- **Post hoc.** m13 was proposed after the re-specified m10's LFO results
+  had been seen (m10 - m9 +63.8 and m10 - m12 +47.0 on GDP-only, suggesting
+  that latent SV is what helps). m13 is therefore a second latent-SV
+  specification scored on the same evaluation window, and its z-values
+  overstate the evidence somewhat, and nothing in the decision rule corrects
+  for that. The rule's extra condition (z >= 2 with first attempts only)
+  guards only against choosing a lucky refit seed, and it changed nothing
+  here (m13 needed no retry; z 2.06 either way). Counting the re-specified
+  m10 and m13 as two latent-SV tries on the same window, a Bonferroni bar
+  for two tries (z about 2.24) would not be met by z 2.06.
+- **The gain is not only COVID.** 2020 Q2 alone is worth +23.7 nats and
+  dominates the SE; without the COVID quarters m13 - m12 is +28.5 (NW SE 6.0,
+  z 4.7), before 2020 +20.1 (SE 4.9, z 4.1), and m13 is ahead in 122 of 146
+  quarters.
+- **The variance decomposition barely moves on the full sample** (0.790
+  against m12's 0.779), but outside COVID m13 puts more of headline variance
+  into measurement error than m12 (see "m13: fits and posterior").
+
+### m13: specification
+
+`stan/m13_serial_latent_sv.stan`:
+- y_t^k = mu_t + eps_t^k, k = E, I, P; eps_t^k = psi_k eps_{t-1}^k + u_t^k;
+  u_t ~ N(0, R_t) with m12's structural covariance (rho_EI = tanh(z_EI), P
+  independent) and stationary AR(1) SV h_{t,k}, all exactly as m12;
+- mu_t = c + rho mu_{t-1} + exp(g_t / 2) eta_t;
+- g_t = mu_g + phi_g (g_{t-1} - mu_g) + omega_g zeta_t, stationary and
+  non-centred, g_1 ~ N(mu_g, omega_g² / (1 - phi_g²));
+- mu_1 ~ N(c / (1 - rho), exp(g_1) / (1 - rho²)): m10's convention (the
+  stationary law at the period-1 variance; the marginal stationary law under
+  latent SV has no closed form, and period 1 is outside the LFO window).
+
+With g_t = log(tau²) for all t the model is m12 exactly.
+- **Priors.** mu_g ~ N(2, 1), phi_g ~ U(-1, 1), omega_g ~ half-N(0, 0.5)
+  (m10's) replace tau ~ half-N(0, 2); every other prior is m12's
+  (`priors.md`). `tau = exp(mu_g / 2)` and `tau_t = exp(g_t / 2)` are
+  generated quantities.
+- **Sampling.** Given (g, h) the model block integrates mu out with m12's
+  quasi-differenced Kalman filter on (mu_t, mu_{t-1}), with tau replaced by
+  tau_t in the predicted-state factor and in the backward-sampling variance;
+  mu is drawn by FFBS. The data block guards K = 3.
+- **Tests** (`tests/test_m13.R`, 133 checks, all pass, none skipped):
+  - the Stan filter's total and per-period log-likelihood against the dense
+    multivariate-normal density, to 1e-9 / 1e-8, for 5 psi settings
+    (including psi = 0, psi_E = psi_I and |psi| up to 0.95) with non-constant
+    g and h, a COVID-like jump of +5 in g, g = -12 in some periods,
+    z_EI = -5 and h = -15;
+  - with constant tau_t, bit-identical (`expect_identical`) to m12's
+    `kf_m12`, in Stan and in C++;
+  - FFBS against the dense smoother with non-constant g, 20000 draws: worst
+    mean error 1.8-2.0 Monte Carlo SEs, worst covariance error 2.3;
+  - the C++ filter (`R/lib/filter_m13.cpp`) against Stan, to 1e-11;
+  - the particle filter (particles over (g, h), Kalman over
+    (mu_t, mu_{t-1})) against the exact Kalman filter at omega, omega_g ->
+    0, and against m12's particle filter at omega_g = 0 (to 1e-10, same
+    seed); against brute-force Monte Carlo over 200000 (g, h) paths with a
+    latent-volatility jump: -37.488 (bootstrap proposal) and -37.497
+    (adapted proposal) against -37.496 (se 0.005);
+  - the C++ conditional filter against the fit's `log_lik_pred` on 5 draws.
+  The LFO dispatch (`filter_loglik("m13")`, with a particle schedule and
+  through `filter_par`'s workers) is checked against the dense MVN in
+  `tests/test_filters.R` (x), 9 checks. The whole of `tests/test_filters.R`
+  was later run and passes (63 checks, none failed or skipped).
+- **Warmup stalls** (`R/fit_m13.R stall`, 150 warmup iterations,
+  adapt_delta 0.99, treedepth 12, timeout 600 s): 0 of 100 chains stalled at
+  init = 2 (median 116 s, max 265 s) and 0 of 40 at init = 0.5 (median 57 s).
+  Process note: seeds 5 and 6 of the init = 2 batch were killed by mistake
+  mid-run and rerun separately (neither stalled); the harness output
+  (`stall_init2/`, `stall_init2_redo56/`, `stall_init05/`, each with a
+  `stall_summary.rds`) was written to the session scratch directory, not the
+  repo, and `stall_init2/stall_summary.rds` still holds the killed rows
+  (exit -15). Rerun with `Rscript R/fit_m13.R stall` to reproduce.
+
+### m13: fits and posterior
+
+Both seeds use the production settings and pass the production gate, with
+mu_g, phi_g and omega_g added to the hyperparameters and R-hat <= 1.05
+required on every g[t] as well (`output/tables/m13_gate_seeds.csv`; fits
+`output/fit_m13.rds`, `output/fit_m13_seed2.rds`, gitignored, regenerated by
+`Rscript R/fit_m13.R` and `Rscript R/fit_m13.R --seed=2`):
+
+| Check | seed 1 | seed 2 | Gate |
+|---|---|---|---|
+| divergences | 4 of 8000 (0.050%) | 0 of 8000 | < 0.1% |
+| E-BFMI by chain | 0.935, 0.854, 0.969, 0.920 | 0.843, 0.844, 0.869, 0.855 | min >= 0.3 |
+| max R-hat, hyperparameters | 1.0020 (omega[1]) | 1.0027 (omega[2]) | <= 1.01 |
+| max R-hat, mu / h / g | 1.0011 / 1.0018 / 1.0020 | 1.0020 / 1.0019 / 1.0015 | <= 1.05 |
+| min bulk / tail ESS, hyperparameters | 1553 (omega[2]) / 3213 | 1784 (omega[2]) / 2618 | >= 400 |
+| min bulk / tail ESS, mu | 4344 / 4866 | 4550 / 5191 | >= 400 |
+| max-treedepth hits | 0 | 0 | - |
+| sampling time (4 parallel chains) | 1375 s (wall 1384 s; chains 989-1375 s) | 1664 s (wall 1674 s) at load average 10-11 | <= 30 min |
+
+`output/tables/fit_diagnostics.csv` tabulates m13 from the saved fit
+(`R/02_fit_models.R --diag-only m13`), so its `wall_secs` is CmdStan's
+sampling total, 1375 s, not the 1384 s wall time.
+
+The two seeds' posterior means agree to within 0.007. Seed 1, posterior
+medians with 90% intervals (annualised units):
+
+| | m13 | m12 |
+|---|---|---|
+| latent innovation sd | tau_t, see below; exp(mu_g / 2) 2.47 [1.71, 3.61] | tau 3.99 [3.66, 4.34] |
+| phi_g, omega_g | 0.91 [0.80, 0.97], 0.61 [0.42, 0.89] | - |
+| psi (E, I, P) | -0.46, -0.36, -0.19 | -0.47, -0.34, -0.16 |
+| psi_P 90% interval | [-0.35, -0.02] (now excludes 0) | [-0.36, 0.04] |
+| rho_EI | 0.12 [-0.03, 0.27] | 0.175 [0.00, 0.32] |
+| rho, mu_bar (means) | 0.27, 2.77 | 0.09, 3.10 |
+| variance ratio, full sample | 0.790 [0.705, 0.889] | 0.779 [0.707, 0.850] |
+| variance ratio, full sample excl. 2020 Q1 - 2021 Q1 | 0.731 | 0.727 |
+| variance ratio, 1978 Q4 - 2026 Q2 | 0.855 [0.790, 0.923] | 0.909 |
+| the same excl. 2020 Q1 - 2021 Q1 | 0.755 | 0.875 (m10 0.558) |
+
+- **Latent volatility.** tau_t (posterior median of each decade's average):
+  1960s 4.9, 1970s 4.6, 1980s 3.4, 1990s 2.5, 2000s 1.6, 2010s 1.4,
+  2020s 4.0; 2020 Q2 12.0 [8.3, 19.1], 2020 Q3 11.6. Real activity was more
+  volatile before the mid-1980s and much less volatile in the 2000s-2010s
+  than m12's constant tau of 4 allows, and COVID is a large real shock.
+- **Latent path.** The median path differs from m12's by 0.38 pp
+  (annualised) on average, at most 1.7 (1963 Q3). 2020 Q2 mu is -27.9
+  (m12 -27.4, headline -28.1).
+- **Decomposition.** With a time-varying latent sd, a quiet-period quarter's
+  disagreement between the measures is attributed more to measurement error:
+  on 1978 Q4 - 2026 Q2 excluding COVID, m13's latent path has 75.5% of
+  headline variance against m12's 87.5% (m10, with hours, 55.8%). On the
+  full sample the two nearly agree because the 1960s-70s volatility and
+  COVID dominate.
+- **Prior sensitivity.** Seed 1 refitted with omega_g ~ half-N(0, 1)
+  (`Rscript R/fit_m13.R --omega_g_sd=1 --out=output/fit_m13_omegag1.rds`)
+  passes the gate (4 divergences, E-BFMI 0.839, max R-hat 1.0019 on
+  hyperparameters and 1.0018 on g, min bulk ESS 1577; 1441 s). omega_g goes
+  from 0.61 [0.42, 0.89] to 0.66 [0.44, 1.02], phi_g from 0.91 to 0.90, tau
+  from 2.47 to 2.43. The median tau_t path changes by 1.9% on average (at
+  most 7.4%, 2019 Q3; relative change of each quarter's median); 2020 Q2 tau_t 12.0 -> 12.3; decade means change by at
+  most 0.1. The latent median path moves by 0.033 pp on average (at most
+  0.18, 1969 Q1); the variance ratio goes from 0.790 to 0.786 (full sample)
+  and from 0.755 to 0.753 (1978 Q4 - 2026 Q2 excluding COVID). The results
+  are insensitive to this widening. (omega_g's posterior median sits at the
+  78th percentile of the half-N(0, 0.5) prior; m10's 0.94 sat higher.)
+
+### m13: LFO
+
+`Rscript R/03_compare.R m13`: same window (1990 Q1 - 2026 Q2, 146 targets,
+initial training 121 quarters), refit rule, 4 attempts, particle schedule,
+4 filter passes and Newey-West lag 8 as every other model.
+
+- **Fits.** 6 (the initial fit and refits at 1:146, 1:171, 1:204, 1:223 and
+  1:243, the last on data to 2020 Q2). All 6 meet the refit rule on the first
+  attempt; 0 divergences, min E-BFMI 0.81, max R-hat 1.013, min bulk ESS 222;
+  max Pareto k used 0.696, no high-k step without a refit. Two fits are weak
+  mixing (bulk ESS below 400): 1:171 (309; highest R-hat on phi_g) and 1:204
+  (222; highest R-hat on phi[3]). The fit diagnostics record the lowest bulk
+  ESS but not the variable that has it.
+  m13 needs one refit after COVID; m12 also needed a 2020 Q4 refit, which
+  passed only on its third attempt.
+- **Filter.** The RBPF in `R/lib/filter_m13.cpp` with the locally adapted g
+  proposal (defensive share 0.1) and the pf_schedule particle schedule. On
+  12 posterior draws with 4 runs each, at fixed N = 2000 the adapted proposal
+  beats the bootstrap one (COVID run-sd 0.65 against 1.38 nats, bias -0.27
+  against -0.96; min pilot ESS fraction at 2020 Q2 0.0028 against 0.0006);
+  under the schedule they are close. The schedule raised N in 23 of 267
+  quarters (100000 only at 2020 Q2; cost x1.31). The same 12-draw check
+  against a 2-run N = 50000 reference gives a whole-series bias of about
+  -0.6 to -0.7 nats per draw over 267 quarters (COVID quarters -0.19); that
+  is on the full-sample likelihood, not the LFO targets (below).
+- **Monte Carlo error.** Pass totals -1046.05 (main), -1045.17, -1046.10,
+  -1045.96: mean -1045.82, MCSE 0.22. MCSE of m13 - m12 0.29. The main pass
+  alone gives m13 - m12 = +59.83 (iid SE 25.08, NW SE 29.24).
+- **Particle bias against high-particle references** (`pfcheck`, m12's
+  reference settings): over the COVID quarters 2020 Q1 - 2021 Q1 the summed
+  bias is +0.069 under the schedule and -0.173 at N = 2000 (m12: +0.160 and
+  -0.374); the 2020 Q2 reference is -23.205 (se 0.109, 3 passes) against
+  m12's -47.03. Over the 20 targets 2015-2019 it is -0.028 under the
+  schedule (per target -0.015 to +0.017) and -0.035 at N = 2000 (m12
+  -0.017). Net bias on m13 - m12 is about -0.09 (COVID) and -0.011
+  (2015-19): negligible against a 59.6-nat difference. Only 2020 Q2 has 3
+  reference passes; every other target has 1.
+- **Process.** The LFO process (20:21-22:25 on 2026-10-17) exited with
+  status 1: "Error while shutting down parallel: unable to terminate some
+  child processes", printed at R shutdown after every output had been
+  written. The summary was rerun and exited cleanly; logged in
+  `output/lfo/lfo_log.txt`. Compute used about 3 h 55 min including the
+  particle checks.
+- **Existing models untouched.** Every elpd_lfo and GDP-only score in
+  `model_comparison.csv` and all 206 earlier rows of
+  `model_comparison_pairwise.csv` are identical to commit 277f609;
+  `lfo_retry_sensitivity.csv` is byte-identical.
+
+Group 1 (E, I, P):
+
+| model | elpd_lfo | SE | refits | retried | below rule | weak mixing | MCSE |
+|---|---|---|---|---|---|---|---|
+| **m13** | **-1045.82** | 22.7 | 5 | 0 | 0 | 2 | 0.22 |
+| m12 | -1105.47 | 42.7 | 7 | 1 | 0 | 3 | 0.20 |
+| m9 | -1122.24 | 40.0 | 7 | 2 | 0 | 3 | 0.31 |
+| m4 | -1123.72 | 40.0 | 6 | 0 | 0 | 3 | 0.02 |
+
+(m5, m7, m6, m1, m3, m2 are unchanged; m13 leads each by 123.0-150.4,
+NW SE 20.7-25.8.)
+
+Key differences (`model_comparison_pairwise.csv`):
+
+| a - b | target | diff | SE iid | z iid | SE NW(8) | z NW | MCSE |
+|---|---|---|---|---|---|---|---|
+| m13 - m12 | group 1 | **+59.65** | 24.74 | 2.41 | 28.89 | **2.06** | 0.29 |
+| m13 - m9 | group 1 | +76.42 | 21.80 | 3.51 | 24.78 | 3.08 | 0.38 |
+| m13 - m4 | group 1 | +77.90 | 21.89 | 3.56 | 23.74 | 3.28 | 0.22 |
+| m13 - m5 | group 1 | +123.01 | 15.29 | 8.04 | 25.72 | 4.78 | 0.22 |
+| m13 - m10 | GDP-only | +12.62 | 6.87 | 1.84 | 5.48 | 2.30 | 0.22 |
+| m13 - m11 | GDP-only | +67.54 | 12.67 | 5.33 | 18.42 | 3.67 | |
+| m13 - m8 | GDP-only | +114.86 | 32.98 | 3.48 | 44.91 | 2.56 | |
+
+Newey-West lags 4 / 8 / 12 / 16 give SE 27.5 / 28.9 / 29.1 / 29.2 for
+m13 - m12, so z 2.17 / 2.06 / 2.05 / 2.05: the z >= 2 condition holds at
+every lag tried, but only just. m13 - m10 compares models with different
+information (m10 also sees past hours and its fits start in 1978) and
+different structure (m10 has independent, non-AR measurement errors; m11 has
+no SV), so neither gap measures the value of the labour data: no m13 + hours
+model exists.
+
+Seed-selection (retry) sensitivity for m13 - m12
+(`lfo_retry_sensitivity_summary.csv`). m13 had no retried refit, so only
+the 17 targets served by m12's retried 1:245 fit change:
+
+| variant | diff | SE iid | SE NW | z NW |
+|---|---|---|---|---|
+| as reported (kept attempts) | +59.65 | 24.74 | 28.89 | 2.06 |
+| first attempt only | +59.79 | 24.75 | 29.00 | 2.06 |
+| all attempts pooled | +59.60 | 24.74 | 28.90 | 2.06 |
+| the 53 retried targets dropped (93 left) | +42.17 | 24.53 | 28.78 | 1.47 |
+
+The "dropped" row removes evidence (including 2020 Q2's +23.7) rather than
+measuring selection, as for m12 - m9. (In this file `n_targets_rescored`
+counts all 53 retried targets for every pair, including pairs where neither
+model was retried; that was already so before, and the values are right.)
+
+By sub-period (`model_comparison_subperiod.csv`, which now has a `target`
+column: earlier rows are "group 1 joint", the new m13 - m10, m12 - m10 and
+m10 - m9 rows "GDP-only"):
+
+| period | n | m13 - m12 (SE iid / NW) | m13 - m9 (SE iid / NW) | m13 - m10, GDP-only (SE iid / NW) |
+|---|---|---|---|---|
+| 1990-99 | 40 | +1.31 (0.81 / 0.54) | +8.00 (3.16 / 2.34) | -0.54 (3.86 / 3.56) |
+| 2000-07 | 32 | +3.99 (1.11 / 0.86) | +13.23 (2.22 / 1.29) | +6.96 (2.18 / 1.21) |
+| 2008-19 | 48 | +14.78 (3.35 / 2.76) | +18.72 (3.65 / 3.74) | +6.32 (2.69 / 2.18) |
+| 2020 | 4 | +30.07 (22.39 / 8.28*) | +25.89 (19.63 / 7.72*) | -2.32 (4.09 / 1.84*) |
+| 2021-22 | 8 | +2.51 (2.97 / 1.58) | +2.92 (2.92 / 1.83) | +1.84 (2.02 / 1.51) |
+| 2023-26 | 14 | +6.99 (0.71 / 0.89) | +7.66 (1.00 / 1.09) | +0.37 (1.29 / 0.82) |
+| pre-2020 | 120 | +20.09 (3.83 / 4.86) | +39.95 (5.37 / 5.48) | +12.74 (5.24 / 5.02) |
+| all excl. COVID (2020 Q2 - 2021 Q1) | 142 | +28.53 (5.19 / 6.02) | +49.06 (6.44 / 6.26) | +14.92 (5.73 / 5.58) |
+| **all** | 146 | **+59.65 (24.74 / 28.89)** | +76.42 (21.80 / 24.78) | +12.62 (6.87 / 5.48) |
+
+\* With n = 4 the Newey-West SE is not meaningful.
+
+m13 is ahead of m12 in 122 of 146 quarters (median gain +0.17 per quarter).
+Largest gains: 2020 Q2 +23.7, 2020 Q4 +5.5, 2020 Q3 +2.3. Largest losses:
+2016 Q3 -2.0, 2020 Q1 -1.5, 2008 Q4 -1.0. Outside 2020 the gain per
+quarter grows over the window as the latent volatility falls further below
+m12's constant tau: about +0.03 per quarter in 1990-99, +0.12 in 2000-07,
++0.31 in 2008-19 and +0.50 in 2023-26.
+
+### Production decision: m12 -> m13
+
+The rule was fixed before m13's LFO results were known. Because m13 is a
+post-hoc candidate (above), it adds a fifth condition to the four used for
+m9 -> m12: switch production to m13 only if (1) it passes the production
+gate on two seeds, (2) its LFO score is reliable, (3) it beats m12 by
+z_NW >= 2, (4) it still does so using each LFO refit's first attempt only,
+and (5) a local fit takes at most 30 minutes.
+
+| Condition | Observed | Met |
+|---|---|---|
+| gate on two seeds | seeds 1 and 2 both pass (table above) | yes |
+| reliable LFO | MCSE of m13 - m12 0.29 (4 passes each); measured bias about -0.1; all 6 m13 fits meet the refit rule on attempt 1 | yes |
+| z_NW >= 2 | +59.65 / 28.89 = 2.06 (lags 4-16: 2.05-2.17; main pass alone 59.83 / 29.24 = 2.05) | yes, narrowly |
+| z_NW >= 2, first attempts only | +59.79 / 29.00 = 2.06 | yes, narrowly |
+| local fit <= 30 min | 23.1 min (1384 s wall, seed 1, 4 parallel chains); 27.9 min (1674 s wall, 1664 s sampling) for seed 2 at load average 10-11 | yes; thin margin under load |
+
+The comparison author recommended making m13 the leading candidate rather
+than switching automatically, given the thin margins and the post-hoc
+origin. The pre-set rule decides, and all its conditions are met, so
+production uses `stan/m13_serial_latent_sv.stan` from 2026-10-18:
+`R/fit_production.R` (gate hyperparameters add mu_g, phi_g, omega_g; R-hat
+<= 1.05 also on every g[t]), `R/output_estimate.R` (model string,
+hyperparameter list), `R/input_hash.R` (the m13 Stan file replaces m12's),
+`R/build_site.R` (model description, equations, priors, comparison text)
+and the CI workflow (cached executable `stan/m13_serial_latent_sv`, key on
+its .stan hash; timeout unchanged at 120 minutes).
+
+The production fit on the current data (`Rscript R/fit_production.R`, seed 1,
+2026-10-18, load average about 4) reproduces the seed-1 research fit draw
+for draw (identical mu, g and omega_g draws): 4 divergences in 8000, E-BFMI
+0.854-0.969, max R-hat 1.0020 (omega[1]) on hyperparameters and 1.0011 /
+1.0018 / 1.0020 on mu / h / g, min bulk / tail ESS 1553 / 3213 on
+hyperparameters and 4344 / 4866 on mu, 0 treedepth hits; gate passed.
+Sampling took 1173 s (chains 856-1173 s), about 20 minutes wall. A second
+production run (another process, about 00:39-00:59 on 2026-10-18) then
+rewrote `output/fit_production.rds` and `docs/`: the same seed gave the same
+draws (mu and omega_g identical to the seed-1 research fit), sampling took
+1177 s (chains 859-1177 s), and the input hash is unchanged.
+`R/output_estimate.R` and `R/build_site.R` were then rerun. A later review
+fix made the site's posterior numbers in the model description (tau_t by
+decade and at 2020 Q2, the psi medians) come from the fit:
+`R/output_estimate.R` now also writes `docs/model_summary.json`, which
+`R/build_site.R` fills into the text. The other models' variance splits in
+"Why this specification" remain research-suite numbers, labelled as such.
+The estimates are unchanged (`estimates.csv` and `estimates_latest.json`
+byte-identical); because both scripts changed, the input hash changed, and
+the hash in `docs/diagnostics.json` equals `Rscript R/input_hash.R`
+(37ae6eaa...). The next weekly CI run will therefore refit once even
+without new data.
+
+Published numbers, m13 against the last m12 publication (quarter-on-quarter
+%, posterior median and 90% interval):
+- 2026 Q2: 0.48 [0.30, 0.63] against 0.47 [0.29, 0.62]; headline 0.42;
+- 2020 Q1-Q4: -0.26 / -6.98 / +3.43 / +3.50 against -0.33 / -6.84 / +3.38 /
+  +3.52;
+- the median path differs by 0.10 pp on average (at most 0.43);
+- variance ratio 0.790 [0.705, 0.889] against 0.779 [0.707, 0.850].
+
+What does and does not change for users: the full-sample variance ratio
+moves from 0.779 to 0.790, and the published path moves by 0.38 pp
+(annualised; about 0.1 pp quarter-on-quarter) on average.
+
+Open items:
+- the fit's run time on GitHub's runners has not been measured (m12's was
+  not either); at 23-28 minutes locally the 120-minute job limit leaves
+  room, but the 30-minute local condition is close under load;
+- the 2015-2019 particle check has 1 reference pass per target; only
+  2020 Q2 has 3;
+- two m13 LFO fits (1:171, 1:204) have bulk ESS of 309 and 222, below the
+  production level;
+- the post-hoc caveat cannot be removed on this evaluation window; a real
+  test is the out-of-sample record from the next ABS releases.
+
 ## Round of 2026-10-17: m12, m3 rewrite, m10 re-specification, stricter LFO, production switch
 
 This section supersedes the 2026-10-16 comparison tables below (they are kept,
@@ -108,7 +1218,8 @@ unchanged (2026 Q2, T = 267).
   PSIS-LFO-CV: -1105.47 against -1122.24 for m9 (+16.77, Newey-West SE 6.12,
   z 2.74).
 - **Production switched from m9 to m12**, under a rule fixed before m12's
-  results were known (below).
+  results were known (below). *(Superseded 2026-10-18: production is now
+  m13; see "Round of 2026-10-18".)*
 - **m3** now samples cleanly (mu integrated out). Its Omega is still weakly
   identified; that is a property of the model.
 - **m10** had a genuine two-mode posterior. It was re-specified with
@@ -390,7 +1501,9 @@ dense MVN, the m8 Kalman filter at omega -> 0, brute-force Monte Carlo over
   attempt 1 only, +1.67 pooled).
 - **Weak mixing.** Ten fits that meet the rule have min bulk ESS below 400
   (`weak_mixing` in `lfo_fit_diagnostics.csv`; none has E-BFMI below 0.3).
-  They would not pass the production gate:
+  They would not pass the production gate. In brackets: the lowest bulk ESS
+  and the variable with the highest R-hat (`worst_rhat`); the table does not
+  record which variable has the lowest ESS:
   - m12: data to 1994 Q2 (ESS 336, phi[3]), 2020 Q2 (210, tau), 2020 Q4
     (125, tau);
   - m9: data to 2000 Q3 (231, phi[3]), 2020 Q2 (210, tau), 2020 Q4 (106,
@@ -399,8 +1512,9 @@ dense MVN, the m8 Kalman filter at omega -> 0, brute-force Monte Carlo over
     (117, tau; R-hat 1.033);
   - m3: data to 2020 Q2 (391, Omega[2,1]).
 
-  The weak spots are tau on the fits just after COVID (all three SV models)
-  and an SV persistence or volatility parameter on some pre-COVID fits.
+  The highest R-hat is on tau on the fits just after COVID (all three SV
+  models) and on an SV persistence or volatility parameter on some pre-COVID
+  fits.
 - **Reuse.** m4 and m9 refits with the same Stan file, data end point and seed
   as an earlier checkpoint were taken from it (5 m4 and 4 m9; the m4 1:175 cache hit is
   logged twice because of a restart) and checked
@@ -471,7 +1585,11 @@ The 2026-10-16 statement that the finite-N bias is "about 0.3-0.4 nats
 against the SV models" referred to the fixed N = 2000 filter; it is
 consistent with the -0.37 / -0.47 above and is superseded by the schedule.
 
-### Comparison results (current)
+### Comparison results (2026-10-17; m13 added 2026-10-18)
+
+*These scores are unchanged, but m13 (-1045.82) now leads group 1 and the
+GDP-only target; "diff vs m12" below is no longer the difference from the
+best model. See "Round of 2026-10-18" for m13's rows.*
 
 Group 1: E, I, P, full sample; 146 predictions, 1990 Q1 - 2026 Q2
 (`output/tables/model_comparison.csv`, `model_comparison_pairwise.csv`):
@@ -548,13 +1666,17 @@ largest losses are 2020 Q4 (-3.1) and 2020 Q2 (-3.0).
    is ahead of m9 by +63.8 (z 2.5 NW) and of m12 by +47.0 (z 1.6 NW): the
    latent-volatility feature, not just hours, may be what helps. It uses a
    shorter sample and past hours, so it is a research model.
+   *(2026-10-18: m13 tested that suggestion; it is ahead of m10 by +12.6 on
+   GDP-only, z_NW 2.3.)*
 4. **The comparison still does not test the variance decomposition.** Over
    the same 1978 Q4 - 2026 Q2 quarters, m10's latent variance ratio is 0.75
    [0.68, 0.82] and m12's 0.91 [0.84, 0.97] (0.56 and 0.88 excluding
    2020 Q1 - 2021 Q1); m10 predicts GDP somewhat better. "About a fifth of
    headline variance is measurement error" is m12's answer, not a result the
    comparison validates. A model with latent SV (m10) puts the
-   measurement-error share much higher outside COVID.
+   measurement-error share much higher outside COVID. *(2026-10-18: m13,
+   with latent SV on the full sample, gives 0.755 on those quarters
+   excluding COVID, between m10 and m12.)*
 
 **Caveats.**
 - z of 2.5-2.7 for m12 - m9 comes from a single evaluation window; the
@@ -585,7 +1707,7 @@ largest losses are 2020 Q4 (-3.1) and 2020 Q2 (-3.0).
   schedule and pointwise scores exactly (logged in `lfo_log.txt`).
 - Pseudo-real-time only, as before (current vintage, one-step-ahead).
 
-### Production decision: m9 -> m12
+### Production decision: m9 -> m12 *(superseded 2026-10-18 by m12 -> m13)*
 
 The rule was fixed before m12's LFO results were known: switch production to
 m12 only if (1) it passes the production gate on two seeds, (2) its LFO score
@@ -616,7 +1738,8 @@ Open items:
   prediction. Its published 2020 path is close to m9's: median QoQ growth
   -0.33 / -6.84 / +3.38 / +3.52 in 2020 Q1-Q4, against m9's last published
   -0.27 / -6.84 / +3.40 / +3.41;
-- m9 + latent SV (as in the new m10) is the natural next candidate.
+- m9 + latent SV (as in the new m10) is the natural next candidate. *(Done
+  2026-10-18 as m12 + latent SV: m13, now production.)*
 
 ## Model comparison: PSIS-LFO-CV (2026-10-16; results superseded 2026-10-17)
 
@@ -795,7 +1918,8 @@ because the model knows in advance which four quarters are the COVID quarters.
 4. **Serially correlated errors help.** m5 against m2 is +27.4 (SE 3.0). No SV
    model has this feature, so m9 + AR(1) measurement errors is the most
    promising next extension. *(Done 2026-10-17: that model is m12, which beats
-   m9 by +16.8, NW z 2.7, and is now the production model.)*
+   m9 by +16.8, NW z 2.7, and was the production model from 2026-10-17 to
+   2026-10-18, when m13 replaced it.)*
 5. **Hours and monthly employment add nothing detectable for GDP.**
    - m10 is ahead of m8 by 34.9 (SE 11.4 iid, 18.8 Newey-West, z 1.85),
      suggestive rather than decisive. On the GDP-only target it is level
@@ -867,7 +1991,7 @@ p(y_t | y_{1:t-1}) with the states integrated out by a filter. The old LOO
 objects (`output/loos*.rds`, `output/loo_compare.rds`) were deleted once the
 LFO results existed.
 
-## Headline replication result (per-draw variance ratios, 2026-10-16; m3, m10, m12 updated 2026-10-17)
+## Headline replication result (per-draw variance ratios, 2026-10-16; m3, m10, m12 updated 2026-10-17; m13 added 2026-10-18)
 
 For each posterior draw s, the ratio var_t(mu_t^(s)) / var_t(headline) is
 computed. The headline is the mean of E, I and P. The table shows the median
@@ -889,7 +2013,8 @@ Full sample (T = 267, 1959 Q4 - 2026 Q2; headline sd 4.54):
 | Latent mu (m6)      | 0.779 | 0.696 | 0.861 |
 | Latent mu (m7, COVID scale) | **0.614** | 0.544 | 0.685 |
 | Latent mu (m9, production until 2026-10-17)  | 0.785 | 0.709 | 0.866 |
-| Latent mu (m12, production from 2026-10-17) | 0.779 | 0.707 | 0.850 |
+| Latent mu (m12, production 2026-10-17 to 2026-10-18) | 0.779 | 0.707 | 0.850 |
+| Latent mu (m13, production from 2026-10-18) | 0.790 | 0.705 | 0.889 |
 
 Hours subsample (T = 191, 1978 Q4 - 2026 Q2; headline sd 3.95):
 
@@ -900,10 +2025,12 @@ Hours subsample (T = 191, 1978 Q4 - 2026 Q2; headline sd 3.95):
 | Latent mu (m10) *(superseded: old spec, mode A)* | 0.347 | 0.263 | 0.487 |
 | Latent mu (m9), same quarters  | 0.899 | 0.829 | 0.968 |
 | Latent mu (m12), same quarters | 0.909 | 0.840 | 0.973 |
+| Latent mu (m13), same quarters | 0.855 | 0.790 | 0.923 |
 
-The m9 and m12 rows are their full-sample fits restricted to the
-1978 Q4 - 2026 Q2 quarters (computed 2026-10-17, not in the CSV). Excluding
-2020 Q1 - 2021 Q1 the medians are m10 0.558, m9 0.861, m12 0.875.
+The m9, m12 and m13 rows are their full-sample fits restricted to the
+1978 Q4 - 2026 Q2 quarters (computed 2026-10-17, m13 2026-10-18; not in the
+CSV). Excluding 2020 Q1 - 2021 Q1 the medians are m10 0.558, m9 0.861, m12
+0.875, m13 0.755.
 
 Mixed-frequency quarters (T_q = 193, 1978 - 2026; headline sd 3.93):
 
@@ -917,7 +2044,9 @@ m9. They concluded that latent growth is "30-35% less variable than
 headline". The posterior-mean path is smoother than any single plausible path,
 so that statistic overstates the reduction. Per draw, the latent series has
 about **20% less variance than headline** (m9: 0.785 [0.709, 0.866]; m12:
-0.779 [0.707, 0.850]) and about 55% less than GDP(E).
+0.779 [0.707, 0.850]; m13: 0.790 [0.705, 0.889]) and about 55% less than
+GDP(E). Excluding the COVID quarters the share differs more between models
+(full sample: m13 0.731, m12 0.727; 1978 Q4 onward: m13 0.755, m12 0.875).
 
 This still supports the paper's qualitative claim that part of the
 quarter-to-quarter volatility in Australian GDP growth is measurement error.
@@ -1122,19 +2251,21 @@ genuine multimodality.
   does not write to that table):
   - m1, m2: default adapt_delta (0.8), max_treedepth 10;
   - m3, m5, m6, m7, m8: adapt_delta 0.99, max_treedepth 10;
-  - m4, m9, m10, m11, m12: adapt_delta 0.99, max_treedepth 12 (m12's are
-    the production settings, as m9's were).
+  - m4, m9, m10, m11, m12, m13: adapt_delta 0.99, max_treedepth 12 (m13's
+    are the production settings, as m12's and m9's were).
 - **LFO refits:** 4 x (1000 + 1000), with each model's own adapt_delta and
   max_treedepth, and the refit rule described in "Round of 2026-10-17".
 - **Diagnostics.** The research suite reports diagnostics and never stops on
   them. Only `R/fit_production.R` enforces a gate:
   - divergences < 0.1%;
   - min E-BFMI >= 0.3;
-  - R-hat <= 1.01 on hyperparameters and <= 1.05 on mu[t] and h[t,k];
+  - R-hat <= 1.01 on hyperparameters and <= 1.05 on mu[t], h[t,k] and g[t];
   - bulk and tail ESS >= 400 on hyperparameters and mu[t].
 
-  The hyperparameters are c, rho, tau, mu_h, phi, omega, rho_EI, psi and
-  mu_bar (psi added with the switch to m12).
+  The hyperparameters are c, rho, tau, mu_h, phi, omega, rho_EI, psi,
+  mu_bar, mu_g, phi_g and omega_g (psi added with the switch to m12; mu_g,
+  phi_g, omega_g and the g[t] R-hat check with the switch to m13, where tau
+  is the generated quantity exp(mu_g / 2)).
 
 ## Files
 
@@ -1146,11 +2277,14 @@ genuine multimodality.
   by both fetch scripts.
 
 **Research suite**
-- `R/02_fit_models.R`: fits m1-m10 and m12 (`Rscript R/02_fit_models.R m9 m12`
-  for a subset). Writes `output/tables/fit_diagnostics.csv`.
+- `R/02_fit_models.R`: fits m1-m10, m12 and m13 (`Rscript R/02_fit_models.R m9 m12`
+  for a subset; `--diag-only m13` tabulates a saved fit). Writes
+  `output/tables/fit_diagnostics.csv`.
 - `R/fit_m11.R`: fits m11.
 - `R/fit_m12.R`: fits m12 with the production gate (any seed), and the
   warmup-stall harness.
+- `R/fit_m13.R`: the same for m13, plus `--omega_g_sd=S` for the
+  prior-sensitivity fit; writes `output/tables/m13_gate_seeds.csv`.
 - `R/03_compare.R`: PSIS-LFO-CV comparison and per-draw variance
   decomposition.
 - `R/lib/filters.R`, `R/lib/filters.cpp`, `R/lib/lfo.R`: Kalman filter,
@@ -1159,36 +2293,50 @@ genuine multimodality.
   particle filter (registered by `register_m12()` in `R/03_compare.R`).
 - `R/lib/filter_m10.R`, `R/lib/filter_m10.cpp`: the re-specified m10's
   particle filter over (g, h) (registered by `register_m10_filter()`).
-- `tests/test_filters.R`, `tests/test_m12.R`, `tests/test_m3_m10.R`: filter
-  tests, each against a dense multivariate-normal likelihood.
+- `R/lib/filter_m13.R`, `R/lib/filter_m13.cpp`: m13's Kalman filter and
+  particle filter over (g, h) (registered by `register_m13()`).
+- `tests/test_filters.R`, `tests/test_m12.R`, `tests/test_m13.R`,
+  `tests/test_m3_m10.R`: filter tests, each against a dense
+  multivariate-normal likelihood.
 - `R/diag_m10_modes.R`: m10 mode check (16 dispersed chains; 4 chains started
   in old mode A) -> `output/tables/m10_mode_check.csv`.
 - `R/diag_m3_ident.R`: m3 identification checks ->
   `output/tables/m3_identification.csv`.
 - `R/04_figures.R`: figures 01-07 in `output/figures/`.
+- `R/sample_window.R`: the optional sample start (`LATENTGDP_START`) and
+  output root (`LATENTGDP_OUT`) for the research scripts. With both unset,
+  behaviour is unchanged. Production never sources it. See "1980Q1 sample
+  (RDP 2014-12 alignment)".
 
 **Production**
 - `R/fit_production.R`, `R/output_estimate.R`, `R/build_site.R`: production
-  fit (m12 since 2026-10-17; m9 before), estimate writer and site.
+  fit (m13 since 2026-10-18; m12 from 2026-10-17; m9 before), estimate
+  writer and site.
 - `R/input_hash.R`: CI input fingerprint.
 
 **Models**
-- `stan/m{1..12}_*.stan`: the 12 specifications.
+- `stan/m{1..13}_*.stan`: the 13 specifications.
   - m1-m5: original replication of Rees-Lancaster-Finlay.
   - m6: structural Sigma restriction (a cheap novel extension).
   - m7: Lenza-Primiceri COVID variance scale.
-  - m8: 4-signal (Rees-Lancaster-Finlay Model 4, adding hours worked).
+  - m8: 4-signal (Rees-Lancaster-Finlay Model 4, but with hours worked as
+    the fourth signal where the paper uses the unemployment rate).
   - m9: m6 + SV (production until 2026-10-17; tied with m4 on LFO).
   - m10: m8 + SV on the measurement errors and on latent growth
     (re-specified 2026-10-17; the old constant-tau version was multimodal).
   - m11: mixed-frequency, Banbura-Modugno style, with monthly employment.
-  - m12: m9 + AR(1) measurement errors (production from 2026-10-17).
+  - m12: m9 + AR(1) measurement errors (production 2026-10-17 to
+    2026-10-18).
+  - m13: m12 + SV on latent growth (production from 2026-10-18).
 
 **Outputs**
-- `output/fit_m{1..12}.rds`, `output/fit_production.rds`: saved CmdStanFit
+- `output/fit_m{1..13}.rds`, `output/fit_production.rds`: saved CmdStanFit
   objects (gitignored). `output/fit_m12_gate.rds` and
   `output/fit_m12_seed2_gate.rds` are the seed-1 and seed-2 gate records
-  (also gitignored; their content is in `output/tables/m12_gate_seeds.csv`).
+  (also gitignored; their content is in `output/tables/m12_gate_seeds.csv`);
+  likewise `output/fit_m13_gate.rds`, `output/fit_m13_seed2_gate.rds` and
+  `output/tables/m13_gate_seeds.csv`. `output/fit_m13_omegag1.rds` is the
+  prior-sensitivity fit.
 - `output/lfo/`: LFO log (`lfo_log.txt`, committed) and checkpoints (`*.rds`,
   gitignored, regenerable by `R/03_compare.R`). `output/lfo/superseded/`
   holds the checkpoints of the 2026-10-16 run; they are local only and also
@@ -1197,6 +2345,18 @@ genuine multimodality.
   seeds, with identical draws.
 - `output/tables/`: comparison, diagnostics and variance-decomposition tables.
 - `output/figures/`: generated PNGs.
+- `output/sample_1980/`: the 1980 Q1 research run. It holds:
+  - the fits (`fit_m*.rds`, m13's two seeds and gate records);
+  - `tables/` (the same tables as `output/tables/`, plus
+    `posterior_comparison_full_vs_1980.csv`, `lfo_full_vs_sample.csv` and
+    `lfo_full_vs_sample_models.csv`);
+  - `figures/` (01-07);
+  - `lfo/` (checkpoints, `lfo_log.txt`, `run_lfo_1980.sh`,
+    `run_lfo_1980_extra.sh`);
+  - `logs/`;
+  - the fits driver `run_1980.sh`.
+
+  It is not yet gitignored: its `*.rds` files total about 1.7 GB.
 
 **Documentation**
 - `priors.md`: every prior, as coded.

@@ -1,0 +1,68 @@
+2026-10-18 21:16:59 START m1: Rscript R/03_compare.R m1
+2026-10-18 21:17:08 END m1 exit 0
+2026-10-18 21:17:08 START m2: Rscript R/03_compare.R m2
+2026-10-18 21:17:38 END m2 exit 0
+2026-10-18 21:17:38 START m3: Rscript R/03_compare.R m3
+2026-10-18 21:18:48 END m3 exit 0
+2026-10-18 21:18:48 START m5: Rscript R/03_compare.R m5
+2026-10-18 21:20:34 END m5 exit 0
+2026-10-18 21:20:34 START m6: Rscript R/03_compare.R m6
+2026-10-18 21:22:48 END m6 exit 0
+2026-10-18 21:22:48 START m7: Rscript R/03_compare.R m7
+2026-10-18 21:24:02 END m7 exit 0
+2026-10-18 21:24:02 START m8: Rscript R/03_compare.R m8
+2026-10-18 21:24:52 END m8 exit 0
+2026-10-18 21:24:52 START m11: Rscript R/03_compare.R m11
+2026-10-18 21:27:58 END m11 exit 0
+2026-10-18 21:27:58 START m13: Rscript R/03_compare.R m13
+2026-10-18 23:15:45 END m13 exit 0
+2026-10-18 23:15:45 START m12: Rscript R/03_compare.R m12
+2026-10-18 23:51:55 END m12 exit 0
+2026-10-18 23:51:55 START m9: Rscript R/03_compare.R m9
+2026-10-19 00:19:41 END m9 exit 0
+2026-10-19 00:19:41 START pfcheck_covid: Rscript R/03_compare.R pfcheck m13 m12
+2026-10-19 01:31:40 driver restarted after the job vanished (see lfo_log.txt)
+2026-10-19 01:31:40 START m1: Rscript R/03_compare.R m1
+2026-10-19 01:31:48 END m1 exit 0
+2026-10-19 01:31:48 START m2: Rscript R/03_compare.R m2
+2026-10-19 01:31:55 END m2 exit 0
+2026-10-19 01:31:55 START m3: Rscript R/03_compare.R m3
+2026-10-19 01:32:01 END m3 exit 0
+2026-10-19 01:32:01 START m5: Rscript R/03_compare.R m5
+2026-10-19 01:32:07 END m5 exit 0
+2026-10-19 01:32:07 START m6: Rscript R/03_compare.R m6
+2026-10-19 01:32:14 END m6 exit 0
+2026-10-19 01:32:14 START m7: Rscript R/03_compare.R m7
+2026-10-19 01:32:20 END m7 exit 0
+2026-10-19 01:32:20 START m8: Rscript R/03_compare.R m8
+2026-10-19 01:32:27 END m8 exit 0
+2026-10-19 01:32:27 START m11: Rscript R/03_compare.R m11
+2026-10-19 01:32:33 END m11 exit 0
+2026-10-19 01:32:33 START m13: Rscript R/03_compare.R m13
+2026-10-19 01:32:40 END m13 exit 0
+2026-10-19 01:32:40 START m12: Rscript R/03_compare.R m12
+2026-10-19 01:32:46 END m12 exit 0
+2026-10-19 01:32:46 START m9: Rscript R/03_compare.R m9
+2026-10-19 01:32:53 END m9 exit 0
+2026-10-19 01:32:53 START pfcheck_covid: Rscript R/03_compare.R pfcheck m13 m12
+2026-10-19 01:40:55 END pfcheck_covid exit 0
+2026-10-19 01:40:55 START pfref: Rscript R/03_compare.R pfref m13 m12
+2026-10-19 02:06:06 END pfref exit 0
+2026-10-19 02:06:06 START pfcheck_pre: Rscript R/03_compare.R pfcheck m13 m12 --precovid
+2026-10-19 02:21:49 END pfcheck_pre exit 0
+2026-10-19 02:21:49 START m4: Rscript R/03_compare.R m4
+2026-10-19 02:46:26 END m4 exit 0
+2026-10-19 02:46:26 START m10: Rscript R/03_compare.R m10
+2026-10-19 03:45:48 END m10 exit 0
+2026-10-19 03:45:48 START retrycheck: Rscript R/03_compare.R retrycheck m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11 m12 m13
+2026-10-19 03:49:05 END retrycheck exit 0
+2026-10-19 03:49:05 START summary: Rscript R/03_compare.R summary
+2026-10-19 03:49:13 END summary exit 0
+2026-10-19 03:49:13 DRIVER DONE
+2026-10-19 03:49:32 START pfcheck_covid_m9m4: Rscript R/03_compare.R pfcheck m9 m4
+2026-10-19 04:07:58 END pfcheck_covid_m9m4 exit 0
+2026-10-19 04:07:58 START pfref_m9m4: Rscript R/03_compare.R pfref m9 m4
+2026-10-19 04:21:01 END pfref_m9m4 exit 0
+2026-10-19 04:21:01 START summary: Rscript R/03_compare.R summary
+2026-10-19 04:21:09 END summary exit 0
+2026-10-19 04:21:09 EXTRA DONE

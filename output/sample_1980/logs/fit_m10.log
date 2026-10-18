@@ -1,0 +1,109 @@
+sample start 1980-03-01; output root output/sample_1980 
+
+===== m10 (T = 186) =====
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 2 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 3 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 4 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 2 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 3 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 4 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 1 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 2 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 2 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 3 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 3 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 4 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 1 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 2 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 2 finished in 199.7 seconds.
+Chain 3 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 4 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 1 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 3 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 3 finished in 276.6 seconds.
+Chain 4 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 4 finished in 282.9 seconds.
+Chain 1 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 1 finished in 290.4 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 262.4 seconds.
+Total execution time: 290.5 seconds.
+
+Warning: 2 of 8000 (0.0%) transitions ended with a divergence.
+See https://mc-stan.org/misc/warnings for details.
+
+# A tibble: 21 × 10
+   variable   mean median     sd    mad      q5    q95  rhat ess_bulk ess_tail
+   <chr>     <dbl>  <dbl>  <dbl>  <dbl>   <dbl>  <dbl> <dbl>    <dbl>    <dbl>
+ 1 mu_bar    2.74   2.74  0.205  0.200   2.41    3.08  1.00     8827.    7205.
+ 2 c         1.51   1.50  0.294  0.293   1.04    2.02  1.00     5054.    5438.
+ 3 rho       0.449  0.451 0.0983 0.0995  0.284   0.606 1.000    4936.    5504.
+ 4 tau       1.56   1.51  0.420  0.342   1.02    2.30  1.00     4598.    4063.
+ 5 alpha    -1.12  -1.13  0.302  0.299  -1.59   -0.612 1.00     4931.    4701.
+ 6 beta      0.967  0.973 0.0902 0.0859  0.809   1.10  1.00     3899.    4175.
+ 7 mu_g      0.829  0.819 0.500  0.456   0.0441  1.66  1.00     4598.    4063.
+ 8 phi_g     0.810  0.822 0.0940 0.0908  0.634   0.937 1.00     1905.    3339.
+ 9 omega_g   0.965  0.950 0.214  0.211   0.642   1.35  1.00     2884.    4752.
+10 mu_h[1]   1.87   1.88  0.454  0.344   1.11    2.59  1.00     4079.    3560.
+11 mu_h[2]   1.71   1.70  0.647  0.566   0.676   2.78  1.00     5785.    5458.
+12 mu_h[3]   1.43   1.35  0.766  0.715   0.312   2.80  1.00     5502.    5294.
+13 mu_h[4]   1.79   1.80  0.183  0.167   1.50    2.07  1.00     5699.    4975.
+14 phi[1]    0.902  0.966 0.222  0.0343  0.578   0.996 1.00     1658.     749.
+15 phi[2]    0.960  0.970 0.0357 0.0265  0.893   0.996 1.00     2853.    4416.
+16 phi[3]    0.974  0.983 0.0281 0.0161  0.921   0.998 1.00     2686.    3723.
+17 phi[4]    0.466  0.601 0.434  0.348  -0.475   0.927 1.00     1964.    3646.
+18 omega[1]  0.215  0.192 0.108  0.0878  0.0866  0.425 1.00     2918.    4097.
+19 omega[2]  0.375  0.362 0.130  0.125   0.186   0.608 1.00     2325.    3826.
+20 omega[3]  0.296  0.278 0.118  0.109   0.140   0.518 1.00     2643.    3985.
+21 omega[4]  0.357  0.342 0.176  0.175   0.0943  0.674 1.00     2143.    1826.
+  model   T chains draws adapt_delta max_treedepth divergences treedepth_hits
+1   m10 186      4  8000        0.99            12           2              0
+  min_ebfmi max_rhat_hyper worst_rhat_var min_ess_bulk_hyper min_ess_tail_hyper
+1 0.8784044       1.003337       omega[3]           1658.357            749.256
+  max_rhat_mu min_ess_bulk_mu wall_secs        fitted_at
+1    1.001313        5250.663       298 2026-10-18 20:42
+
+Diagnostics written to output/sample_1980/tables/fit_diagnostics.csv
+   model   T chains draws adapt_delta max_treedepth divergences treedepth_hits
+1     m1 186      4  8000        0.80            10           0              0
+2     m2 186      4  8000        0.80            10           0              0
+3     m3 186      4  8000        0.99            10           0              0
+4     m4 186      4  8000        0.99            12           9              0
+5     m5 186      4  8000        0.99            10           0              0
+6     m6 186      4  8000        0.99            10           0              0
+7     m7 186      4  8000        0.99            10           0              0
+8     m8 186      4  8000        0.99            10           0              0
+9     m9 186      4  8000        0.99            12           1              0
+10   m10 186      4  8000        0.99            12           2              0
+11   m13 186      4  8000        0.99            12           0              0
+   min_ebfmi max_rhat_hyper worst_rhat_var min_ess_bulk_hyper
+1  0.7612291       1.000358       sigma[1]           4140.675
+2  0.5432052       1.000838            tau           2144.824
+3  0.9493956       1.002057     Omega[3,1]           2353.252
+4  0.8303557       1.001548         phi[2]           1742.344
+5  0.5567173       1.001971            tau           1674.796
+6  0.4352716       1.004849            rho           1214.419
+7  0.4759340       1.002709            tau           1558.184
+8  0.5652856       1.002993            rho           1369.565
+9  0.8484181       1.006308         phi[1]           1273.082
+10 0.8784044       1.003337       omega[3]           1658.357
+11 0.8817784       1.001274         rho_EI           1315.413
+   min_ess_tail_hyper max_rhat_mu min_ess_bulk_mu wall_secs        fitted_at
+1           4635.3682    1.003104       10707.695         3 2026-10-18 07:42
+2           3254.7206    1.003271        6268.384         5 2026-10-18 07:43
+3           2840.6530    1.001679        2484.173        29 2026-10-18 07:45
+4           2496.7823    1.001194        5442.923       140 2026-10-18 08:20
+5           2598.5543    1.001683        6142.788        28 2026-10-18 07:43
+6           1918.3960    1.001988        2926.527        53 2026-10-18 07:44
+7           3206.7684    1.001870        2776.113        16 2026-10-18 07:44
+8           2400.6630    1.002080        7231.491        11 2026-10-18 07:45
+9           2608.9931    1.001145        5324.351       196 2026-10-18 08:23
+10           749.2560    1.001313        5250.663       298 2026-10-18 20:42
+11           881.7777    1.001343        5531.307      1042 2026-10-18 08:03

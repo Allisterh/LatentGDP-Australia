@@ -3,6 +3,8 @@
 #   <docs>/estimates_latest.json     - latest quarter headline numbers
 #   <docs>/diagnostics.json          - run metadata, sampler / convergence
 #                                      diagnostics and the input fingerprint
+#   <docs>/model_summary.json        - posterior summaries quoted on the site (latent
+#                                      volatility by decade, psi), annualised units
 # These are the stable contract for downstream consumers of the estimate.
 #
 # Environment overrides (for smoke tests that must not touch docs/):
@@ -89,12 +91,37 @@ latest_json <- list(
   variance_ratio_vs_headline_q05 = round(var_ratio_q[1], 4),
   variance_ratio_vs_headline_q95 = round(var_ratio_q[3], 4),
   units = "quarter-on-quarter growth, % (100 x dlog of chain volume measures)",
-  model = "m12: structural Sigma (Cov(eps_P, .) = 0) + stochastic volatility + AR(1) measurement errors",
+  model = "m13: structural Sigma (Cov(eps_P, .) = 0) + stochastic volatility + AR(1) measurement errors + stochastic volatility on latent growth",
   data_source = "ABS 5206.0 Table 24, seasonally adjusted, chain volume measures"
 )
 
 write_json(latest_json, file.path(docs_dir, "estimates_latest.json"),
            pretty = TRUE, auto_unbox = TRUE, digits = 4)
+
+# --- Model summary ----------------------------------------------------------
+# Posterior summaries that the site's model description quotes, in the model's
+# annualised units (no SCALE): the latent innovation sd tau_t = exp(g_t / 2), as the
+# posterior median of each decade's average, and at 2020 Q2; and the median psi.
+tau_t_draws <- unclass(posterior::as_draws_matrix(fit$draws("tau_t")))
+psi_draws   <- unclass(posterior::as_draws_matrix(fit$draws("psi")))
+stopifnot(ncol(tau_t_draws) == nrow(gdp_growth), ncol(psi_draws) == 3)
+yr      <- as.integer(format(as.Date(gdp_growth$date), "%Y"))
+decades <- sort(unique(yr[yr >= 1960] %/% 10 * 10))
+decade_avg <- setNames(lapply(decades, function(d) {
+  cols <- which(yr %/% 10 * 10 == d)
+  round(median(rowMeans(tau_t_draws[, cols, drop = FALSE])), 4)
+}), paste0(decades, "s"))
+i_2020q2 <- which(as.Date(gdp_growth$date) == as.Date("2020-06-01"))
+stopifnot(length(i_2020q2) == 1)
+model_summary <- list(
+  units = "annualised growth, % (400 x dlog)",
+  latent_sd_decade_avg = decade_avg,
+  latent_sd_2020q2 = round(median(tau_t_draws[, i_2020q2]), 4),
+  psi = list(E = round(median(psi_draws[, 1]), 4), I = round(median(psi_draws[, 2]), 4),
+             P = round(median(psi_draws[, 3]), 4))
+)
+write_json(model_summary, file.path(docs_dir, "model_summary.json"),
+           pretty = TRUE, auto_unbox = TRUE, digits = NA)
 
 # --- Diagnostics ------------------------------------------------------------
 # Sampler settings come from the fit itself, not hard-coded constants.
@@ -109,10 +136,12 @@ diag <- fit$diagnostic_summary(quiet = TRUE)
 # Hyperparameter names are read defensively: candidates absent from the fit
 # are skipped, so a renamed / reparameterised model still yields diagnostics for
 # whatever exists (and "hyperparameters" in the JSON records what was used).
-# psi (AR(1) measurement-error coefficients) is m12's; it is absent from an m9 fit.
-# The set matches hyper_vars in R/fit_production.R (the gated quantities), including
-# the derived mu_bar = c / (1 - rho).
-HYPER_CANDIDATES <- c("c", "rho", "tau", "rho_EI", "mu_h", "phi", "omega", "psi", "mu_bar")
+# psi (AR(1) measurement-error coefficients) is absent from an m9 fit; mu_g, phi_g and
+# omega_g (latent-growth SV) are m13's and absent from an m12 fit. In m13, tau is the
+# generated quantity exp(mu_g / 2). The set matches hyper_vars in R/fit_production.R (the
+# gated quantities), including the derived mu_bar = c / (1 - rho).
+HYPER_CANDIDATES <- c("c", "rho", "tau", "rho_EI", "mu_h", "phi", "omega", "psi", "mu_bar",
+                      "mu_g", "phi_g", "omega_g")
 stan_vars  <- fit$metadata()$stan_variables
 hyper_used <- intersect(HYPER_CANDIDATES, stan_vars)
 if (length(hyper_used) == 0) {

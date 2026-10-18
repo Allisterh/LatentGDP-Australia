@@ -1,0 +1,7 @@
+2026-10-19 04:08:05  === extra reference passes for the 2020Q2 target: m9, m4 (4 cores)
+2026-10-19 04:11:12  [m9] pfref 2020Q2 (fit 1:138) reference pass 2: elpd -46.146 at N_t 400000 (187 s)
+2026-10-19 04:14:23  [m9] pfref 2020Q2 (fit 1:138) reference pass 3: elpd -49.242 at N_t 400000 (191 s)
+2026-10-19 04:17:37  [m4] pfref 2020Q2 (fit 1:146) reference pass 2: elpd -50.167 at N_t 400000 (195 s)
+2026-10-19 04:21:01  [m4] pfref 2020Q2 (fit 1:146) reference pass 3: elpd -50.550 at N_t 400000 (204 s)
+2026-10-19 04:21:01  [m9] pfref: 2020Q2 reference mean -48.348 (se 1.108, 3 passes); schedule mean -49.602, N=2000 mean -50.725; sum over COVID targets vs reference mean: bias N=2000 -3.712, bias schedule -1.547
+2026-10-19 04:21:01  [m4] pfref: 2020Q2 reference mean -50.735 (se 0.392, 3 passes); schedule mean -49.720, N=2000 mean -52.250; sum over COVID targets vs reference mean: bias N=2000 -3.312, bias schedule 0.551

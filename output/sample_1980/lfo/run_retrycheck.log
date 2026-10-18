@@ -1,0 +1,21 @@
+2026-10-19 03:45:55  === seed-selection check of retried refits: m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13 (4 cores)
+2026-10-19 03:45:55  [m1] retrycheck: no retried fits
+2026-10-19 03:45:55  [m2] retrycheck: no retried fits
+2026-10-19 03:45:55  [m3] retrycheck: no retried fits
+Warning: 12 of 4000 (0.0%) transitions ended with a divergence.
+See https://mc-stan.org/misc/warnings for details.
+
+Warning: 1 of 4 chains had an E-BFMI less than 0.3.
+See https://mc-stan.org/misc/warnings for details.
+
+2026-10-19 03:46:50  [m4] retrycheck fit 1:146 attempt 1 (seed 10146) re-created: divergences 12, min E-BFMI 0.011, max R-hat 1.277 (phi[3]), min bulk ESS 11
+2026-10-19 03:49:05  [m4] retrycheck fit 1:146 (16 targets, 190 s): pooled 8 chains max R-hat 1.152 (phi[3]), min bulk ESS 35; sum elpd kept -149.060, first attempt -145.794, pooled -146.613 (main pass -146.156)
+2026-10-19 03:49:05  [m5] retrycheck: no retried fits
+2026-10-19 03:49:05  [m6] retrycheck: no retried fits
+2026-10-19 03:49:05  [m7] retrycheck: no retried fits
+2026-10-19 03:49:05  [m8] retrycheck: no retried fits
+2026-10-19 03:49:05  [m9] retrycheck: no retried fits
+2026-10-19 03:49:05  [m10] retrycheck: no retried fits
+2026-10-19 03:49:05  [m11] retrycheck: no retried fits
+2026-10-19 03:49:05  [m12] retrycheck: no retried fits
+2026-10-19 03:49:05  [m13] retrycheck: no retried fits

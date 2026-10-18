@@ -421,4 +421,65 @@ test_that("(iii) RBPF Monte Carlo error is small relative to model differences",
   expect_lt(max(sds), 0.05 * abs(mean(means$m9) - mean(k6)))
 })
 
+# (x) m13 as R/03_compare.R wires it: register_m12(), register_m10_filter(), register_m13()
+# in that order. filter_loglik("m13", ...) must equal the dense MVN likelihood of m12 when
+# the latent and measurement volatilities are constant (omega, omega_g -> 0, mu_g = log
+# tau^2; under a varying particle schedule, through filter_par's forked workers too), equal
+# filter_loglik_m13() bit for bit, and leave the m12, m10 and m9 dispatch unchanged.
+# The m13 filter's own tests (dense MVN with time-varying g and h, brute force, FFBS) are
+# in tests/test_m13.R.
+test_that("(x) m13 registered as in R/03_compare.R: dense MVN at constant variances, dispatch", {
+  source("R/lib/filter_m13.R")
+  Tt <- 12
+  sched <- as.integer(c(40, 7, 300, 25, 25, 90, 3, 150, 60, 10, 200, 33))
+  mh <- c(2.2, 1.7, 1.3); ph <- c(0.9, 0.5, -0.3); psi <- c(-0.5, 0.4, -0.2)
+  th <- list(c = 1.1, rho = 0.45, tau = 3.0); r <- 0.35
+  y <- sim_y(Tt, 3)
+  s_ <- exp(mh / 2)
+  H <- matrix(c(s_[1]^2, r * s_[1] * s_[2], 0, r * s_[1] * s_[2], s_[2]^2, 0, 0, 0, s_[3]^2), 3)
+  V1 <- H / (1 - outer(psi, psi))
+  S <- kronecker(ar1_cov(Tt, th$rho, th$tau), matrix(1, 3, 3))
+  for (t in 1:Tt) for (u in 1:Tt) {
+    lag <- abs(t - u)
+    blk <- if (t >= u) diag(psi^lag, 3) %*% V1 else V1 %*% diag(psi^lag, 3)
+    S[(t - 1) * 3 + 1:3, (u - 1) * 3 + 1:3] <- S[(t - 1) * 3 + 1:3, (u - 1) * 3 + 1:3] + blk
+  }
+  ref <- dmvnorm(stack(y), rep(th$c / (1 - th$rho), 3 * Tt), S, log = TRUE)
+  v12 <- c(c = th$c, rho = th$rho, tau = th$tau, setNames(mh, sprintf("mu_h[%d]", 1:3)),
+           setNames(ph, sprintf("phi[%d]", 1:3)), setNames(rep(1e-10, 3), sprintf("omega[%d]", 1:3)),
+           rho_EI = r, setNames(psi, sprintf("psi[%d]", 1:3)), z_EI = atanh(r))
+  # omega_g = 0 exactly: the adapted g proposal (the LFO default) is then exact; at
+  # omega_g = 1e-10 it is only unbiased (see tests/test_m13.R (v)), the bootstrap one exact.
+  v13 <- c(v12[c("c", "rho")], mu_g = log(th$tau^2), phi_g = 0.6, omega_g = 0,
+           v12[!names(v12) %in% c("c", "rho", "tau")])
+  dm12 <- matrix(v12, 1, dimnames = list(NULL, names(v12)))
+  dm13 <- matrix(v13, 1, dimnames = list(NULL, names(v13)))
+  base_fl <- filter_loglik
+  base_md <- model_defs
+  register_m12(); register_m10_filter(); register_m13()
+  on.exit({ assign("filter_loglik", base_fl, envir = globalenv())
+            assign("model_defs", base_md, envir = globalenv()) }, add = TRUE)
+  expect_identical(model_defs$m13$type, "sv")
+  expect_true(all(c("mu_g", "phi_g", "omega_g", "psi", "rho_EI", "z_EI") %in% model_defs$m13$pars))
+  o <- filter_loglik("m13", dm13, y, N = sched, seed = 3)            # adapted, omega_g = 0
+  expect_equal(sum(o$full), ref, tolerance = 1e-6)
+  expect_equal(dim(o$ess_frac), c(1L, Tt))
+  dm13e <- dm13; dm13e[, "omega_g"] <- 1e-10                          # bootstrap, omega_g > 0
+  o <- filter_loglik_m13(dm13e, y, N = sched, seed = 3, prop = 0L)
+  expect_equal(sum(o$full), ref, tolerance = 1e-6)
+  # forked workers (filter_par) on 3 copies of the draw
+  op <- filter_par("m13", dm13[c(1, 1, 1), , drop = FALSE], y, list(), sched, 9L, 2L)
+  expect_equal(rowSums(op$full), rep(ref, 3), tolerance = 1e-6)
+  # dispatch: m13 == direct call; m12 unchanged by registering m13 (omega, omega_g > 0)
+  dm13b <- dm13; dm13b[, "omega_g"] <- 0.6; dm13b[, grepl("^omega\\[", colnames(dm13b))] <- 0.3
+  expect_identical(filter_loglik("m13", dm13b, y, N = 300L, seed = 5)$full,
+                   filter_loglik_m13(dm13b, y, N = 300L, seed = 5)$full)
+  dm12b <- dm12; dm12b[, grepl("^omega\\[", colnames(dm12b))] <- 0.3
+  expect_identical(filter_loglik("m12", dm12b, y, N = 300L, seed = 5)$full,
+                   filter_loglik_m12(dm12b, y, N = 300L, seed = 5)$full)
+  dm9 <- dm12b[, !grepl("^psi|z_EI", colnames(dm12b)), drop = FALSE]
+  expect_identical(filter_loglik("m9", dm9, y, N = 300L, seed = 5)$full,
+                   base_fl("m9", dm9, y, N = 300L, seed = 5)$full)
+})
+
 cat("\nAll filter tests finished.\n")

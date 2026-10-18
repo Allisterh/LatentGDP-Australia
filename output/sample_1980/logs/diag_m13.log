@@ -1,0 +1,38 @@
+sample start 1980-03-01; output root output/sample_1980 
+
+===== m13 (saved fit output/sample_1980/fit_m13.rds, 2026-10-18 08:03) =====
+  model   T chains draws adapt_delta max_treedepth divergences treedepth_hits
+1   m13 186      4  8000        0.99            12           0              0
+  min_ebfmi max_rhat_hyper worst_rhat_var min_ess_bulk_hyper min_ess_tail_hyper
+1 0.8817784       1.001274         rho_EI           1315.413           881.7777
+  max_rhat_mu min_ess_bulk_mu wall_secs        fitted_at
+1    1.001343        5531.307      1042 2026-10-18 08:03
+
+Diagnostics written to output/sample_1980/tables/fit_diagnostics.csv
+  model   T chains draws adapt_delta max_treedepth divergences treedepth_hits
+1    m1 186      4  8000        0.80            10           0              0
+2    m2 186      4  8000        0.80            10           0              0
+3    m3 186      4  8000        0.99            10           0              0
+4    m5 186      4  8000        0.99            10           0              0
+5    m6 186      4  8000        0.99            10           0              0
+6    m7 186      4  8000        0.99            10           0              0
+7    m8 186      4  8000        0.99            10           0              0
+8   m13 186      4  8000        0.99            12           0              0
+  min_ebfmi max_rhat_hyper worst_rhat_var min_ess_bulk_hyper min_ess_tail_hyper
+1 0.7612291       1.000358       sigma[1]           4140.675          4635.3682
+2 0.5432052       1.000838            tau           2144.824          3254.7206
+3 0.9493956       1.002057     Omega[3,1]           2353.252          2840.6530
+4 0.5567173       1.001971            tau           1674.796          2598.5543
+5 0.4352716       1.004849            rho           1214.419          1918.3960
+6 0.4759340       1.002709            tau           1558.184          3206.7684
+7 0.5652856       1.002993            rho           1369.565          2400.6630
+8 0.8817784       1.001274         rho_EI           1315.413           881.7777
+  max_rhat_mu min_ess_bulk_mu wall_secs        fitted_at
+1    1.003104       10707.695         3 2026-10-18 07:42
+2    1.003271        6268.384         5 2026-10-18 07:43
+3    1.001679        2484.173        29 2026-10-18 07:45
+4    1.001683        6142.788        28 2026-10-18 07:43
+5    1.001988        2926.527        53 2026-10-18 07:44
+6    1.001870        2776.113        16 2026-10-18 07:44
+7    1.002080        7231.491        11 2026-10-18 07:45
+8    1.001343        5531.307      1042 2026-10-18 08:03

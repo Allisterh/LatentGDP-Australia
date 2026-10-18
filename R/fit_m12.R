@@ -17,10 +17,19 @@
 # finished within --timeout seconds or its last step size is below 1e-6 (step-size
 # collapse). Writes DIR/stall_summary.rds and prints the stalled chains.
 
+#
+# Sample window and output root: R/sample_window.R (LATENTGDP_START, LATENTGDP_OUT). The
+# default --out and gate-record paths are under the output root, e.g.
+#   LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980 Rscript R/fit_m12.R --seed=2
+# writes output/sample_1980/fit_m12_seed2.rds. Both unset = the full sample and the
+# paths above, exactly as before.
+
 suppressPackageStartupMessages({
   library(cmdstanr)
   library(posterior)
 })
+source("R/sample_window.R")
+cat(sw_describe(), "\n")
 
 args <- commandArgs(trailingOnly = TRUE)
 opt <- function(name, default) {
@@ -30,7 +39,7 @@ opt <- function(name, default) {
 mode <- if (length(args) && !startsWith(args[1], "--")) args[1] else "fit"
 stopifnot(mode %in% c("fit", "stall"))
 
-gdp_growth <- readRDS("data/processed/gdp_growth.rds")
+gdp_growth <- sw_trim_q(readRDS("data/processed/gdp_growth.rds"))
 stan_data <- list(
   T = nrow(gdp_growth),
   K = 3,
@@ -111,8 +120,8 @@ if (mode == "stall") {
 # Full fit
 # ---------------------------------------------------------------------------
 seed <- as.integer(opt("seed", "1"))
-out  <- opt("out", if (seed == 1L) "output/fit_m12.rds" else
-  sprintf("output/fit_m12_seed%d.rds", seed))
+out  <- opt("out", if (seed == 1L) sw_out("fit_m12.rds") else
+  sw_out(sprintf("fit_m12_seed%d.rds", seed)))
 par  <- as.integer(opt("parallel", "4"))
 dir.create(dirname(out), showWarnings = FALSE, recursive = TRUE)
 

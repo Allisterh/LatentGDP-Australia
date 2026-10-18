@@ -14,7 +14,7 @@
 # Requires the 'openssl' package (a dependency of readabs via httr).
 
 INPUT_HASH_FILES <- c(
-  "stan/m12_struct_sv_serial.stan",
+  "stan/m13_serial_latent_sv.stan",
   "R/utils_abs.R",
   "R/01_fetch_data.R",
   "R/input_hash.R",

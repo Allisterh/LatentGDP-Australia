@@ -1,17 +1,22 @@
-# Production fit: m12 only (m9's structural Sigma + SV, plus AR(1) measurement errors).
+# Production fit: m13 only (m12's structural Sigma + SV on the measurement innovations +
+# AR(1) measurement errors, plus stochastic volatility on the latent innovation).
 # Runs in CI (weekly; picks up each quarterly ABS 5206.0 release).
 # Fits the production model, saves the fit for downstream use, and then applies a
 # strict convergence gate: if any check fails the script stop()s, so CI never
 # publishes an estimate from a fit that has not converged.
 #
-# Why m12 (NOTES.md, "2026-10-17"): it replaced m9 under a rule fixed before the
-# results were known - pass this gate on two seeds, a reliable LFO score, beat m9
-# on PSIS-LFO-CV by z_NW >= 2, and a local fit <= 30 min. Observed: both seeds
-# pass; m12 - m9 = +16.77 nats (Newey-West SE 6.12, z 2.74).
+# Why m13 (NOTES.md, "2026-10-18"): it replaced m12 under a rule fixed before m13's LFO
+# results were known - pass this gate on two seeds, a reliable LFO score, beat m12 on
+# PSIS-LFO-CV by z_NW >= 2 (also with each refit's first attempt only), and a local fit
+# <= 30 min. Observed: both seeds pass; m13 - m12 = +59.65 nats (Newey-West SE 28.89,
+# z 2.06; first attempt only +59.79, SE 29.00, z 2.06); local fit 23.1 min (seed 1).
+# m13 was proposed after the re-specified m10's results were seen, so its gain is post hoc.
+# (m12 was production from 2026-10-17 to 2026-10-18; m9 before that.)
 #
-# m12 is sampled with mu integrated out by a Kalman filter on quasi-differenced
-# data (see the header of stan/m12_struct_sv_serial.stan); mu is drawn exactly by
-# FFBS in generated quantities. psi = 0 gives m9 exactly.
+# m13 is sampled with mu integrated out by a Kalman filter on quasi-differenced data,
+# conditional on the latent log-variance path g and the measurement log-variances h (see
+# the header of stan/m13_serial_latent_sv.stan); mu is drawn exactly by FFBS in generated
+# quantities. g_t = log(tau^2) for all t gives m12 exactly.
 
 suppressPackageStartupMessages({
   library(cmdstanr)
@@ -28,7 +33,7 @@ stan_data <- list(
   y = as.matrix(gdp_growth[, c("g_E", "g_I", "g_P")])
 )
 
-mod <- cmdstan_model("stan/m12_struct_sv_serial.stan")
+mod <- cmdstan_model("stan/m13_serial_latent_sv.stan")
 fit <- mod$sample(
   data = stan_data,
   chains = 4,
@@ -45,8 +50,9 @@ fit <- mod$sample(
 # the gate so a failing fit can still be inspected locally.
 fit$save_object(file = "output/fit_production.rds")
 
-cat("\n=== m12 production fit ===\n")
-print(fit$summary(variables = c("mu_bar", "rho", "tau", "rho_EI", "psi")))
+cat("\n=== m13 production fit ===\n")
+print(fit$summary(variables = c("mu_bar", "rho", "tau", "mu_g", "phi_g", "omega_g",
+                                "rho_EI", "psi")))
 cat(sprintf("Wall time: %.0f s\n", fit$time()$total))
 
 # ---------------------------------------------------------------------------
@@ -54,7 +60,7 @@ cat(sprintf("Wall time: %.0f s\n", fit$time()$total))
 #   divergences          < 0.1% of post-warmup draws
 #   min E-BFMI (chains)  >= 0.3   (0.2 is the hard floor at which Stan itself
 #                                  warns; anything below 0.3 already fails)
-#   max R-hat            <= 1.01 on hyperparameters, <= 1.05 on every mu[t], h[t,k]
+#   max R-hat            <= 1.01 on hyperparameters, <= 1.05 on every mu[t], h[t,k], g[t]
 #   min bulk & tail ESS  >= 400  on hyperparameters and on every mu[t]
 # Chain and draw counts are read from the fit, never hard-coded.
 # ---------------------------------------------------------------------------
@@ -66,7 +72,10 @@ GATE <- list(
   max_rhat_state = 1.05,
   min_ess        = 400
 )
-hyper_vars <- c("c", "rho", "tau", "mu_h", "phi", "omega", "rho_EI", "psi", "mu_bar")
+# tau = exp(mu_g / 2) is a generated quantity in m13 (the latent innovation sd at the
+# long-run log-variance); mu_g, phi_g, omega_g are the latent SV hyperparameters.
+hyper_vars <- c("c", "rho", "tau", "mu_h", "phi", "omega", "rho_EI", "psi", "mu_bar",
+                "mu_g", "phi_g", "omega_g")
 
 n_chains <- fit$num_chains()
 sdiag    <- fit$sampler_diagnostics(format = "draws_df")
@@ -84,8 +93,10 @@ summ_conv <- function(vars) {
 s_hyper <- summ_conv(hyper_vars)
 s_mu    <- summ_conv("mu")
 s_h     <- summ_conv("h")
+s_g     <- summ_conv("g")
 
-stopifnot(nrow(s_mu) == stan_data$T, nrow(s_h) == stan_data$T * stan_data$K)
+stopifnot(nrow(s_mu) == stan_data$T, nrow(s_h) == stan_data$T * stan_data$K,
+          nrow(s_g) == stan_data$T)
 
 # NA diagnostics (e.g. a constant draw) count as failures, never as passes.
 worst_max <- function(x) if (anyNA(x)) NA_real_ else max(x)
@@ -106,6 +117,7 @@ checks <- data.frame(
     "max R-hat, hyperparameters",
     "max R-hat, mu[t]",
     "max R-hat, h[t,k]",
+    "max R-hat, g[t]",
     "min bulk ESS, hyperparameters",
     "min tail ESS, hyperparameters",
     "min bulk ESS, mu[t]",
@@ -117,15 +129,16 @@ checks <- data.frame(
     worst_max(s_hyper$rhat),
     worst_max(s_mu$rhat),
     worst_max(s_h$rhat),
+    worst_max(s_g$rhat),
     worst_min(s_hyper$ess_bulk),
     worst_min(s_hyper$ess_tail),
     worst_min(s_mu$ess_bulk),
     worst_min(s_mu$ess_tail)
   ),
-  op = c("<", ">=", "<=", "<=", "<=", ">=", ">=", ">=", ">="),
+  op = c("<", ">=", "<=", "<=", "<=", "<=", ">=", ">=", ">=", ">="),
   threshold = c(
     GATE$max_div_frac, GATE$min_ebfmi,
-    GATE$max_rhat_hyper, GATE$max_rhat_state, GATE$max_rhat_state,
+    GATE$max_rhat_hyper, GATE$max_rhat_state, GATE$max_rhat_state, GATE$max_rhat_state,
     GATE$min_ess, GATE$min_ess, GATE$min_ess, GATE$min_ess
   ),
   worst = c(
@@ -134,6 +147,7 @@ checks <- data.frame(
     which_at(s_hyper, "rhat", which.max),
     which_at(s_mu, "rhat", which.max),
     which_at(s_h, "rhat", which.max),
+    which_at(s_g, "rhat", which.max),
     which_at(s_hyper, "ess_bulk", which.min),
     which_at(s_hyper, "ess_tail", which.min),
     which_at(s_mu, "ess_bulk", which.min),

@@ -1,0 +1,11 @@
+2026-10-19 00:19:48  === particle-count check on the COVID targets: m13, m12 (4 cores)
+2026-10-19 00:32:10  [m13] pfcheck fit 1:160 (2 covid targets, 742 s): reference N_t: base 8000 in 27 periods, raised in 135 (max 400000, in 1 periods), cost x1.75 of N=8000
+2026-10-19 00:45:43  [m13] pfcheck fit 1:162 (3 covid targets, 813 s): reference N_t: base 8000 in 25 periods, raised in 140 (max 400000, in 1 periods), cost x1.76 of N=8000
+2026-10-19 00:45:43  [m13] pfcheck: sum over COVID targets: bias N=2000 -0.028, bias schedule -0.015 (vs reference)
+2026-10-19 01:32:59  === particle-count check on the COVID targets: m13, m12 (4 cores)
+2026-10-19 01:32:59  [m13] pfcheck fit 1:160 taken from output/sample_1980/lfo/pfcheck_m13.rds
+2026-10-19 01:32:59  [m13] pfcheck fit 1:162 taken from output/sample_1980/lfo/pfcheck_m13.rds
+2026-10-19 01:32:59  [m13] pfcheck: sum over COVID targets: bias N=2000 -0.028, bias schedule -0.015 (vs reference)
+2026-10-19 01:36:33  [m12] pfcheck fit 1:142 (2 covid targets, 214 s): reference N_t: base 8000 in 49 periods, raised in 113 (max 400000, in 1 periods), cost x1.52 of N=8000
+2026-10-19 01:40:55  [m12] pfcheck fit 1:162 (3 covid targets, 263 s): reference N_t: base 8000 in 29 periods, raised in 136 (max 400000, in 1 periods), cost x1.84 of N=8000
+2026-10-19 01:40:55  [m12] pfcheck: sum over COVID targets: bias N=2000 -3.630, bias schedule -0.276 (vs reference)

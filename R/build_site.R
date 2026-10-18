@@ -2,8 +2,8 @@
 #   <docs>/index.html          - landing page with headline + chart
 #   <docs>/chart_latent.png    - historical mu vs headline
 #   <docs>/chart_recent.png    - zoomed view of last ~5 years
-# Assumes output_estimate.R has already written <docs>/estimates*.json/csv
-# and <docs>/diagnostics.json.
+# Assumes output_estimate.R has already written <docs>/estimates*.json/csv,
+# <docs>/diagnostics.json and <docs>/model_summary.json.
 #
 # Environment override (for smoke tests that must not touch docs/):
 #   LATENTGDP_DOCS  site directory (default docs)
@@ -22,6 +22,12 @@ estimates <- read.csv(file.path(docs_dir, "estimates.csv")) |>
   mutate(date = as.Date(date))
 latest    <- read_json(file.path(docs_dir, "estimates_latest.json"), simplifyVector = TRUE)
 diag      <- read_json(file.path(docs_dir, "diagnostics.json"), simplifyVector = TRUE)
+# Posterior summaries quoted in the model description (written by output_estimate.R
+# from the production fit, so the text follows each new fit).
+msum_path <- file.path(docs_dir, "model_summary.json")
+if (!file.exists(msum_path))
+  stop(msum_path, " not found: run R/output_estimate.R first", call. = FALSE)
+msum      <- read_json(msum_path, simplifyVector = TRUE)
 
 # "YYYY Qn" label for a quarter-end date.
 quarter_label <- function(d) {
@@ -76,7 +82,7 @@ p_full <- ggplot(estimates, aes(x = date)) +
              label = off_scale_note, size = 3, hjust = 1, colour = "grey40")} +
   labs(
     title = sprintf("Australian latent GDP growth, %s-present", sample_start_q),
-    subtitle = "Model m12 (structural Sigma + SV + AR(1) errors). Blue = posterior median + 90% CI. Grey = headline.",
+    subtitle = "Model m13 (structural Sigma + SV + AR(1) errors + latent SV). Blue = posterior median + 90% CI. Grey = headline.",
     x = NULL, y = "quarter-on-quarter growth, %",
     caption = paste("Data: ABS 5206.0 Table 24. Run:", diag$run_time_utc, "UTC.")
   )
@@ -195,11 +201,11 @@ html_top <- sprintf('<!doctype html>
   <p>This page publishes a Bayesian state-space estimate of Australian
   quarterly GDP growth that filters measurement error out of the three
   ABS measures (Expenditure, Income, Production-based GDP).
-  The model is m12 from <a href="https://github.com/DavidAStephan/LatentGDP">this
-  repo</a>: an AR(1) latent state, measurement errors that follow their own
-  AR(1) with stochastic volatility, and a construction-based zero
-  restriction on the Production-side error covariance. Background: RBA RDP
-  2014-12 (Rees, Lancaster &amp; Finlay).</p>
+  The model is m13 from <a href="https://github.com/DavidAStephan/LatentGDP">this
+  repo</a>: an AR(1) latent state whose volatility changes over time,
+  measurement errors that follow their own AR(1) with stochastic volatility,
+  and a construction-based zero restriction on the Production-side error
+  covariance. Background: RBA RDP 2014-12 (Rees, Lancaster &amp; Finlay).</p>
 
   <p>Data: ABS Cat. 5206.0 Table 24 (Selected Analytical Series),
   seasonally adjusted, chain volume measures. The page is rebuilt
@@ -237,29 +243,39 @@ html_model <- '
   built from independent industry surveys, so its error is independent of
   E and I by construction (the &quot;structural Sigma&quot;). The first
   quarter&apos;s errors start from the stationary distribution at that
-  quarter&apos;s variances. With &psi; = 0 the model is m9, the previous
-  production model.</p>
+  quarter&apos;s variances.</p>
 
   <h3>Latent state and stochastic volatility</h3>
-  <div class="eq">&mu;<sub>t</sub> = c + &rho; &middot; &mu;<sub>t-1</sub> + &eta;<sub>t</sub>,  &eta;<sub>t</sub> ~ N(0, &tau;<sup>2</sup>),  &mu;<sub>1</sub> stationary
+  <div class="eq">&mu;<sub>t</sub> = c + &rho; &middot; &mu;<sub>t-1</sub> + &tau;<sub>t</sub> &eta;<sub>t</sub>,  &eta;<sub>t</sub> ~ N(0, 1),  &tau;<sub>t</sub> = exp(g<sub>t</sub> / 2)
+&mu;<sub>1</sub> ~ N(c / (1 - &rho;), &tau;<sub>1</sub><sup>2</sup> / (1 - &rho;<sup>2</sup>))
+g<sub>t</sub> = &mu;<sub>g</sub> + &phi;<sub>g</sub> (g<sub>t-1</sub> - &mu;<sub>g</sub>) + &omega;<sub>g</sub> &zeta;<sub>t</sub>,  &zeta;<sub>t</sub> ~ N(0, 1),  g<sub>1</sub> stationary
 h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &mu;<sub>h,k</sub>) + &omega;<sub>k</sub> &xi;<sub>k,t</sub>,  &xi;<sub>k,t</sub> ~ N(0, 1),  h<sub>k,1</sub> stationary
 &sigma;<sub>k,t</sub><sup>2</sup> = exp(h<sub>k,t</sub>) = Var(u<sub>t</sub><sup>k</sup>),  k = E, I, P</div>
-  <p>The volatility captures the long fall in measurement error (largest
-  in the 1960s&ndash;70s). It does <em>not</em> absorb COVID: the three
-  measures agreed in 2020 Q2, so the collapse goes into &mu;<sub>t</sub>.
-  The estimated &psi; are negative (about &minus;0.5, &minus;0.3 and
-  &minus;0.2 for E, I and P in the research fit on the 2026 Q2 data): the
+  <p>There are two kinds of volatility. The measurement-error volatility
+  h captures the long fall in measurement error (largest in the
+  1960s&ndash;70s). The latent volatility &tau;<sub>t</sub> lets the
+  volatility of true growth change too: in the current fit it
+  falls from about {{TAU_1960S}} (annualised, decade average) in the 1960s to about
+  {{TAU_2010S}} in the 2010s and rises to about {{TAU_2020Q2}} in 2020 Q2. COVID is therefore treated as a
+  large real shock, not as measurement error: the three measures agreed in
+  2020 Q2, so the collapse goes into &mu;<sub>t</sub>.
+  The estimated &psi; are about {{PSI_E}}, {{PSI_I}} and {{PSI_P}} for E, I and P
+  (posterior medians); negative values mean that the
   measurement errors partly reverse the next quarter.
-  &mu; is integrated out by a Kalman filter on the quasi-differenced data
-  y<sub>t</sub> &minus; &psi; y<sub>t-1</sub> during sampling, and drawn
-  by forward-filtering backward-sampling.</p>
+  Given both volatility paths, &mu; is integrated out by a Kalman filter on
+  the quasi-differenced data y<sub>t</sub> &minus; &psi; y<sub>t-1</sub>
+  during sampling, and drawn by forward-filtering backward-sampling.
+  With &tau;<sub>t</sub> held constant the model is m12, the previous
+  production model.</p>
 
   <h3>Priors</h3>
   <p>In the model&apos;s annualised units (400&times;dlog; this page shows
   quarter-on-quarter, i.e. divided by 4). N(m, s) has sd s.</p>
   <div class="eq">c           ~ N(1.5, 1)
 &rho;           ~ N(0.5, 0.3)    constrained to (-1, 1)
-&tau;           ~ half-N(0, 2)
+&mu;<sub>g</sub>          ~ N(2, 1)
+&phi;<sub>g</sub>          ~ Uniform(-1, 1)
+&omega;<sub>g</sub>          ~ half-N(0, 0.5)
 &mu;<sub>h,k</sub>         ~ N(2, 1)
 &phi;<sub>k</sub>          ~ Uniform(-1, 1)
 &omega;<sub>k</sub>          ~ half-N(0, 0.5)
@@ -268,52 +284,69 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
   <p>All priors for all models:
   <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/priors.md">priors.md</a>.
   Nothing is published unless the fit has &lt;0.1% divergences, E-BFMI
-  &ge; 0.3, R-hat &le; 1.01 (hyperparameters) / 1.05 (states) and ESS
-  &ge; 400.</p>
+  &ge; 0.3, R-hat &le; 1.01 (hyperparameters) / 1.05 (latent growth and
+  both volatility paths) and ESS &ge; 400.</p>
 
   <h3>Why this specification</h3>
-  <p>The 12 specifications were compared by leave-future-out
+  <p>The 13 specifications were compared by leave-future-out
   cross-validation: one-step-ahead predictive density, latent states
   integrated out, 146 quarters from 1990 Q1 (current-vintage data). They
   were compared in three groups with different data: the three measures
-  on the full sample (m1&ndash;m7, m9, m12); the three measures plus hours
-  from 1978 (m8, m10); and the mixed-frequency m11, which also sees monthly
-  employment inside the predicted quarter.</p>
+  on the full sample (m1&ndash;m7, m9, m12, m13); the three measures plus
+  hours from 1978 (m8, m10); and the mixed-frequency m11, which also sees
+  monthly employment inside the predicted quarter.</p>
   <ul>
-    <li>Two features help, and their gains add up: stochastic volatility
-      and serially correlated measurement errors. m12 has both. It beats
-      m9 (volatility only) by 16.8 nats (SE 6.7 assuming independent
-      quarters, 6.1 allowing for serial correlation) and m5 (serial
-      correlation only) by 63 (SE 14 and 21). The gain over m9 is broad:
-      m12 is ahead in 99 of the 146 quarters and by 19.9 nats before 2020.
-      It is behind in 2020, by 4.2 nats.</li>
-    <li>m12 replaced m9 in October 2026 under a rule fixed before its
-      results were known: pass the publication checks on two seeds, have
-      a reliable score, beat m9 by at least 2 serial-correlation-robust
-      SEs, and fit in under 30 minutes. It met all four (z = 2.7).</li>
+    <li>Three features help, each measured as one step added to a model
+      that has the ones before (whether the gains add up was not tested):
+      stochastic volatility
+      in the measurement errors, serially correlated measurement errors,
+      and stochastic volatility in latent growth. m13 has all three. It
+      beats m12 (the first two only) by 59.6 nats (SE 24.7 assuming
+      independent quarters, 28.9 allowing for serial correlation; z = 2.1).
+      One quarter, 2020 Q2, contributes 23.7 nats and most of that SE.
+      Without the COVID quarters the gain is 28.5 nats (SE 6.0), and m13 is
+      ahead in 122 of the 146 quarters.</li>
+    <li>m13 replaced m12 in October 2026 under a rule fixed before
+      m13&apos;s comparison results were known: pass the publication checks
+      on two seeds, have a reliable score, beat m12 by at least 2
+      serial-correlation-robust SEs (also when no refit is allowed a retry
+      with a new seed), and fit in under 30 minutes. It met every
+      condition, with thin margins (z = 2.06; 23 minutes). m13 was proposed after the hours
+      model m10, re-specified with the same latent volatility, had been
+      scored on the same quarters, so its gain is not a pre-registered
+      test. m12 had replaced m9 the day before under the same kind of rule
+      (+16.8 nats, z = 2.7).</li>
     <li>The structural restriction itself is not supported by prediction
-      (m9 against m4, the same model without it: +1.5 nats, SE 1.5). It is
+      (m9 against m4, the same model without it: +1.5 nats, SE 1.5 assuming
+      independent quarters, 2.2 allowing for serial correlation). It is
       kept because it reflects how GDP(P) is built.</li>
-    <li>Neither hours nor monthly employment detectably improves GDP
-      prediction on m12. The re-specified hours model m10 is ahead by 47
-      nats, but with an SE of 30; the employment model m11 is behind by 8
-      (SE 27; both SEs allow for serial correlation).</li>
+    <li>On GDP prediction, the hours model m10, which also has latent
+      volatility, is behind m13 by 12.6 nats (SE 5.5) and the employment
+      model m11 is behind by 68 (SE 18; both SEs allow for serial
+      correlation). These gaps do not show that hours or employment are
+      unhelpful: m10 lacks m13&apos;s serially correlated measurement errors
+      and E/I-only error correlation and is estimated only from 1978, m11
+      has no stochastic volatility, and no m13-plus-hours model has been
+      fitted.</li>
   </ul>
   <p>The comparison scores predictions of the observed measures, not the
-  split between true growth and measurement error. Models that predict
-  GDP about equally well can imply very different splits. Over the same
-  1978&ndash;2026 quarters m10&apos;s latent path has about 75% of headline
-  variance and m12&apos;s about 91% (research-suite fits on the 2026 Q2
-  data). The variance figure above is therefore a property of m12, not
-  something the comparison confirms.</p>
+  split between true growth and measurement error, and models that
+  predict about equally well can imply very different splits. Over the full sample
+  m13&apos;s latent path has {{VR_FULL}}% of headline variance (from the
+  current production fit) and m12&apos;s 78%, but over 1978&ndash;2026
+  excluding 2020 Q1&ndash;2021 Q1 m13&apos;s has 75%, m12&apos;s 88% and the
+  hours model m10&apos;s 56%. Apart from m13&apos;s full-sample figure, these
+  splits come from research-suite fits on the 2026 Q2 data and are not
+  updated by the weekly run. The variance figure above is
+  therefore a property of m13, not something the comparison confirms.</p>
   <p>An earlier PSIS-LOO comparison on this page (m9 +6 over m4, SV
   +240) was invalid and has been withdrawn.</p>
 
-  <p>Full research record (all 12 specs, the comparison tables and the
+  <p>Full research record (all 13 specs, the comparison tables and the
   caveats) at
   <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/NOTES.md">NOTES.md</a>.
   Stan source at
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/stan/m12_struct_sv_serial.stan">stan/m12_struct_sv_serial.stan</a>.</p>
+  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/stan/m13_serial_latent_sv.stan">stan/m13_serial_latent_sv.stan</a>.</p>
 '
 
 html_foot <- sprintf('
@@ -337,9 +370,28 @@ if (!grepl("^[0-9a-f]{40}$", repo_ref)) repo_ref <- "master"
 html_model <- gsub("/LatentGDP/blob/master/", sprintf("/LatentGDP/blob/%s/", repo_ref),
                    html_model, fixed = TRUE)
 
+# Fill the posterior numbers in the model description from model_summary.json.
+# (The variance splits of other models in "Why this specification" are research-suite
+# results, labelled as such, and are edited by hand when the research suite is rerun.)
+num <- function(x, fmt) {
+  if (is.null(x) || length(x) != 1 || !is.finite(x)) stop("model_summary.json: missing value", call. = FALSE)
+  s <- sprintf(fmt, x)
+  if (x < 0) paste0("&minus;", sub("^-", "", s)) else s
+}
+fills <- c(
+  "{{TAU_1960S}}"  = num(msum$latent_sd_decade_avg[["1960s"]], "%.1f"),
+  "{{TAU_2010S}}"  = num(msum$latent_sd_decade_avg[["2010s"]], "%.1f"),
+  "{{TAU_2020Q2}}" = num(msum$latent_sd_2020q2, "%.0f"),
+  "{{PSI_E}}"      = num(msum$psi[["E"]], "%.2f"),
+  "{{PSI_I}}"      = num(msum$psi[["I"]], "%.2f"),
+  "{{PSI_P}}"      = num(msum$psi[["P"]], "%.2f"),
+  "{{VR_FULL}}"    = num(100 * latest$variance_ratio_vs_headline, "%.0f"))
+for (k in names(fills)) html_model <- gsub(k, fills[[k]], html_model, fixed = TRUE)
+stopifnot(!grepl("{{", html_model, fixed = TRUE))
+
 html <- paste0(html_top, html_model, html_foot)
 
 writeLines(html, file.path(docs_dir, "index.html"))
 cat("Site built at ", docs_dir, "/:\n",
     "  index.html, chart_latent.png, chart_recent.png\n",
-    "  estimates.csv, estimates_latest.json, diagnostics.json\n", sep = "")
+    "  estimates.csv, estimates_latest.json, diagnostics.json, model_summary.json\n", sep = "")

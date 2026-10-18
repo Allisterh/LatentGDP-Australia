@@ -15,7 +15,10 @@
 # density of each quarter conditions only on the past.
 #
 # Groups (different data, so compared separately):
-#   group 1: 3 measures (E, I, P), full sample  -> m1, m2, m3, m4, m5, m6, m7, m9
+#   group 1: 3 measures (E, I, P), full sample  -> m1, m2, m3, m4, m5, m6, m7, m9, m12, m13
+#            (m13 = m12 + SV on the latent innovation; its LFO run was on the evening of
+#            2026-10-17, documented as the 2026-10-18 round in NOTES.md; added after the
+#            re-specified m10's results were known, so its comparison is post hoc)
 #   group 2: 3 measures + hours, post-1978      -> m8, m10
 # Group 2 also gets the GDP-only predictive log p(y^GDP_t | y_{1:t-1}) (hours in the
 # past, not in the target), which is on the same scale as group 1's density over
@@ -87,6 +90,19 @@
 #   Rscript R/03_compare.R retrycheck m9 m12  # rescore the targets of retried refits (seed selection)
 #   Rscript R/03_compare.R m9 --no-mcse    # main pass only; then, in parallel processes,
 #   Rscript R/03_compare.R rerun m9 1      #   re-runs 1..PF_RERUNS (each stored in order)
+#
+# Sample start (R/sample_window.R). With LATENTGDP_START / LATENTGDP_OUT unset everything
+# above is unchanged (full sample, output/lfo, output/tables). With e.g.
+#   LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980 Rscript R/03_compare.R ...
+# every data set starts at 1980 Q1 (m11's months at 1980-01), the evaluation window is
+# still 1990 Q1 - last quarter (the same 146 targets), the initial training sample is the
+# quarters before 1990 Q1 (40), and all checkpoints and tables go to <root>/lfo and
+# <root>/tables. Every bound above is the same. Differences from the full-sample run: the
+# refit cache (full-sample fits) is not used; the variance decomposition is left to
+# R/02_fit_models.R --vardecomp; the summary adds a few key pairs (m6 - m2, m13 - m5;
+# GDP-only m10 - m8, m13 - m11, m12 - m11, m13 - m8) to the sub-period table and writes
+# lfo_full_vs_sample.csv / lfo_full_vs_sample_models.csv, which compare the same targets
+# with the full-sample output/tables/lfo_pointwise.csv (read only).
 
 suppressPackageStartupMessages({
   library(cmdstanr)
@@ -98,10 +114,11 @@ source("R/lib/filters.R")
 source("R/lib/lfo.R")
 source("R/lib/filter_m12.R"); register_m12()        # m12: m9 + AR(1) measurement errors
 source("R/lib/filter_m10.R"); register_m10_filter() # re-specified m10 (latent SV)
+source("R/lib/filter_m13.R"); register_m13()        # m13: m12 + latent SV (pars incl. z_EI)
 model_defs$m12$pars <- c(M12_PARS, "z_EI")          # z_EI: exact 1 +- rho_EI in the filter
 # Compile every filter in the parent: forked filter workers that compile on first use
 # race on Rcpp's cache files ("load(file = index_file): empty input file").
-load_filters(); load_filter_m12(); load_filter_m10()
+load_filters(); load_filter_m12(); load_filter_m10(); load_filter_m13()
 
 WINDOW_START   <- as.Date("1990-03-01")
 K_THRES        <- 0.7
@@ -120,13 +137,31 @@ cores_arg <- grep("^--cores=", args_all, value = TRUE)
 CORES <- if (length(cores_arg)) as.integer(sub("^--cores=", "", cores_arg)) else 4L
 NO_MCSE <- "--no-mcse" %in% args_all    # main LFO pass only; re-runs via `rerun <model> <r>`
 args_in <- setdiff(args_all, c(cores_arg, "--no-mcse"))
-# Earlier checkpoints whose refits may be reused (same Stan file; see the header).
-REFIT_CACHE <- c(m4 = "output/lfo/superseded/lfo_m4_N2000_oldrule.rds",
-                 m9 = "output/lfo/superseded/lfo_m9_N2000_oldrule.rds")
+# Sample start and output root (R/sample_window.R; LATENTGDP_START / LATENTGDP_OUT). With
+# both unset (the default) every path below is output/lfo/... and output/tables/... and the
+# data are the full sample, exactly as before. A non-default sample start must write to its
+# own root (e.g. LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980): the
+# evaluation window stays WINDOW_START - last quarter, and the initial training sample is
+# every quarter of the trimmed data before WINDOW_START (40 quarters from 1980 Q1).
+source("R/sample_window.R")
+SW_DEFAULT <- sw_is_default()
+SW_START <- sw_start()
+if (!is.null(SW_START) && sw_out_root() == "output")
+  stop("LATENTGDP_START is set but LATENTGDP_OUT is not: a non-default sample must not write ",
+       "to output/ (use e.g. LATENTGDP_OUT=output/sample_1980)", call. = FALSE)
+OUT_LFO <- sw_out("lfo")
+OUT_TAB <- sw_out("tables")
+lfo_path <- function(fmt, ...) file.path(OUT_LFO, sprintf(fmt, ...))
+tab_path <- function(f) file.path(OUT_TAB, f)
+# Earlier checkpoints whose refits may be reused (same Stan file; see the header). They are
+# full-sample fits indexed by data end point 1:i, so they are used only on the full sample.
+REFIT_CACHE <- if (is.null(SW_START))
+  c(m4 = "output/lfo/superseded/lfo_m4_N2000_oldrule.rds",
+    m9 = "output/lfo/superseded/lfo_m9_N2000_oldrule.rds") else character(0)
 
-dir.create("output/lfo", showWarnings = FALSE, recursive = TRUE)
-dir.create("output/tables", showWarnings = FALSE, recursive = TRUE)
-log_path <- "output/lfo/lfo_log.txt"
+dir.create(OUT_LFO, showWarnings = FALSE, recursive = TRUE)
+dir.create(OUT_TAB, showWarnings = FALSE, recursive = TRUE)
+log_path <- file.path(OUT_LFO, "lfo_log.txt")
 log_msg <- function(...) {
   msg <- paste0(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "  ", sprintf(...))
   cat(msg, "\n", sep = "")
@@ -135,8 +170,8 @@ log_msg <- function(...) {
 log_line <- function(x) log_msg("%s", x)
 
 # ---- data ----------------------------------------------------------------------
-gdp   <- readRDS("data/processed/gdp_growth.rds")
-gdp4  <- readRDS("data/processed/gdp_growth_with_hours.rds")
+gdp   <- sw_trim_q(readRDS("data/processed/gdp_growth.rds"))            # unchanged by default
+gdp4  <- sw_trim_q(readRDS("data/processed/gdp_growth_with_hours.rds"))
 y3    <- as.matrix(gdp[, c("g_E", "g_I", "g_P")])
 y4    <- as.matrix(gdp4[, c("g_E", "g_I", "g_P", "g_U")])
 covid_dates <- as.Date(c("2020-06-01", "2020-09-01", "2020-12-01", "2021-03-01"))
@@ -156,7 +191,7 @@ data_m7 <- function(i) {
 }
 # m11: monthly employment + quarterly GDP (same alignment as R/fit_m11.R). LFO periods
 # are quarters; the filter runs monthly and ll_post_m11 aggregates months to quarters.
-emp <- readRDS("data/processed/employment_growth_monthly.rds")
+emp <- sw_trim_m(readRDS("data/processed/employment_growth_monthly.rds"))
 emp <- emp[emp$date <= max(gdp$date), ]
 q_cand <- match(gdp$date, emp$date)
 q_keep <- which(!is.na(q_cand) & q_cand >= 3)
@@ -167,6 +202,14 @@ y11[, 1] <- emp$g_emp
 y11[q_end, 2:4] <- y3[q_keep, ]
 L3 <- which(q_dates == WINDOW_START) - 1L
 stopifnot(length(L3) == 1, all(diff(q_end) == 3))
+# Non-default sample: every group starts at the common sample start, so the initial
+# training samples coincide (40 quarters, 1980 Q1 - 1989 Q4, for start 1980-03-01).
+if (!is.null(SW_START)) {
+  stopifnot(gdp$date[1] == SW_START, gdp4$date[1] == SW_START, q_dates[1] == SW_START,
+            L1 == L2, L1 == L3, L1 >= 1)
+  SAMPLE_NOTE <- sprintf("sample from %s (LATENTGDP_START), output root %s; initial training %d quarters %s-%s",
+                         format(SW_START), sw_out_root(), L1, format(gdp$date[1]), format(gdp$date[L1]))
+}
 data_m11 <- function(i) list(T_m = q_end[i], T_q = i, q_end_m = as.array(q_end[seq_len(i)]),
                              y_q = y3[q_keep[seq_len(i)], , drop = FALSE],
                              y_emp = emp$g_emp[seq_len(q_end[i])])
@@ -197,9 +240,10 @@ specs <- list(
   m8  = list(group = 2, file = "stan/m8_labour.stan",          data = data_g2, extras = ad99),
   m10 = list(group = 2, file = "stan/m10_labour_sv.stan",      data = data_g2, extras = sv_set),
   m11 = list(group = 3, file = "stan/m11_mixed_freq.stan",     data = data_m11, extras = sv_set),
-  m12 = list(group = 1, file = "stan/m12_struct_sv_serial.stan", data = data_g1, extras = sv_set)
+  m12 = list(group = 1, file = "stan/m12_struct_sv_serial.stan", data = data_g1, extras = sv_set),
+  m13 = list(group = 1, file = "stan/m13_serial_latent_sv.stan", data = data_g1, extras = sv_set)
 )
-group_models <- list(`1` = c("m1", "m2", "m3", "m4", "m5", "m6", "m7", "m9", "m12"),
+group_models <- list(`1` = c("m1", "m2", "m3", "m4", "m5", "m6", "m7", "m9", "m12", "m13"),
                      `2` = c("m8", "m10"), `3` = "m11")
 
 ctx_fun_for <- function(model) {
@@ -357,7 +401,7 @@ run_lfo <- function(model) {
           format(dates[length(dates)]))
   psis_lfo(model, y, dates, L, refit_fun = make_refit(model), ctx_fun = ctx_fun_for(model),
            k_thres = K_THRES, max_refits = MAX_REFITS, N = N_PARTICLES, cores = CORES,
-           ckpt = sprintf("output/lfo/lfo_%s.rds", model), log_fun = log_line,
+           ckpt = lfo_path("lfo_%s.rds", model), log_fun = log_line,
            ll_post = if (model == "m11") ll_post_m11 else identity,
            pf = if (model_defs[[model]]$type == "sv") PF else NULL)
 }
@@ -366,8 +410,8 @@ run_lfo <- function(model) {
 # pass with new seeds (same draws, refit schedule and particle schedules). Resumable:
 # output/lfo/lfo_<model>_rerun.rds holds the list of finished re-run pointwise tables.
 run_mcse <- function(model) {
-  path <- sprintf("output/lfo/lfo_%s_rerun.rds", model)
-  st <- readRDS(sprintf("output/lfo/lfo_%s.rds", model))
+  path <- lfo_path("lfo_%s_rerun.rds", model)
+  st <- readRDS(lfo_path("lfo_%s.rds", model))
   reruns <- if (file.exists(path)) readRDS(path) else list()
   if (is.data.frame(reruns)) reruns <- list()       # old single-rerun format: start over
   y <- switch(specs[[model]]$group, y3, y4, y11)
@@ -397,16 +441,16 @@ PF_REF <- list(n_base = 8000L, ess_target = 4000, n_max = 400000L,
 # output/tables/lfo_pf_precovid_check.csv (`Rscript R/03_compare.R pfcheck m9 m12 --precovid`).
 run_pfcheck <- function(model, targets = c("covid", "precovid")) {
   targets <- match.arg(targets)
-  st <- readRDS(sprintf("output/lfo/lfo_%s.rds", model))
+  st <- readRDS(lfo_path("lfo_%s.rds", model))
   y <- switch(specs[[model]]$group, y3, y4, y11)
-  reruns <- if (file.exists(sprintf("output/lfo/lfo_%s_rerun.rds", model)))
-    readRDS(sprintf("output/lfo/lfo_%s_rerun.rds", model)) else list()
+  reruns <- if (file.exists(lfo_path("lfo_%s_rerun.rds", model)))
+    readRDS(lfo_path("lfo_%s_rerun.rds", model)) else list()
   pw <- st$pointwise
   # by date, so that group 2 (whose period index differs from group 1's) gets the same quarters
   tg <- if (targets == "covid") which(as.Date(pw$date) %in% c(as.Date("2020-03-01"), covid_dates)) # 2020Q1-2021Q1
         else which(as.Date(pw$date) >= as.Date("2015-01-01") & as.Date(pw$date) <= as.Date("2019-12-31"))
   # Resumable: each finished fit is stored in output/lfo/pfcheck_<model>[_pre].rds.
-  ck_path <- sprintf("output/lfo/pfcheck_%s%s.rds", model, if (targets == "covid") "" else "_pre")
+  ck_path <- lfo_path("pfcheck_%s%s.rds", model, if (targets == "covid") "" else "_pre")
   out <- if (file.exists(ck_path)) readRDS(ck_path) else list()
   for (f in st$fits) {
     rows <- tg[pw$i_fit[tg] == f$i]
@@ -454,14 +498,14 @@ run_pfcheck <- function(model, targets = c("covid", "precovid")) {
 # the mean of all reference passes (elpd_ref_mean, elpd_ref_se = sd / sqrt(passes)).
 PF_REF_EXTRA <- 2L
 run_pfref <- function(model) {
-  st <- readRDS(sprintf("output/lfo/lfo_%s.rds", model))
+  st <- readRDS(lfo_path("lfo_%s.rds", model))
   y <- switch(specs[[model]]$group, y3, y4, y11)
   pw <- st$pointwise
   r <- which(as.Date(pw$date) == covid_dates[1])         # 2020Q2 (by date: any group)
   f <- st$fits[[which(vapply(st$fits, function(x) as.integer(x$i), 0L) == pw$i_fit[r])]]
   yy <- y[seq_len(pw$t[r]), , drop = FALSE]
   ctx <- ctx_fun_for(model)(f$i)
-  ex_path <- sprintf("output/lfo/pfref_%s.rds", model)
+  ex_path <- lfo_path("pfref_%s.rds", model)
   ex <- if (file.exists(ex_path)) readRDS(ex_path) else list()
   while (length(ex) < PF_REF_EXTRA) {
     k <- length(ex) + 1L
@@ -518,11 +562,11 @@ pf_table_ref_mean <- function(tab, extra) {
 # (output/tables/lfo_retry_sensitivity_summary.csv).
 RETRY_FILTER_SEED <- 640000L
 run_retrycheck <- function(model) {
-  st <- readRDS(sprintf("output/lfo/lfo_%s.rds", model))
+  st <- readRDS(lfo_path("lfo_%s.rds", model))
   y <- switch(specs[[model]]$group, y3, y4, y11)
   fd <- st$fit_diag
   retried <- fd$i_fit[isTRUE_vec(fd$attempt > 1)]
-  ck_path <- sprintf("output/lfo/retrycheck_%s.rds", model)
+  ck_path <- lfo_path("retrycheck_%s.rds", model)
   out <- if (file.exists(ck_path)) readRDS(ck_path) else list()
   if (!length(retried)) { log_msg("[%s] retrycheck: no retried fits", model); return(NULL) }
   mod <- cmdstan_model(specs[[model]]$file)
@@ -613,13 +657,13 @@ run_retrycheck <- function(model) {
 if (length(args_in) && args_in[1] == "rerun") {
   m <- args_in[2]; r <- as.integer(args_in[3])
   stopifnot(m %in% names(specs), !is.na(r), r >= 1)
-  st <- readRDS(sprintf("output/lfo/lfo_%s.rds", m))
+  st <- readRDS(lfo_path("lfo_%s.rds", m))
   stopifnot(isTRUE(st$done))
   y <- switch(specs[[m]]$group, y3, y4, y11)
   t0 <- Sys.time()
   pw2 <- lfo_rerun_filter(st, y, ctx_fun_for(m), seed_offset = 500000L * r, cores = CORES,
                           ll_post = if (m == "m11") ll_post_m11 else identity)
-  path <- sprintf("output/lfo/lfo_%s_rerun.rds", m)
+  path <- lfo_path("lfo_%s_rerun.rds", m)
   repeat {
     rr <- if (file.exists(path)) tryCatch(readRDS(path), error = function(e) NULL) else list()
     if (!is.null(rr) && length(rr) >= r - 1) break
@@ -639,14 +683,14 @@ if (length(args_in) && args_in[1] == "pfref") {
   stopifnot(length(ms) > 0, all(ms %in% names(specs)))
   log_msg("=== extra reference passes for the 2020Q2 target: %s (%d cores)", paste(ms, collapse = ", "), CORES)
   extra <- do.call(rbind, lapply(ms, run_pfref))
-  path <- "output/tables/lfo_pf_covid_check.csv"
+  path <- tab_path("lfo_pf_covid_check.csv")
   if (!file.exists(path)) { log_msg("pfref: %s not found (run pfcheck first); extra passes kept in output/lfo/pfref_*.rds", path); quit(save = "no") }
   tab <- read.csv(path, stringsAsFactors = FALSE)
   tab <- tab[, setdiff(names(tab), c("n_ref_passes", "elpd_ref_mean", "elpd_ref_se",
                                      "bias_N2000_vs_refmean", "bias_sched_vs_refmean",
                                      "elpd_sub_ref_mean", "bias_sub_sched_vs_refmean"))]
   all_extra <- dplyr::bind_rows(lapply(unique(tab$model), function(m) {
-    pth <- sprintf("output/lfo/pfref_%s.rds", m)
+    pth <- lfo_path("pfref_%s.rds", m)
     if (file.exists(pth)) do.call(rbind, readRDS(pth)) else NULL
   }))
   tab <- if (is.null(all_extra)) tab else pf_table_ref_mean(tab, all_extra)
@@ -668,10 +712,10 @@ if (length(args_in) && args_in[1] == "retrycheck") {
   log_msg("=== seed-selection check of retried refits: %s (%d cores)", paste(ms, collapse = ", "), CORES)
   for (m in ms) run_retrycheck(m)
   tab <- bind_rows(lapply(names(specs), function(m) {
-    pth <- sprintf("output/lfo/retrycheck_%s.rds", m)
+    pth <- lfo_path("retrycheck_%s.rds", m)
     if (file.exists(pth)) bind_rows(lapply(readRDS(pth), function(o) cbind(o$rows, o$fit[, -(1:3)])))
   }))
-  write.csv(tab, "output/tables/lfo_retry_sensitivity.csv", row.names = FALSE)
+  write.csv(tab, tab_path("lfo_retry_sensitivity.csv"), row.names = FALSE)
   quit(save = "no")
 }
 if (length(args_in) && args_in[1] == "pfcheck") {
@@ -680,7 +724,7 @@ if (length(args_in) && args_in[1] == "pfcheck") {
   stopifnot(length(ms) > 0, all(ms %in% names(specs)))
   log_msg("=== particle-count check on the %s targets: %s (%d cores)", if (pre) "2015-2019" else "COVID",
           paste(ms, collapse = ", "), CORES)
-  path <- if (pre) "output/tables/lfo_pf_precovid_check.csv" else "output/tables/lfo_pf_covid_check.csv"
+  path <- if (pre) tab_path("lfo_pf_precovid_check.csv") else tab_path("lfo_pf_covid_check.csv")
   for (m in ms) {
     res <- run_pfcheck(m, if (pre) "precovid" else "covid")
     old <- if (file.exists(path)) read.csv(path, stringsAsFactors = FALSE) else NULL
@@ -703,6 +747,7 @@ if (length(to_run)) {
           paste(to_run, collapse = ", "), CORES, format(WINDOW_START), K_THRES, MAX_REFITS,
           REFIT_WARMUP, REFIT_SAMPLING, 100 * RULE$max_div_frac, RULE$max_rhat, RULE$min_ebfmi,
           RULE$min_ess_bulk, MAX_ATTEMPTS, PF$n_base, PF$n_max, PF$ess_target, PF_RERUNS)
+  if (!is.null(SW_START)) log_msg("=== %s", SAMPLE_NOTE)
 }
 for (m in to_run) {
   run_lfo(m)
@@ -711,8 +756,8 @@ for (m in to_run) {
 
 # ---- summarise ------------------------------------------------------------------------
 all_models <- names(specs)
-have <- all_models[file.exists(sprintf("output/lfo/lfo_%s.rds", all_models))]
-st_all <- lapply(setNames(have, have), function(m) readRDS(sprintf("output/lfo/lfo_%s.rds", m)))
+have <- all_models[file.exists(lfo_path("lfo_%s.rds", all_models))]
+st_all <- lapply(setNames(have, have), function(m) readRDS(lfo_path("lfo_%s.rds", m)))
 done <- names(Filter(function(s) isTRUE(s$done), st_all))
 if (!length(done)) { log_msg("no completed LFO runs yet"); quit(save = "no") }
 
@@ -724,7 +769,7 @@ mcse_rows <- list()
 for (m in done) {
   p0 <- st_all[[m]]$pointwise
   p0$elpd_main <- p0$elpd; p0$elpd_sub_main <- p0$elpd_sub
-  path <- sprintf("output/lfo/lfo_%s_rerun.rds", m)
+  path <- lfo_path("lfo_%s_rerun.rds", m)
   if (model_defs[[m]]$type == "sv" && file.exists(path)) {
     rr <- readRDS(path)
     if (is.data.frame(rr)) rr <- list(rr)
@@ -833,7 +878,7 @@ n_unrecorded <- function(m) {
   a <- attempts_all[attempts_all$model == m & !attempts_all$kept, , drop = FALSE]
   sum(vapply(seq_len(nrow(fd)), function(r) (fd$attempt[r] - 1L) - sum(a$i_fit == fd$i_fit[r]), 0))
 }
-write.csv(attempts_all, "output/tables/lfo_refit_attempts.csv", row.names = FALSE)
+write.csv(attempts_all, tab_path("lfo_refit_attempts.csv"), row.names = FALSE)
 
 for (m in done) {
   bad <- fit_diag_all[fit_diag_all$model == m & !fit_diag_all$meets_rule, ]
@@ -853,8 +898,12 @@ summ_group <- function(g) {
   best <- names(which.max(tot))
   tibble(
     group = as.integer(g), model = ms,
-    sample = switch(g, `1` = "E, I, P; full sample", `2` = "E, I, P, hours; post-1978",
-                    `3` = "E, I, P quarterly + monthly employment; post-1978"),
+    sample = if (is.null(SW_START))
+      switch(g, `1` = "E, I, P; full sample", `2` = "E, I, P, hours; post-1978",
+             `3` = "E, I, P quarterly + monthly employment; post-1978") else
+      paste0(switch(g, `1` = "E, I, P", `2` = "E, I, P, hours",
+                    `3` = "E, I, P quarterly + monthly employment"),
+             "; from ", format(SW_START, "%Y-%m")),
     window = sprintf("%s to %s", st_all[[ms[1]]]$pointwise$date[1], st_all[[ms[1]]]$pointwise$date[n]),
     n_pred = n,
     elpd_lfo = tot,
@@ -936,7 +985,14 @@ periods <- list(`1990-99` = c("1990-01-01", "1999-12-31"), `2000-07` = c("2000-0
                 `all excl. COVID` = c("1990-01-01", "2026-12-31"))
 sub_rows <- list()
 key_pairs <- list(c("m12", "m9"), c("m12", "m4"), c("m12", "m5"), c("m9", "m5"), c("m9", "m4"),
-                  c("m5", "m2"), c("m9", "m2"), c("m12", "m2"))
+                  c("m5", "m2"), c("m9", "m2"), c("m12", "m2"),
+                  c("m13", "m12"), c("m13", "m9"), c("m13", "m4"))
+# Non-default sample only (the full-sample tables keep their rows): the remaining pairs
+# of the full-sample conclusions (structural restriction without SV, all three features),
+# and the two nested measurement-SV comparisons (m4 = m2 + measurement SV, m9 = m6 +
+# measurement SV; m9 - m5 is not nested, since m9 lacks m5's AR(1) errors).
+if (!is.null(SW_START)) key_pairs <- c(key_pairs, list(c("m6", "m2"), c("m13", "m5"),
+                                                       c("m4", "m2"), c("m9", "m6")))
 if (length(g1)) {
   P1 <- sapply(g1, function(m) st_all[[m]]$pointwise$elpd)
   dts <- as.Date(st_all[[g1[1]]]$pointwise$date)
@@ -954,14 +1010,36 @@ if (length(g1)) {
     }
   }
 }
+# The same sub-periods on the GDP-only target (common window; Pg above) for the
+# cross-group pairs with the latent-SV models (target = "GDP-only"; the group-1 rows
+# above are target = "group 1 joint", which for group 1 is the same GDP 3-vector).
+key_pairs_gdp <- list(c("m13", "m10"), c("m12", "m10"), c("m10", "m9"))
+if (!is.null(SW_START)) key_pairs_gdp <- c(key_pairs_gdp, list(c("m10", "m8"), c("m13", "m11"),
+                                                               c("m12", "m11"), c("m13", "m8")))
+n_g1_rows <- length(sub_rows)
+if (exists("Pg")) {
+  dtg <- as.Date(st_all[[colnames(Pg)[1]]]$pointwise$date)
+  tg_ <- st_all[[colnames(Pg)[1]]]$pointwise$t
+  for (pn in names(periods)) {
+    sel <- dtg >= as.Date(periods[[pn]][1]) & dtg <= as.Date(periods[[pn]][2])
+    if (pn == "all excl. COVID") sel <- sel & !(tg_ %in% covid_idx)
+    for (kp in key_pairs_gdp) if (all(kp %in% colnames(Pg))) {
+      d <- Pg[sel, kp[1]] - Pg[sel, kp[2]]; n <- length(d)
+      sub_rows[[length(sub_rows) + 1]] <- tibble(period = pn, n_pred = n, model_a = kp[1],
+        model_b = kp[2], elpd = sum(d), se_iid = sqrt(n * var(d)),
+        se_nw = se_nw(d, L = min(NW_LAG, n - 1L)))
+    }
+  }
+}
 sub_tab <- bind_rows(sub_rows)
-write.csv(sub_tab, "output/tables/model_comparison_subperiod.csv", row.names = FALSE)
+sub_tab$target <- rep(c("group 1 joint", "GDP-only"), c(n_g1_rows, length(sub_rows) - n_g1_rows))
+write.csv(sub_tab, tab_path("model_comparison_subperiod.csv"), row.names = FALSE)
 
 # Seed-selection sensitivity (from `retrycheck`): the key group-1 differences with the
 # targets of every retried fit rescored from attempt 1 alone ("first") or from all
 # attempts pooled ("pooled"), each as a correction (variant - kept, same filter seed) to
 # the pass-mean pointwise values; and with those targets dropped ("drop").
-rc_path <- "output/tables/lfo_retry_sensitivity.csv"
+rc_path <- tab_path("lfo_retry_sensitivity.csv")
 if (file.exists(rc_path) && length(g1)) {
   rc <- read.csv(rc_path, stringsAsFactors = FALSE)
   rc <- rc[rc$model %in% g1, , drop = FALSE]
@@ -988,15 +1066,15 @@ if (file.exists(rc_path) && length(g1)) {
     }
   }
   sens_tab <- bind_rows(sens_rows)
-  write.csv(sens_tab, "output/tables/lfo_retry_sensitivity_summary.csv", row.names = FALSE)
+  write.csv(sens_tab, tab_path("lfo_retry_sensitivity_summary.csv"), row.names = FALSE)
   cat("\n=== Seed-selection sensitivity of retried refits (a - b) ===\n")
   print(as.data.frame(sens_tab), digits = 4)
 }
 
-write.csv(cmp, "output/tables/model_comparison.csv", row.names = FALSE)
-write.csv(pairs_tab, "output/tables/model_comparison_pairwise.csv", row.names = FALSE)
-write.csv(pw, "output/tables/lfo_pointwise.csv", row.names = FALSE)
-write.csv(fit_diag_all, "output/tables/lfo_fit_diagnostics.csv", row.names = FALSE)
+write.csv(cmp, tab_path("model_comparison.csv"), row.names = FALSE)
+write.csv(pairs_tab, tab_path("model_comparison_pairwise.csv"), row.names = FALSE)
+write.csv(pw, tab_path("lfo_pointwise.csv"), row.names = FALSE)
+write.csv(fit_diag_all, tab_path("lfo_fit_diagnostics.csv"), row.names = FALSE)
 
 cat("\n=== PSIS-LFO-CV, one-step-ahead, marginal likelihood (states integrated out) ===\n")
 print(as.data.frame(cmp |> select(group, model, n_pred, elpd_lfo, se_elpd, elpd_diff_vs_best,
@@ -1024,7 +1102,94 @@ for (m in done) {
 }
 if (!"m11" %in% done) cat("m11 (mixed frequency): LFO not run/completed - not compared\n")
 
+# ---- non-default sample: the same targets scored on the full sample --------------------
+# Both runs score the same 146 one-step targets (WINDOW_START - last quarter); they differ
+# in the training data of every fit (the full sample starts in 1959 Q4 / 1978 Q4), so a
+# change in a difference reflects both the data dropped and the parameters estimated from
+# it. Reads the full-sample output/tables/lfo_pointwise.csv (pass-mean pointwise values),
+# never writes to output/tables. Tables: <root>/tables/lfo_full_vs_sample.csv (key
+# differences by sub-period, both samples, and the change with its own iid / Newey-West SE)
+# and lfo_full_vs_sample_models.csv (each model's totals and rank in both samples).
+if (!is.null(SW_START) && file.exists("output/tables/lfo_pointwise.csv")) {
+  fpw <- read.csv("output/tables/lfo_pointwise.csv", stringsAsFactors = FALSE)
+  spw <- as.data.frame(pw)
+  # pointwise vector of model m on target "joint" (its own group's density) or "gdp"
+  pv <- function(df, m, tgt) {
+    r <- df[df$model == m, , drop = FALSE]
+    if (!nrow(r)) return(NULL)
+    r <- r[order(as.Date(r$date)), , drop = FALSE]
+    v <- if (tgt == "gdp" && specs[[m]]$group != 1) r$elpd_sub else r$elpd
+    setNames(v, r$date)
+  }
+  cross_pairs <- list(
+    c("m9", "m5", "joint"), c("m12", "m5", "joint"), c("m4", "m1", "joint"),
+    c("m5", "m2", "joint"), c("m12", "m9", "joint"),
+    c("m13", "m12", "joint"), c("m10", "m8", "joint"), c("m10", "m8", "gdp"),
+    c("m9", "m4", "joint"), c("m6", "m2", "joint"), c("m3", "m2", "joint"),
+    c("m13", "m10", "gdp"), c("m13", "m11", "gdp"), c("m12", "m11", "gdp"),
+    c("m10", "m12", "gdp"), c("m10", "m9", "gdp"), c("m13", "m8", "gdp"),
+    c("m13", "m9", "joint"), c("m13", "m4", "joint"), c("m13", "m5", "joint"),
+    c("m13", "m7", "joint"), c("m12", "m4", "joint"), c("m7", "m1", "joint"),
+    c("m4", "m2", "joint"), c("m9", "m6", "joint"))
+  cs_rows <- list()
+  for (cp in cross_pairs) {
+    a <- cp[1]; b <- cp[2]; tg <- cp[3]
+    fa <- pv(fpw, a, tg); fb <- pv(fpw, b, tg); sa <- pv(spw, a, tg); sb <- pv(spw, b, tg)
+    if (any(vapply(list(fa, fb, sa, sb), is.null, TRUE))) next
+    stopifnot(identical(names(fa), names(sa)), identical(names(fa), names(fb)),
+              identical(names(sa), names(sb)))
+    dts <- as.Date(names(sa)); tt <- match(dts, gdp$date)
+    df_ <- fa - fb; ds_ <- sa - sb
+    for (pn in c(names(periods), "all")) {
+      sel <- if (pn == "all") rep(TRUE, length(dts)) else
+        dts >= as.Date(periods[[pn]][1]) & dts <= as.Date(periods[[pn]][2])
+      if (pn == "all excl. COVID") sel <- sel & !(tt %in% covid_idx)
+      n <- sum(sel); L_ <- min(NW_LAG, n - 1L)
+      f1 <- df_[sel]; s1 <- ds_[sel]; ch <- s1 - f1
+      cs_rows[[length(cs_rows) + 1]] <- tibble(
+        model_a = a, model_b = b, target = if (tg == "joint") paste0("group ", specs[[a]]$group, " joint") else "GDP-only",
+        period = pn, n_pred = n,
+        diff_full = sum(f1), se_iid_full = sqrt(n * var(f1)), se_nw_full = se_nw(f1, L = L_),
+        diff_sample = sum(s1), se_iid_sample = sqrt(n * var(s1)), se_nw_sample = se_nw(s1, L = L_),
+        z_nw_full = sum(f1) / se_nw(f1, L = L_), z_nw_sample = sum(s1) / se_nw(s1, L = L_),
+        change = sum(ch), se_iid_change = sqrt(n * var(ch)), se_nw_change = se_nw(ch, L = L_),
+        n_ahead_full = sum(f1 > 0), n_ahead_sample = sum(s1 > 0),
+        sign_same = sign(sum(f1)) == sign(sum(s1)))
+    }
+  }
+  cs_tab <- bind_rows(cs_rows)
+  write.csv(cs_tab, tab_path("lfo_full_vs_sample.csv"), row.names = FALSE)
+  mrows <- list()
+  for (m in done) for (tg in c("joint", "gdp")) {
+    if (tg == "gdp" && specs[[m]]$group == 1) next
+    f_ <- pv(fpw, m, tg); s_ <- pv(spw, m, tg)
+    if (is.null(f_) || is.null(s_)) next
+    mrows[[length(mrows) + 1]] <- tibble(model = m, group = specs[[m]]$group,
+      target = if (tg == "joint") paste0("group ", specs[[m]]$group, " joint") else "GDP-only",
+      elpd_full = sum(f_), elpd_sample = sum(s_), change = sum(s_ - f_),
+      se_iid_change = sqrt(length(s_) * var(s_ - f_)), se_nw_change = se_nw(s_ - f_))
+  }
+  cm_tab <- bind_rows(mrows)
+  # ranks on the GDP-only target (group 1 joint = GDP), all models, in each sample
+  j <- which(cm_tab$group == 1 | cm_tab$target == "GDP-only")
+  cm_tab$rank_gdp_full <- NA_integer_; cm_tab$rank_gdp_sample <- NA_integer_
+  cm_tab$rank_gdp_full[j] <- rank(-cm_tab$elpd_full[j], ties.method = "min")
+  cm_tab$rank_gdp_sample[j] <- rank(-cm_tab$elpd_sample[j], ties.method = "min")
+  write.csv(cm_tab, tab_path("lfo_full_vs_sample_models.csv"), row.names = FALSE)
+  cat("\n=== Same 146 targets: full sample vs ", format(SW_START), " sample (a - b) ===\n", sep = "")
+  if (nrow(cs_tab)) print(as.data.frame(cs_tab |> filter(period == "all") |>
+                        select(model_a, model_b, target, diff_full, se_nw_full, diff_sample,
+                               se_nw_sample, z_nw_full, z_nw_sample, change, se_nw_change)), digits = 3)
+  print(as.data.frame(cm_tab), digits = 5)
+}
+
 # ---- variance decomposition, per posterior draw -------------------------------------
+# Full sample only. For a non-default sample R/02_fit_models.R --vardecomp writes
+# <root>/tables/variance_decomposition.csv from that sample's fits.
+if (!SW_DEFAULT) {
+  log_msg("variance decomposition skipped (%s): use R/02_fit_models.R --vardecomp", sw_describe())
+  quit(save = "no")
+}
 # ratio_s = var_t(mu_t^(s)) / var_t(headline_t), headline = mean of E, I, P.
 # Uses the full-sample fits from R/02_fit_models.R and R/fit_m11.R.
 headline_full <- rowMeans(y3)

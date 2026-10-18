@@ -5,6 +5,11 @@ output/loo_compare.rds
 # PSIS-LFO checkpoints (regenerable by R/03_compare.R; the tables in output/tables are kept),
 # including the local-only superseded checkpoints in output/lfo/superseded/
 output/lfo/**/*.rds
+# Non-default-sample research runs (R/sample_window.R; LATENTGDP_OUT=output/sample_<x>,
+# e.g. output/sample_1980/): their fit objects and LFO / particle-check checkpoints are
+# regenerable and too large for git (several exceed GitHub's 100 MB limit). Their tables,
+# logs, figures and driver scripts are kept.
+output/sample_*/**/*.rds
 
 # Raw ABS downloads (refetched each run)
 data/raw/
@@ -24,6 +29,7 @@ stan/m9_struct_sv
 stan/m10_labour_sv
 stan/m11_mixed_freq
 stan/m12_struct_sv_serial
+stan/m13_serial_latent_sv
 
 # R/RStudio
 .Rproj.user/

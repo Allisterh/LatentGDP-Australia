@@ -31,8 +31,9 @@ env:
 jobs:
   recompute:
     runs-on: ubuntu-latest
-    # m12's fit takes about 2.5x as long as m9's (about 20-40 min on 4 local cores;
-    # not yet measured on GitHub's runners), so the limit was raised from 90 min.
+    # The production fit (m13 since 2026-10-18; m12 before) takes about 23-28 min on
+    # 4 local cores (m12: 21-26 min); neither has been measured on GitHub's runners.
+    # The limit was raised from 90 to 120 min for m12 and is unchanged for m13.
     timeout-minutes: 120
     outputs:
       changed: ${{ steps.inputs.outputs.changed }}
@@ -138,31 +139,31 @@ jobs:
       # file.mtime(exe) < file.mtime(stan_file); checkout stamps the .stan with
       # the current time and the cache restores the exe's old mtime, so touch
       # the exe after a hit to make cmdstanr reuse it.
-      - name: Restore compiled m12 executable
+      - name: Restore compiled m13 executable
         if: steps.inputs.outputs.changed == 'true'
         id: cache-exe
         uses: actions/cache/restore@v6
         with:
-          path: stan/m12_struct_sv_serial
-          key: m12-exe-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ steps.keys.outputs.image }}-${{ hashFiles('stan/m12_struct_sv_serial.stan') }}
+          path: stan/m13_serial_latent_sv
+          key: m13-exe-${{ env.CMDSTAN_VERSION }}-${{ runner.os }}-${{ steps.keys.outputs.image }}-${{ hashFiles('stan/m13_serial_latent_sv.stan') }}
 
       - name: Mark restored executable as up to date
         if: steps.inputs.outputs.changed == 'true' && steps.cache-exe.outputs.cache-hit == 'true'
         run: |
-          touch stan/m12_struct_sv_serial
-          ls -l --time-style=full-iso stan/m12_struct_sv_serial.stan stan/m12_struct_sv_serial
+          touch stan/m13_serial_latent_sv
+          ls -l --time-style=full-iso stan/m13_serial_latent_sv.stan stan/m13_serial_latent_sv
 
-      - name: Fit production model (m12)
+      - name: Fit production model (m13)
         if: steps.inputs.outputs.changed == 'true'
         run: Rscript R/fit_production.R
 
       # Saved right after the fit (whether or not the quality gate passed), so
       # a failed gate doesn't throw away a fresh compile.
-      - name: Save compiled m12 executable
-        if: always() && steps.inputs.outputs.changed == 'true' && steps.cache-exe.outputs.cache-hit != 'true' && hashFiles('stan/m12_struct_sv_serial') != ''
+      - name: Save compiled m13 executable
+        if: always() && steps.inputs.outputs.changed == 'true' && steps.cache-exe.outputs.cache-hit != 'true' && hashFiles('stan/m13_serial_latent_sv') != ''
         uses: actions/cache/save@v6
         with:
-          path: stan/m12_struct_sv_serial
+          path: stan/m13_serial_latent_sv
           key: ${{ steps.cache-exe.outputs.cache-primary-key }}
 
       - name: Write estimates and build site

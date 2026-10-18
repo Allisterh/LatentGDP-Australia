@@ -1,7 +1,8 @@
 # Priors
 
 Every prior below is transcribed from the `model` block of the Stan file named
-in each section (checked against the files on 2026-10-17). If a Stan file and
+in each section (checked against the files on 2026-10-17; the m13 section on
+2026-10-18). If a Stan file and
 this document disagree, the Stan file is right and this document needs fixing.
 
 **Units.** Every model works in annualised growth, 400 × Δlog(GDP), in percent
@@ -25,12 +26,12 @@ scale.
 simulation anywhere in this repository. The scales were chosen by hand from
 the sample moments above, not checked by simulation.
 
-## Shared AR(1) latent block (m2-m9, m12; m10 in part)
+## Shared AR(1) latent block (m2-m9, m12; m10 and m13 in part)
 
 m2, m3, m4, m5, m6, m7, m8, m9 and m12 all use the same latent-state equation
-and the same priors on it. m10 uses the same `c` and `rho` but, since
-2026-10-17, replaces the constant `tau` with stochastic volatility on the
-latent innovation (see its section):
+and the same priors on it. m10 (since 2026-10-17) and m13 use the same `c`
+and `rho` but replace the constant `tau` with stochastic volatility on the
+latent innovation (see their sections):
 
 | Parameter | Declared | Prior | Note |
 |---|---|---|---|
@@ -41,9 +42,9 @@ latent innovation (see its section):
 The implied prior on the latent states is mu_1 ~ N(c/(1-rho), tau²/(1-rho²))
 (the stationary distribution) and mu_t | mu_{t-1} ~ N(c + rho·mu_{t-1}, tau²).
 - m2, m5, m6, m7 and m8 implement it with `mu_raw ~ std_normal()`.
-- m3, m4, m9, m10 and m12 integrate mu out with a Kalman filter that starts
-  from the same stationary initial distribution. This is the same prior (for
-  m10, with tau² replaced by exp(g_t)).
+- m3, m4, m9, m10, m12 and m13 integrate mu out with a Kalman filter that
+  starts from the same stationary initial distribution. This is the same
+  prior (for m10 and m13, with tau² replaced by exp(g_t)).
 
 ## m1 baseline (`stan/m1_baseline.stan`)
 
@@ -196,10 +197,11 @@ from the shared block:
 | `sigma_emp` | > 0 | half-N(0, 5) |
 | `mu_raw[m]` | real | std_normal, giving a stationary AR(1) monthly latent |
 
-## m12 structural Sigma + SV + AR(1) measurement errors: production (`stan/m12_struct_sv_serial.stan`)
+## m12 structural Sigma + SV + AR(1) measurement errors (`stan/m12_struct_sv_serial.stan`; production 2026-10-17 to 2026-10-18)
 
-Production model since 2026-10-17. Every prior is m9's, unchanged, plus m5's
-prior on the measurement-error AR(1) coefficients.
+Production model from 2026-10-17 until m13 replaced it on 2026-10-18. Every
+prior is m9's, unchanged, plus m5's prior on the measurement-error AR(1)
+coefficients.
 
 | Parameter | Declared | Prior |
 |---|---|---|
@@ -221,3 +223,45 @@ prior on the measurement-error AR(1) coefficients.
   separate prior; at psi = 0 it is m9's period-1 density.
 - **mu.** mu is integrated out by a Kalman filter on the quasi-differenced
   data and drawn by FFBS. Its prior is the shared stationary AR(1) prior.
+
+## m13 m12 + latent SV: production (`stan/m13_serial_latent_sv.stan`)
+
+Production model since 2026-10-18 (NOTES.md, "Round of 2026-10-18"). It is
+m12 with the latent innovation sd made time-varying, exp(g_t / 2), exactly as
+in the re-specified m10. The latent SV block takes m10's priors (the same as
+each measurement SV block), which replace m12's `tau ~ half-N(0, 2)`. Every
+other prior is m12's, unchanged.
+
+| Parameter | Declared | Prior |
+|---|---|---|
+| `c`, `rho` | | shared AR(1) block: N(1.5, 1), N(0.5, 0.3) on (-1, 1) |
+| `mu_g`    | real | N(2, 1). Long-run log-variance of the latent innovation |
+| `phi_g`   | (-1, 1) | Uniform(-1, 1) |
+| `omega_g` | > 0 | half-N(0, 0.5) |
+| `g_raw[t]` | real | std_normal. Implies g_1 ~ N(mu_g, omega_g²/(1-phi_g²)), g_t \| g_{t-1} ~ N(mu_g + phi_g(g_{t-1} - mu_g), omega_g²) |
+| `mu_h[k]`  | real | N(2, 1) |
+| `phi[k]`   | (-1, 1) | Uniform(-1, 1) |
+| `omega[k]` | > 0 | half-N(0, 0.5) |
+| `rho_EI`   | (-1, 1) | N(0, 0.5), written on `z_EI = atanh(rho_EI)` with the Jacobian, as in m9 and m12 |
+| `psi[k]`   | (-1, 1) | N(0, 0.5), the same prior as m5 and m12 |
+| `h_raw[t,k]` | real | std_normal. Stationary AR(1) prior on h, as in m4, m9 and m12 |
+
+- **Latent states.** mu_1 ~ N(c/(1-rho), exp(g_1)/(1-rho²)) (m10's
+  convention: the stationary law at the period-1 variance) and
+  mu_t | mu_{t-1} ~ N(c + rho·mu_{t-1}, exp(g_t)). mu is integrated out by a
+  Kalman filter on the quasi-differenced data and drawn by FFBS.
+- **tau.** `tau = exp(mu_g / 2)` and `tau_t = exp(g_t / 2)` are generated
+  quantities, not parameters, and have no prior of their own. At
+  mu_g ~ N(2, 1) the prior median of tau is e ≈ 2.7.
+- **What h is, and the initial errors.** As in m12: sigma_{t,k} =
+  exp(h_{t,k}/2) is the sd of the measurement-error innovation u_t^k, and
+  eps_1 ~ N(0, V_1) with V_1[j,k] = R_1[j,k] / (1 - psi_j psi_k).
+- **omega_g.** Its posterior (median 0.61, 90% interval [0.42, 0.89]) is
+  lower than m10's (0.94), but still in the upper part of the half-N(0, 0.5)
+  prior: the posterior median is at the prior's 78th percentile and the 95%
+  point at its 93rd.
+  Prior sensitivity: a refit with omega_g ~ half-N(0, 1) (`Rscript R/fit_m13.R
+  --omega_g_sd=1`) gives omega_g 0.66 [0.44, 1.02], phi_g 0.90 (from 0.91),
+  tau 2.43 (from 2.47), a variance ratio of 0.786 (from 0.790) and a latent
+  median path that moves by 0.03 pp on average (at most 0.18). The results
+  are insensitive to this widening.
