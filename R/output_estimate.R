@@ -24,7 +24,8 @@ fit_path <- Sys.getenv("LATENTGDP_FIT",  "output/fit_production.rds")
 docs_dir <- Sys.getenv("LATENTGDP_DOCS", "docs")
 
 fit        <- readRDS(fit_path)
-gdp_growth <- readRDS("data/processed/gdp_growth.rds")
+source("R/production_config.R")   # same sample as the fit
+gdp_growth <- load_production_growth()
 
 mu_draws <- fit$draws("mu", format = "draws_matrix")
 stopifnot(ncol(mu_draws) == nrow(gdp_growth))

@@ -13,8 +13,11 @@
 #
 # Requires the 'openssl' package (a dependency of readabs via httr).
 
+source("R/production_config.R")   # load_production_growth(): hash only the fitted sample
+
 INPUT_HASH_FILES <- c(
   "stan/m13_serial_latent_sv.stan",
+  "R/production_config.R",
   "R/utils_abs.R",
   "R/01_fetch_data.R",
   "R/input_hash.R",
@@ -54,7 +57,7 @@ input_hash_components <- function(data_path = "data/processed/gdp_growth.rds",
     stop("input_hash: missing ", data_path, " - run R/01_fetch_data.R first.",
          call. = FALSE)
   }
-  gdp_growth <- readRDS(data_path)
+  gdp_growth <- load_production_growth(data_path)   # the production sample only
   c(
     stats::setNames(sha256_text(canonical_gdp_text(gdp_growth)), "data:gdp_growth"),
     stats::setNames(vapply(files, sha256_file_lf, character(1)),

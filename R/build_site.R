@@ -35,10 +35,10 @@ quarter_label <- function(d) {
   sprintf("%s Q%d", format(d, "%Y"), (as.integer(format(d, "%m")) - 1) %/% 3 + 1)
 }
 
-# First quarter of the sample, for chart titles ("1959 Q4-present").
+# First quarter of the sample, for chart titles ("1980 Q1-present").
 sample_start_q <- quarter_label(min(estimates$date))
 
-# Y-axis range covering the 1960s-70s booms and normal recessions but
+# Y-axis range covering normal recessions and the 2020 Q3 rebound but
 # clipping the COVID collapse; the annotation flags what's off-scale. Units are
 # quarter-on-quarter growth (100 x dlog), 1/4 of the annualised scale.
 YLIM <- c(-2.5, 4.5)
@@ -120,13 +120,13 @@ ci_str <- sprintf("[%+.2f, %+.2f]", latest$mu_q05, latest$mu_q95)
 pct <- function(x) sprintf("%.0f%%", 100 * x)
 var_str <- if (!is.null(latest$variance_ratio_vs_headline_q05) &&
                !is.null(latest$variance_ratio_vs_headline_q95)) {
-  sprintf("%s of headline variance across the full sample (posterior median; 90%% interval %s&ndash;%s)",
-          pct(latest$variance_ratio_vs_headline),
+  sprintf("%s of headline variance over %s&ndash;present (posterior median; 90%% interval %s&ndash;%s)",
+          pct(latest$variance_ratio_vs_headline), sample_start_q,
           pct(latest$variance_ratio_vs_headline_q05),
           pct(latest$variance_ratio_vs_headline_q95))
 } else {
-  sprintf("%s of headline variance across the full sample",
-          pct(latest$variance_ratio_vs_headline))
+  sprintf("%s of headline variance over %s&ndash;present",
+          pct(latest$variance_ratio_vs_headline), sample_start_q)
 }
 
 # Footer diagnostics, read defensively (older diagnostics.json lacked fields).
@@ -252,11 +252,11 @@ g<sub>t</sub> = &mu;<sub>g</sub> + &phi;<sub>g</sub> (g<sub>t-1</sub> - &mu;<sub
 h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &mu;<sub>h,k</sub>) + &omega;<sub>k</sub> &xi;<sub>k,t</sub>,  &xi;<sub>k,t</sub> ~ N(0, 1),  h<sub>k,1</sub> stationary
 &sigma;<sub>k,t</sub><sup>2</sup> = exp(h<sub>k,t</sub>) = Var(u<sub>t</sub><sup>k</sup>),  k = E, I, P</div>
   <p>There are two kinds of volatility. The measurement-error volatility
-  h captures the long fall in measurement error (largest in the
-  1960s&ndash;70s). The latent volatility &tau;<sub>t</sub> lets the
-  volatility of true growth change too: in the current fit it
-  falls from about {{TAU_1960S}} (annualised, decade average) in the 1960s to about
-  {{TAU_2010S}} in the 2010s and rises to about {{TAU_2020Q2}} in 2020 Q2. COVID is therefore treated as a
+  h lets the size of each measure&apos;s errors change over time. The
+  latent volatility &tau;<sub>t</sub> lets the volatility of true growth
+  change too: in the current fit it is about {{TAU_1980S}} (annualised,
+  decade average) in the 1980s and about {{TAU_2010S}} in the 2010s, and
+  rises to about {{TAU_2020Q2}} in 2020 Q2. COVID is therefore treated as a
   large real shock, not as measurement error: the three measures agreed in
   2020 Q2, so the collapse goes into &mu;<sub>t</sub>.
   The estimated &psi; are about {{PSI_E}}, {{PSI_I}} and {{PSI_P}} for E, I and P
@@ -292,7 +292,7 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
   cross-validation: one-step-ahead predictive density, latent states
   integrated out, 146 quarters from 1990 Q1 (current-vintage data). They
   were compared in three groups with different data: the three measures
-  on the full sample (m1&ndash;m7, m9, m12, m13); the three measures plus
+  from 1959 Q4 (m1&ndash;m7, m9, m12, m13); the three measures plus
   hours from 1978 (m8, m10); and the mixed-frequency m11, which also sees
   monthly employment inside the predicted quarter.</p>
   <ul>
@@ -316,6 +316,12 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
       scored on the same quarters, so its gain is not a pre-registered
       test. m12 had replaced m9 the day before under the same kind of rule
       (+16.8 nats, z = 2.7).</li>
+    <li>Since 19 October 2026 the production fit uses data from 1980 Q1,
+      the sample of RBA RDP 2014-12, because the early measurement errors
+      may not represent current ones. The comparison above starts every
+      model in 1959 Q4. Re-run with every model starting in 1980 Q1, m13 is
+      still first, but its lead over m12 is weaker (+57.4 nats, z = 1.6;
+      +6.4 before 2020) and would not have met the switch rule.</li>
     <li>The structural restriction itself is not supported by prediction
       (m9 against m4, the same model without it: +1.5 nats, SE 1.5 assuming
       independent quarters, 2.2 allowing for serial correlation). It is
@@ -331,13 +337,13 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
   </ul>
   <p>The comparison scores predictions of the observed measures, not the
   split between true growth and measurement error, and models that
-  predict about equally well can imply very different splits. Over the full sample
-  m13&apos;s latent path has {{VR_FULL}}% of headline variance (from the
-  current production fit) and m12&apos;s 78%, but over 1978&ndash;2026
-  excluding 2020 Q1&ndash;2021 Q1 m13&apos;s has 75%, m12&apos;s 88% and the
-  hours model m10&apos;s 56%. Apart from m13&apos;s full-sample figure, these
-  splits come from research-suite fits on the 2026 Q2 data and are not
-  updated by the weekly run. The variance figure above is
+  predict about equally well can imply very different splits. In the
+  production fit (1980 Q1 onward) m13&apos;s latent path has {{VR_FULL}}% of
+  headline variance. In research fits from 1959 Q4, m13 has 79% and m12
+  78%, but over 1978&ndash;2026 excluding 2020 Q1&ndash;2021 Q1 m13&apos;s has
+  75%, m12&apos;s 88% and the hours model m10&apos;s 56%. Apart from the
+  production figure, these splits come from research-suite fits on the
+  2026 Q2 data and are not updated by the weekly run. The variance figure above is
   therefore a property of m13, not something the comparison confirms.</p>
   <p>An earlier PSIS-LOO comparison on this page (m9 +6 over m4, SV
   +240) was invalid and has been withdrawn.</p>
@@ -379,7 +385,7 @@ num <- function(x, fmt) {
   if (x < 0) paste0("&minus;", sub("^-", "", s)) else s
 }
 fills <- c(
-  "{{TAU_1960S}}"  = num(msum$latent_sd_decade_avg[["1960s"]], "%.1f"),
+  "{{TAU_1980S}}"  = num(msum$latent_sd_decade_avg[["1980s"]], "%.1f"),
   "{{TAU_2010S}}"  = num(msum$latent_sd_decade_avg[["2010s"]], "%.1f"),
   "{{TAU_2020Q2}}" = num(msum$latent_sd_2020q2, "%.0f"),
   "{{PSI_E}}"      = num(msum$psi[["E"]], "%.2f"),

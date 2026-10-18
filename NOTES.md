@@ -103,6 +103,39 @@ single signal of true growth. Expenditure has the largest sd on the full
 sample. On the post-1978 samples (m8, m11), Income's is slightly larger than
 Expenditure's.
 
+## Production sample moved to 1980 Q1, 2026-10-19
+
+At the user's request the production estimate is now fitted on 1980 Q1 - 2026 Q2
+(T = 186), the sample start of RBA RDP 2014-12, instead of 1959 Q4 - 2026 Q2
+(T = 267). The model is unchanged (m13).
+
+- **Why.** The paper's reason (section 3.2): the pattern of measurement errors in
+  the early years of each GDP series may be unrepresentative of current
+  performance. The prediction evidence is roughly neutral: on the same 146 LFO
+  targets, m13 trained from 1980 scores 6.3 nats better than m13 trained from
+  1959 (NW z 1.69), mostly in 1990-99, and +1.8 (z 0.7) from 2000 on. The
+  comparison author had recommended keeping the full sample (section
+  "Production: unchanged, and the recommendation" below, now superseded).
+- **Code.** `R/production_config.R` defines `PRODUCTION_START = 1980-03-01` and
+  `load_production_growth()`, used by `R/fit_production.R`,
+  `R/output_estimate.R` and `R/input_hash.R`. The input hash now covers only
+  the fitted quarters plus the config file. The research suite still defaults
+  to the full sample (`LATENTGDP_START` unset).
+- **First production fit on 1980 Q1 (local, seed 1).** Gate passed: 0 of 8000
+  divergences, E-BFMI 0.882-0.948, max R-hat 1.0013 (hyperparameters), 1.0013
+  (mu), 1.0015 (h), 1.0017 (g), min bulk/tail ESS 1315/882 (hyperparameters)
+  and 5531/6268 (mu); 18 min wall. The draws reproduce the research fit
+  `output/sample_1980/fit_m13.rds` exactly.
+- **Published numbers.** 2026 Q2 latent growth +0.48% QoQ [0.31, 0.64] (full
+  sample: +0.48% [0.30, 0.63]). Variance ratio 0.87 [0.81, 0.94] over
+  1980 Q1 - 2026 Q2 (full-sample fit: 0.79 [0.70, 0.89] over 1959 Q4 - 2026 Q2).
+  Latent volatility tau_t by decade (annualised, posterior median of decade
+  means): 1980s 3.1, 1990s 2.4, 2000s 1.5, 2010s 1.3, 2020s 4.0; 2020 Q2 13.7.
+- **Site.** The historical chart now starts in 1980 Q1. The "Why this
+  specification" text notes that the LFO comparison starts every model in
+  1959 Q4 and that on the 1980 sample m13's lead over m12 is weaker
+  (+57.4, z 1.6).
+
 ## 1980Q1 sample (RDP 2014-12 alignment), 2026-10-18/19
 
 The whole research suite was re-run on data starting in 1980 Q1:
@@ -792,7 +825,7 @@ pseudo-real-time on the current vintage, one step ahead.
   (z 1.05), and before 2020 m10 is now behind m12 (-8.2). As before, none of
   the labour-model gaps measures the value of the labour data.
 
-### Production: unchanged, and the recommendation
+### Production: unchanged, and the recommendation *(superseded 2026-10-19: production moved to 1980 Q1 at the user's request; see "Production sample moved to 1980 Q1")*
 
 Production still fits m13 on the full sample. This round changed no
 production file.

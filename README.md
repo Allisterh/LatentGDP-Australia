@@ -16,20 +16,24 @@ quarter. This project treats *true* GDP growth as a latent state, observed
 through three noisy signals, and infers it with Bayesian methods.
 
 The latent series is less volatile than headline GDP:
-- **Production model (m13).** On the current vintage (1959 Q4 - 2026 Q2,
-  T = 267), the variance of the latent path is **79% of the variance of
-  headline growth**. That is the posterior median of var(mu draw) / var(headline),
-  with a 90% interval of 71% to 89%.
-- **Other models.** The other full-sample specifications give 78-83% (m12,
+- **Production model (m13).** Fitted on 1980 Q1 - 2026 Q2 (T = 186, the
+  sample start of RBA RDP 2014-12), the variance of the latent path is
+  **87% of the variance of headline growth**. That is the posterior median
+  of var(mu draw) / var(headline), with a 90% interval of 81% to 94%.
+  Fitted from 1959 Q4 (production until 2026-10-19) it is 79% [71%, 89%].
+- **Other models.** The other specifications fitted from 1959 Q4 give 78-83% (m12,
   production from 2026-10-17 to 2026-10-18, 78%; m9, production before that,
   79%). The exception is m7, the COVID-scale model, at 61%. See NOTES.md for
   the full table.
 
-So, according to m13, roughly a fifth of the quarter-to-quarter variance of
-headline growth is measurement error rather than movement in true activity.
-That share depends on the period: excluding the COVID quarters (2020 Q1 -
-2021 Q1) it is about a quarter (73% of headline variance on the full sample,
-75% on 1978 Q4 - 2026 Q2, against 88% for m12 on those quarters). The model
+So, according to the production fit, about an eighth of the
+quarter-to-quarter variance of headline growth since 1980 is measurement
+error rather than movement in true activity. That share depends on the
+period: excluding the COVID quarters (2020 Q1 - 2021 Q1) it is about a
+fifth (78% of headline variance since 1980). From 1959 Q4 the share is
+larger, a fifth (79%) or, excluding COVID, about a quarter (73%), because
+measurement errors were larger before 1980; on 1978 Q4 - 2026 Q2 excluding
+COVID the full-sample m13 gives 75%, against 88% for m12. The model
 comparison does not test this split (see "What it does not test" below).
 Earlier versions of
 this project claimed a 30-35% reduction. That figure is too large: it was the
@@ -41,7 +45,9 @@ plausible path.
 The production model is `stan/m13_serial_latent_sv.stan` (since 2026-10-18;
 from 2026-10-17 it was m12, `stan/m12_struct_sv_serial.stan`, and before that
 m9, `stan/m9_struct_sv.stan`). It is m12 with stochastic volatility added to
-latent growth. It has six parts:
+latent growth. Since 2026-10-19 it is fitted on data from 1980 Q1
+(`R/production_config.R`), following RDP 2014-12; before that it used the
+full sample from 1959 Q4. See "1980 Q1 sample" below. It has six parts:
 - **Latent state.** Latent growth follows a stationary AR(1) with a
   time-varying innovation sd, mu_t = c + rho·mu_{t-1} + tau_t·eta_t, with
   tau_t = exp(g_t / 2). mu_1 ~ N(c/(1-rho), tau_1²/(1-rho²)).
@@ -244,7 +250,7 @@ Further results:
   fifth is measurement error" figure is a property of m13, not something the
   comparison confirms.
 
-## 1980 Q1 sample (research only; production still uses the full sample)
+## 1980 Q1 sample (production since 2026-10-19)
 
 RDP 2014-12 starts its data in 1980 Q1 (section 3.2). Its reason is that,
 although quarterly national accounts go back to 1959 Q3, "the pattern of
@@ -262,13 +268,16 @@ re-run from that start on 2026-10-18/19:
 Only the start date follows the paper. **The RDP's fourth signal is the
 unemployment rate; our m8 and m10 use hours worked.**
 
-**Production is unchanged.** It still fits m13 on 1959 Q4 - 2026 Q2. On the
-1980 sample m13 still passes the production gate on two seeds and is still
-the best model on every LFO target. Its latent path barely moves: the
-correlation with the full-sample path is 0.9985, and the paths differ by
-0.13 pp on average. The comparison author's recommendation is to **keep
-production on m13 with the full sample**, not to move it to 1980 Q1. This
-is a recommendation; nothing was changed. For reference, m13 trained from
+**Production moved to 1980 Q1 on 2026-10-19**, so the published estimate
+uses the paper's sample. The model is still m13. On the 1980 sample m13
+passes the production gate on two seeds and is still the best model on every
+LFO target. Its latent path barely moves: the correlation with the
+full-sample path is 0.9985, and the paths differ by 0.13 pp on average. The
+first 1980 production fit had 0 divergences in 8000 draws, min E-BFMI 0.88
+and max R-hat 1.0017, in 18 minutes locally. The comparison author had
+recommended keeping the full sample; the evidence on prediction is roughly
+neutral, so the choice rests on the paper's argument that pre-1980
+measurement errors are unrepresentative. m13 trained from
 1980 predicts the same 146 targets 6.3 nats better than m13 trained from
 1959 (NW z 1.69). That is below the z >= 2 bar used for every production
 switch. Most of that gain is in 1990-99 (+4.5). From 2000 on it is +1.8
@@ -315,6 +324,7 @@ Production (run by CI):
 
 ```
 R/01_fetch_data.R      ABS 5206.0 Table 24 (GDP E/I/P) -> data/processed/gdp_growth.rds
+R/production_config.R  production sample start (1980 Q1); used by the fit, outputs and input hash
 R/fit_production.R     fits m13, saves output/fit_production.rds, applies the quality gate
 R/output_estimate.R    writes docs/estimates.csv, estimates_latest.json, diagnostics.json, model_summary.json
 R/build_site.R         renders docs/index.html and charts

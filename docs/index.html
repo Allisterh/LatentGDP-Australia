@@ -32,8 +32,8 @@
   <h1>Latent Australian GDP growth, 2026 Q2</h1>
   <div class="card">
     <p class="headline" style="color: #1b9e77;">+0.48%</p>
-    <p class="ci">90% credible interval: [+0.30, +0.63] (quarter-on-quarter growth)</p>
-    <p class="meta">Headline (mean of E, I, P): +0.42%. Latent-path variance is 79% of headline variance across the full sample (posterior median; 90% interval 70%&ndash;89%).</p>
+    <p class="ci">90% credible interval: [+0.31, +0.64] (quarter-on-quarter growth)</p>
+    <p class="meta">Headline (mean of E, I, P): +0.42%. Latent-path variance is 87% of headline variance over 1980 Q1&ndash;present (posterior median; 90% interval 81%&ndash;94%).</p>
   </div>
 
   <h2>Observed measures for 2026 Q2</h2>
@@ -60,8 +60,8 @@
   seasonally adjusted, chain volume measures. The page is rebuilt
   automatically after each quarterly release.</p>
 
-  <h3>Historical estimate, 1959 Q4&ndash;present</h3>
-  <img src="chart_latent.png" alt="Latent GDP growth vs headline, 1959 Q4 to present">
+  <h3>Historical estimate, 1980 Q1&ndash;present</h3>
+  <img src="chart_latent.png" alt="Latent GDP growth vs headline, 1980 Q1 to present">
 
   <h3>Downloads</h3>
   <ul>
@@ -93,14 +93,14 @@ g<sub>t</sub> = &mu;<sub>g</sub> + &phi;<sub>g</sub> (g<sub>t-1</sub> - &mu;<sub
 h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &mu;<sub>h,k</sub>) + &omega;<sub>k</sub> &xi;<sub>k,t</sub>,  &xi;<sub>k,t</sub> ~ N(0, 1),  h<sub>k,1</sub> stationary
 &sigma;<sub>k,t</sub><sup>2</sup> = exp(h<sub>k,t</sub>) = Var(u<sub>t</sub><sup>k</sup>),  k = E, I, P</div>
   <p>There are two kinds of volatility. The measurement-error volatility
-  h captures the long fall in measurement error (largest in the
-  1960s&ndash;70s). The latent volatility &tau;<sub>t</sub> lets the
-  volatility of true growth change too: in the current fit it
-  falls from about 4.9 (annualised, decade average) in the 1960s to about
-  1.4 in the 2010s and rises to about 12 in 2020 Q2. COVID is therefore treated as a
+  h lets the size of each measure&apos;s errors change over time. The
+  latent volatility &tau;<sub>t</sub> lets the volatility of true growth
+  change too: in the current fit it is about 3.1 (annualised,
+  decade average) in the 1980s and about 1.3 in the 2010s, and
+  rises to about 14 in 2020 Q2. COVID is therefore treated as a
   large real shock, not as measurement error: the three measures agreed in
   2020 Q2, so the collapse goes into &mu;<sub>t</sub>.
-  The estimated &psi; are about &minus;0.46, &minus;0.36 and &minus;0.19 for E, I and P
+  The estimated &psi; are about &minus;0.43, &minus;0.35 and &minus;0.18 for E, I and P
   (posterior medians); negative values mean that the
   measurement errors partly reverse the next quarter.
   Given both volatility paths, &mu; is integrated out by a Kalman filter on
@@ -123,7 +123,7 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
 &rho;<sub>EI</sub>         ~ N(0, 0.5)    constrained to (-1, 1)
 &psi;<sub>k</sub>          ~ N(0, 0.5)    constrained to (-1, 1)</div>
   <p>All priors for all models:
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/db3f3bc52be0934e0abcea0a6a79c8e15d377b0a/priors.md">priors.md</a>.
+  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/priors.md">priors.md</a>.
   Nothing is published unless the fit has &lt;0.1% divergences, E-BFMI
   &ge; 0.3, R-hat &le; 1.01 (hyperparameters) / 1.05 (latent growth and
   both volatility paths) and ESS &ge; 400.</p>
@@ -133,7 +133,7 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
   cross-validation: one-step-ahead predictive density, latent states
   integrated out, 146 quarters from 1990 Q1 (current-vintage data). They
   were compared in three groups with different data: the three measures
-  on the full sample (m1&ndash;m7, m9, m12, m13); the three measures plus
+  from 1959 Q4 (m1&ndash;m7, m9, m12, m13); the three measures plus
   hours from 1978 (m8, m10); and the mixed-frequency m11, which also sees
   monthly employment inside the predicted quarter.</p>
   <ul>
@@ -157,6 +157,12 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
       scored on the same quarters, so its gain is not a pre-registered
       test. m12 had replaced m9 the day before under the same kind of rule
       (+16.8 nats, z = 2.7).</li>
+    <li>Since 19 October 2026 the production fit uses data from 1980 Q1,
+      the sample of RBA RDP 2014-12, because the early measurement errors
+      may not represent current ones. The comparison above starts every
+      model in 1959 Q4. Re-run with every model starting in 1980 Q1, m13 is
+      still first, but its lead over m12 is weaker (+57.4 nats, z = 1.6;
+      +6.4 before 2020) and would not have met the switch rule.</li>
     <li>The structural restriction itself is not supported by prediction
       (m9 against m4, the same model without it: +1.5 nats, SE 1.5 assuming
       independent quarters, 2.2 allowing for serial correlation). It is
@@ -172,26 +178,26 @@ h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &m
   </ul>
   <p>The comparison scores predictions of the observed measures, not the
   split between true growth and measurement error, and models that
-  predict about equally well can imply very different splits. Over the full sample
-  m13&apos;s latent path has 79% of headline variance (from the
-  current production fit) and m12&apos;s 78%, but over 1978&ndash;2026
-  excluding 2020 Q1&ndash;2021 Q1 m13&apos;s has 75%, m12&apos;s 88% and the
-  hours model m10&apos;s 56%. Apart from m13&apos;s full-sample figure, these
-  splits come from research-suite fits on the 2026 Q2 data and are not
-  updated by the weekly run. The variance figure above is
+  predict about equally well can imply very different splits. In the
+  production fit (1980 Q1 onward) m13&apos;s latent path has 87% of
+  headline variance. In research fits from 1959 Q4, m13 has 79% and m12
+  78%, but over 1978&ndash;2026 excluding 2020 Q1&ndash;2021 Q1 m13&apos;s has
+  75%, m12&apos;s 88% and the hours model m10&apos;s 56%. Apart from the
+  production figure, these splits come from research-suite fits on the
+  2026 Q2 data and are not updated by the weekly run. The variance figure above is
   therefore a property of m13, not something the comparison confirms.</p>
   <p>An earlier PSIS-LOO comparison on this page (m9 +6 over m4, SV
   +240) was invalid and has been withdrawn.</p>
 
   <p>Full research record (all 13 specs, the comparison tables and the
   caveats) at
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/db3f3bc52be0934e0abcea0a6a79c8e15d377b0a/NOTES.md">NOTES.md</a>.
+  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/NOTES.md">NOTES.md</a>.
   Stan source at
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/db3f3bc52be0934e0abcea0a6a79c8e15d377b0a/stan/m13_serial_latent_sv.stan">stan/m13_serial_latent_sv.stan</a>.</p>
+  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/stan/m13_serial_latent_sv.stan">stan/m13_serial_latent_sv.stan</a>.</p>
 
   <footer>
-    Last updated 2026-10-18 21:09:57 UTC. CmdStan 2.39.0. 2 divergences out of 8000 post-warmup draws (4 chains &times; 2000). Min E-BFMI 0.869; max R-hat (hyperparameters) 1.002; min bulk / tail ESS 1686 / 2791.
-    Sample 1959 Q4 to 2026 Q2 (T = 267 quarters). Source: <a href="https://github.com/DavidAStephan/LatentGDP">github.com/DavidAStephan/LatentGDP</a>.
+    Last updated 2026-10-18 23:22:24 UTC. CmdStan 2.39.0. 0 divergences out of 8000 post-warmup draws (4 chains &times; 2000). Min E-BFMI 0.882; max R-hat (hyperparameters) 1.001; min bulk / tail ESS 1315 / 882.
+    Sample 1980 Q1 to 2026 Q2 (T = 186 quarters). Source: <a href="https://github.com/DavidAStephan/LatentGDP">github.com/DavidAStephan/LatentGDP</a>.
   </footer>
 </body>
 </html>

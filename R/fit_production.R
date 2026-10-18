@@ -25,7 +25,8 @@ suppressPackageStartupMessages({
 
 dir.create("output", showWarnings = FALSE, recursive = TRUE)
 
-gdp_growth <- readRDS("data/processed/gdp_growth.rds")
+source("R/production_config.R")   # PRODUCTION_START = 1980 Q1 (RDP 2014-12)
+gdp_growth <- load_production_growth()
 
 stan_data <- list(
   T = nrow(gdp_growth),
