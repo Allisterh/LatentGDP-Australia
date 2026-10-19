@@ -1,0 +1,65 @@
+"table","model","parameter","stat","value"
+1,"Model 1","mu","median",0.78
+1,"Model 1","rho","median",0.4
+1,"Model 1","sigma2_G","median",0.39
+1,"Model 1","sigma2_E","median",0.44
+1,"Model 1","sigma2_I","median",0.71
+1,"Model 1","sigma2_P","median",0.31
+1,"Model 1","sigma2_G","q05",0.29
+1,"Model 1","sigma2_G","q95",0.52
+1,"Model 1","sigma2_E","q05",0.34
+1,"Model 1","sigma2_E","q95",0.57
+1,"Model 1","sigma2_I","q05",0.56
+1,"Model 1","sigma2_I","q95",0.89
+1,"Model 1","sigma2_P","q05",0.24
+1,"Model 1","sigma2_P","q95",0.42
+1,"Model 1","rho","q05",0.24
+1,"Model 1","rho","q95",0.56
+2,"Model 2","rho","median",0.46
+2,"Model 2","sigma2_G","median",0.43
+2,"Model 2","sigma2_E","median",0.91
+2,"Model 2","sigma2_I","median",0.98
+2,"Model 2","sigma2_P","median",0.52
+2,"Model 2","sigma_EI","median",0.39
+2,"Model 2","sigma_EP","median",0.36
+2,"Model 2","sigma_IP","median",0.2
+3,"Model 3","rho","median",0.62
+3,"Model 3","sigma2_G","median",0.28
+3,"Model 3","sigma2_E","median",0.7
+3,"Model 3","sigma2_I","median",0.87
+3,"Model 3","sigma2_P","median",0.47
+3,"Model 3","sigma_EI","median",0.23
+3,"Model 3","sigma_EP","median",0.22
+3,"Model 3","sigma_IP","median",0.11
+3,"Model 3","lambda","median",-0.64
+4,"Model 1","w_E","value",0.3
+4,"Model 1","w_I","value",0.21
+4,"Model 1","w_P","value",0.49
+4,"Model 2","w_E","value",0.09
+4,"Model 2","w_I","value",0.26
+4,"Model 2","w_P","value",0.65
+4,"Model 3","w_E","value",0.22
+4,"Model 3","w_I","value",0.24
+4,"Model 3","w_P","value",0.54
+5,"GDP(A)","sd","value",0.76
+5,"GDP(E)","sd","value",0.93
+5,"GDP(I)","sd","value",1.03
+5,"GDP(P)","sd","value",0.84
+5,"Model 1","sd","value",0.57
+5,"Model 2","sd","value",0.56
+5,"Model 3","sd","value",0.49
+5,"GDP(A)","rho1","value",0.21
+5,"GDP(E)","rho1","value",-0.03
+5,"GDP(I)","rho1","value",-0.19
+5,"GDP(P)","rho1","value",0.31
+5,"Model 1","rho1","value",0.47
+5,"Model 2","rho1","value",0.79
+5,"Model 3","rho1","value",0.68
+5,"GDP(A)","mean","value",0.79
+5,"GDP(E)","mean","value",0.8
+5,"GDP(I)","mean","value",0.78
+5,"GDP(P)","mean","value",0.8
+6,"GDP(A)","mean_abs_revision","value",0.29
+6,"Model 1","mean_abs_revision","value",0.2
+6,"Model 2","mean_abs_revision","value",0.19
+6,"Model 3","mean_abs_revision","value",0.18

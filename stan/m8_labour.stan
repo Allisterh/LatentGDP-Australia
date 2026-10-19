@@ -1,5 +1,5 @@
-// m8: AR(1) latent growth with a 4th signal - hours worked (Rees-Lancaster-
-// Finlay's "Model 4" specification).
+// m8: AR(1) latent growth with a 4th signal - hours worked. In the spirit of
+// Rees-Lancaster-Finlay (RDP 2014-12) Model 3, which uses the unemployment rate.
 //   y_t^E = mu_t + eps_t^E
 //   y_t^I = mu_t + eps_t^I
 //   y_t^P = mu_t + eps_t^P

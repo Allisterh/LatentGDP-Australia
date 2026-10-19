@@ -1,0 +1,8 @@
+"comparison","a","b","n_common","mu_median_mad","mu_median_max","mu_median_max_date","mu_mean_mad","mu_mean_max","mu_mean_cor","tau_median_rel_mean","tau_median_rel_max","tau_median_rel_max_date"
+"prior: omega_g ~ half-N(0, 1) vs half-N(0, 0.5), full sample","m13_full","m13_full_omegag1",267,0.03265721,0.1828802,"1969-03-01",0.02725645,0.1577311,0.9999489,0.01866254,0.07420938,"2019-09-01"
+"seed 2 vs seed 1, full sample","m13_full","m13_full_seed2",267,0.02051797,0.1949161,"1973-12-01",0.01594242,0.1501804,0.9999796,0.005915233,0.01665523,"2010-03-01"
+"seed 2 vs seed 1, 1980 sample","m13_prod","m13_1980_seed2",186,0.01617271,0.09570555,"1982-03-01",0.01136778,0.06129656,0.9999902,0.007801873,0.03162279,"2017-06-01"
+"1980 sample vs full sample (common quarters)","m13_full","m13_prod",186,0.1369091,1.067019,"1980-12-01",0.1256254,1.026972,0.9984817,0.1320903,0.4628719,"1980-03-01"
+"production fit vs 1980 research fit","m13_prod","m13_1980",186,0,0,"1980-03-01",0,0,1,0,0,"1980-03-01"
+"prior: omega_g ~ half-N(0, 1) vs half-N(0, 0.5), 1980 sample","m13_prod","m13_1980_omegag1",186,0.03336572,0.1730153,"1994-09-01",0.02869909,0.111114,0.9999396,0.04672896,0.1769851,"2019-09-01"
+"RDP sample (to 2013 Q2) vs 1980 sample (to 2026 Q2), common quarters","m13_prod","m13_rdp",134,0.2127199,1.336647,"1982-12-01",0.2057313,1.34936,0.9922078,0.2449088,1.463425,"2013-06-01"

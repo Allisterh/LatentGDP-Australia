@@ -42,3 +42,5 @@ stan/m13_serial_latent_sv
 
 # Claude Code working directory (not part of the project)
 .claude/
+output/sample_rdp/**/*.rds
+output/ppc/**/*.rds

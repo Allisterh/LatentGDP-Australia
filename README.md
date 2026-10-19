@@ -65,18 +65,20 @@ full sample from 1959 Q4. See "1980 Q1 sample" below. It has six parts:
   follows its own stationary AR(1), as in m9 and m12.
 
 With g_t held constant (omega_g = 0) the model is m12; with psi = 0 as well
-it is m9. Posterior (seed 1; medians and 90% intervals; annualised units):
-- **Latent volatility.** tau_t falls from about 4.9 in the 1960s to 1.6 in
-  the 2000s and 1.4 in the 2010s (posterior median of each decade's average),
-  and is 12.0 [8.3, 19.1] in 2020 Q2. m12's constant tau is 3.99. The
-  long-run value exp(mu_g / 2) is 2.47 [1.71, 3.61]; phi_g 0.91, omega_g
-  0.61 [0.42, 0.89].
-- **Measurement errors.** psi = (-0.46, -0.36, -0.19) for (E, I, P), with
-  90% intervals [-0.56, -0.37], [-0.47, -0.23] and [-0.35, -0.02]: a
-  measurement error is partly reversed the next quarter. rho_EI is 0.12
-  [-0.03, 0.27].
-- **Latent path.** The median path differs from m12's by 0.38 pp
-  (annualised) on average; 2020 Q2 is -27.9 (m12 -27.4, headline -28.1).
+it is m9. Posterior of the production fit (1980 Q1 - 2026 Q2, local seed-1
+fit; medians and 90% intervals; annualised units):
+- **Latent volatility.** tau_t is about 3.1 in the 1980s, 2.4 in the 1990s,
+  1.5 in the 2000s and 1.3 in the 2010s (posterior median of each decade's
+  average), and 13.7 [9.1, 24.1] in 2020 Q2. The long-run value
+  exp(mu_g / 2) is 1.81 [1.26, 2.67]; phi_g 0.83 [0.65, 0.94], omega_g 0.88
+  [0.59, 1.26].
+- **Measurement errors.** psi = (-0.43, -0.35, -0.18) for (E, I, P), with
+  90% intervals [-0.54, -0.31], [-0.48, -0.22] and [-0.36, 0.02]: a
+  measurement error is partly reversed the next quarter. rho_EI is 0.09
+  [-0.08, 0.24].
+- **Latent path.** 2020 Q2 is -27.9 (headline -28.1). Fitted from 1959 Q4
+  (production until 2026-10-19) the path is almost the same: correlation
+  0.9985 with the 1980 path. The full-sample values are in NOTES.md.
 
 **How it is sampled.**
 - Given g and h, the model is linear-Gaussian in mu. Quasi-differencing
@@ -100,20 +102,19 @@ half-N(0, 1) changes omega_g from 0.61 to 0.66, the variance ratio from
 **Sampler settings and diagnostics.**
 - Settings: 4 chains × (2000 warmup + 2000 draws), adapt_delta 0.99,
   max_treedepth 12, seed 1.
-- Diagnostics on the current data (production fit, seed 1):
-  - 4 divergences out of 8000 draws;
-  - per-chain E-BFMI 0.85-0.97;
-  - max R-hat 1.002 on hyperparameters, 1.001 on mu, 1.002 on h and g;
-  - minimum bulk / tail ESS 1553 / 3213 on hyperparameters and 4344 / 4866
-    on mu.
-- A seed-2 fit also passes the gate (0 divergences, E-BFMI 0.84, max R-hat
-  1.003 on hyperparameters, bulk ESS 1784). Both seeds' gate records are in
-  `output/tables/m13_gate_seeds.csv`.
-- A fit takes about as long as m12's: 1384 s (23 minutes) wall on 4 local
-  cores for the seed-1 research fit, chains 989-1375 s; seed 2 took 1664 s
-  (28 minutes) at load average 10-11. The production run on 2026-10-18 (load average about 4)
-  took 1173 s of sampling (chains 856-1173 s), about 20 minutes wall; it
-  reproduced the seed-1 research fit draw for draw.
+- Diagnostics of the production fit on 1980 Q1 - 2026 Q2. The published
+  estimate comes from the CI run, whose draws differ from a local run:
+  - published CI run (`docs/diagnostics.json`): 2 divergences out of 8000
+    draws, min E-BFMI 0.846, max R-hat 1.003 on hyperparameters, minimum
+    bulk / tail ESS 1285 / 915 on hyperparameters;
+  - local seed-1 run: 0 divergences, E-BFMI 0.88-0.95, max R-hat 1.0013
+    on hyperparameters, minimum bulk / tail ESS 1315 / 882.
+- A local seed-2 fit on the same sample also passes the gate (1 divergence,
+  E-BFMI 0.86). Gate records: `output/sample_1980/tables/m13_gate_seeds.csv`
+  (1980 sample) and `output/tables/m13_gate_seeds.csv` (full sample).
+- Fit time on the 1980 sample: about 18 minutes wall on 4 local cores
+  (1138 s), and about 27 minutes for the whole CI job on GitHub's runners.
+  On the full sample a fit took 23-28 minutes locally.
 
 **Why m13.** m13 replaced m12 under a rule fixed before m13's LFO results
 were known. The rule added one condition to the one used for m12: the z
@@ -440,8 +441,8 @@ for smoke tests that must not touch `docs/`:
 
 ## References
 
-- Rees, Lancaster & Finlay (2014), "Estimating the Australian Output Gap
-  and Other State-Space Refinements to GDP Measurement", RBA RDP 2014-12.
+- Rees, Lancaster & Finlay (2014), "A State-space Approach to Australian
+  GDP Measurement", RBA Research Discussion Paper 2014-12.
   https://www.rba.gov.au/publications/rdp/2014/2014-12.html
 - Aruoba, Diebold, Nalewaik, Schorfheide & Song (2016), "Improving GDP
   Measurement: A Measurement-Error Perspective", J. Econometrics 191(2).

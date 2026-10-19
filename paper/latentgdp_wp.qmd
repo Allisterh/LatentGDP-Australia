@@ -1,0 +1,993 @@
+---
+title: "Measurement Error in Australian GDP Growth: A State-space Model with Serially Correlated Errors and Stochastic Volatility"
+subtitle: "Working paper draft"
+author: "David Stephan"
+date: "19 October 2026"
+bibliography: references.bib
+link-citations: true
+number-sections: true
+execute:
+  echo: false
+  warning: false
+  message: false
+format:
+  pdf:
+    pdf-engine: tectonic
+    documentclass: article
+    papersize: a4
+    fontsize: 11pt
+    geometry: "margin=2.5cm"
+    linestretch: 1.15
+    toc: true
+    toc-depth: 2
+    colorlinks: true
+    fig-pos: "htbp"
+    mainfont: "STIX Two Text"
+    mathfont: "STIX Two Math"
+    include-in-header:
+      text: |
+        \usepackage{etoolbox}
+        \AtBeginEnvironment{longtable}{\small}
+        \usepackage{amsmath}
+        \usepackage{newunicodechar}
+        \newunicodechar{≥}{\ensuremath{\geq}}
+        \newunicodechar{≤}{\ensuremath{\leq}}
+        \newunicodechar{→}{\ensuremath{\rightarrow}}
+        \newunicodechar{≈}{\ensuremath{\approx}}
+        \newunicodechar{√}{\ensuremath{\surd}}
+        \newunicodechar{ȳ}{\ensuremath{\bar{y}}}
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+    html-math-method: mathjax
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(jsonlite)
+  library(patchwork)
+})
+dir.create("figures", showWarnings = FALSE)
+rd <- function(p) read.csv(p, stringsAsFactors = FALSE)
+TF <- "../output/tables/"
+T8 <- "../output/sample_1980/tables/"
+
+# ---- formatting ---------------------------------------------------------------------
+fmt <- function(x, d = 1) {
+  x <- round(as.numeric(x), d); x[!is.na(x) & x == 0] <- 0
+  s <- formatC(x, format = "f", digits = d, big.mark = ",")
+  gsub("-", "−", s)
+}
+sg  <- function(x, d = 1) paste0(ifelse(round(x, d) > 0, "+", ""), fmt(x, d))
+ci  <- function(a, b, d = 1) paste0("[", fmt(a, d), ", ", fmt(b, d), "]")
+pc  <- function(x, d = 0) paste0(fmt(100 * x, d), "%")
+qlab <- function(d) { d <- as.Date(d); paste0(format(d, "%Y"), " Q", (as.integer(format(d, "%m")) + 2) %/% 3) }
+num <- function(x) formatC(x, format = "d", big.mark = ",")
+tab <- function(df, align = NULL, ...) knitr::kable(df, format = "pipe", align = align, row.names = FALSE, ...)
+nw  <- function(x, L = 8) {                       # as R/03_compare.R se_nw()
+  n <- length(x); e <- x - mean(x); lrv <- sum(e * e) / n
+  for (l in seq_len(min(L, n - 1))) lrv <- lrv + 2 * (1 - l / (L + 1)) * sum(e[-(1:l)] * e[1:(n - l)]) / n
+  sqrt(n * lrv)
+}
+se_iid <- function(x) sqrt(length(x) * var(x))
+
+# ---- data -----------------------------------------------------------------------------
+G <- rd("data/growth.csv"); G$date <- as.Date(G$date)
+P   <- rd("data/params_all.csv")
+pv  <- function(key, var, stat = "q50") P[P$key == key & P$variable == var, stat]
+pci <- function(key, var, d = 2) paste(fmt(pv(key, var), d), ci(pv(key, var, "q05"), pv(key, var, "q95"), d))
+VR  <- rd("data/variance_ratios.csv")
+vr  <- function(key, w, stat = "ratio_q50") VR[VR$key == key & VR$window == w, stat]
+M13 <- rd("data/m13_paths.csv"); M13$date <- as.Date(M13$date)
+mp  <- function(key, date, col) M13[M13$key == key & M13$date == as.Date(date), col]
+DEC <- rd("data/m13_tau_decades.csv")
+dec <- function(key, d, stat = "q50") DEC[DEC$key == key & DEC$decade == d, stat]
+COV <- rd("data/mu_2020q2_by_fit.csv")
+cov <- function(key, stat = "mu_mean") COV[COV$key == key, stat]
+PATHS <- rd("data/mu_paths_all.csv"); PATHS$date <- as.Date(PATHS$date)
+ROB <- rd("data/m13_robustness_paths.csv")
+rob <- function(a, b, col) ROB[ROB$a == a & ROB$b == b, col]
+R5 <- rd("data/rdp_table5_analogue.csv"); R4 <- rd("data/rdp_table4_analogue.csv")
+RDP <- rd("data/rdp2014_reported.csv")
+rdpv <- function(t, m, p, s = "median") RDP$value[RDP$table == t & RDP$model == m & RDP$parameter == p & RDP$stat == s]
+FACT <- rd("data/record_facts.csv")
+fact <- function(id) FACT$value[FACT$id == id]
+TESTS <- rd("data/test_counts.csv")
+PPR <- rd("data/ppc_prior.csv"); PPC <- rd("data/ppc_posterior.csv"); PPV <- rd("data/ppc_coverage.csv")
+ppr <- function(q, col = "q50") PPR[PPR$quantity == q, col]
+ppc <- function(kind, st, col = "p_rep_ge_obs") PPC[PPC$kind == kind & PPC$statistic == st, col]
+
+MCf <- rd(paste0(TF, "model_comparison.csv"));          MC8 <- rd(paste0(T8, "model_comparison.csv"))
+PWf <- rd(paste0(TF, "model_comparison_pairwise.csv")); PW8 <- rd(paste0(T8, "model_comparison_pairwise.csv"))
+G1 <- "group 1 (joint)"; GO <- "GDP-only target, common window (all groups)"; G2 <- "group 2 (joint)"
+pw  <- function(PW, a, b, col = "elpd_diff", comp = G1) PW[PW$comparison == comp & PW$model_a == a & PW$model_b == b, col]
+mc  <- function(MC, m, col) MC[MC$model == m, col][1]
+FVS  <- rd(paste0(T8, "lfo_full_vs_sample.csv"))
+fv   <- function(a, b, period = "all", col = "diff_full", target = "group 1 joint")
+  FVS[FVS$model_a == a & FVS$model_b == b & FVS$period == period & FVS$target == target, col]
+FVSM <- rd(paste0(T8, "lfo_full_vs_sample_models.csv"))
+RSf <- rd(paste0(TF, "lfo_retry_sensitivity_summary.csv")); RS8 <- rd(paste0(T8, "lfo_retry_sensitivity_summary.csv"))
+rs  <- function(RS, a, b, v, col = "elpd_diff") RS[RS$model_a == a & RS$model_b == b & RS$variant == v, col]
+PFCf <- rd(paste0(TF, "lfo_pf_covid_check.csv"));    PFC8 <- rd(paste0(T8, "lfo_pf_covid_check.csv"))
+PFPf <- rd(paste0(TF, "lfo_pf_precovid_check.csv")); PFP8 <- rd(paste0(T8, "lfo_pf_precovid_check.csv"))
+LFDf <- rd(paste0(TF, "lfo_fit_diagnostics.csv"));   LFD8 <- rd(paste0(T8, "lfo_fit_diagnostics.csv"))
+LRAf <- rd(paste0(TF, "lfo_refit_attempts.csv"));    LRA8 <- rd(paste0(T8, "lfo_refit_attempts.csv"))
+FDf  <- rd(paste0(TF, "fit_diagnostics.csv"));       FD8  <- rd(paste0(T8, "fit_diagnostics.csv"))
+G13f <- rd(paste0(TF, "m13_gate_seeds.csv"));        G138 <- rd(paste0(T8, "m13_gate_seeds.csv"))
+G12  <- rd(paste0(TF, "m12_gate_seeds.csv"))
+G1O  <- if (file.exists("data/m13_1980_omegag1_gate.csv")) rd("data/m13_1980_omegag1_gate.csv") else data.frame(metric = character(), value = numeric(), pass = logical())
+VDf  <- rd(paste0(TF, "variance_decomposition.csv")); VD8 <- rd(paste0(T8, "variance_decomposition.csv"))
+M10  <- rd(paste0(TF, "m10_mode_check.csv"));         M3I <- rd(paste0(TF, "m3_identification.csv"))
+m3i  <- function(chk) M3I$value[M3I$check == chk]
+LPf  <- rd(paste0(TF, "lfo_pointwise.csv"));          LP8 <- rd(paste0(T8, "lfo_pointwise.csv"))
+EST    <- rd("../docs/estimates.csv")
+LATEST <- fromJSON("../docs/estimates_latest.json")
+DIAG   <- fromJSON("../docs/diagnostics.json")
+MS     <- fromJSON("../docs/model_summary.json")
+
+gate <- function(GT, seed, pat, col = "value") GT[GT$seed == seed & grepl(pat, GT$metric, fixed = TRUE), col][1]
+
+# pointwise differences a - b on the 146 LFO targets
+pdiff <- function(LP, a, b, col = "elpd", colb = col) {
+  A <- LP[LP$model == a, ]; B <- LP[LP$model == b, ]; B <- B[match(A$date, B$date), ]
+  data.frame(date = as.Date(A$date), d = A[[col]] - B[[colb]])
+}
+d1312f <- pdiff(LPf, "m13", "m12"); d13128 <- pdiff(LP8, "m13", "m12")
+q2 <- as.Date("2020-06-01")
+ex2022 <- function(x) x[!(x$date >= as.Date("2020-03-01") & x$date <= as.Date("2022-12-01")), ]
+lagz <- function(x) sapply(c(4, 8, 12, 16), function(L) sum(x$d) / nw(x$d, L))
+# m13 trained from 1980 against m13 trained from 1959 on the same targets
+dsamp <- data.frame(date = as.Date(LP8$date[LP8$model == "m13"]),
+                    d = LP8$elpd[LP8$model == "m13"] - LPf$elpd[LPf$model == "m13"][match(LP8$date[LP8$model == "m13"], LPf$date[LPf$model == "m13"])])
+ds_9099 <- dsamp[dsamp$date < as.Date("2000-01-01"), "d"]
+ds_2000 <- dsamp[dsamp$date >= as.Date("2000-01-01"), "d"]
+
+# data summaries
+dstat <- function(x) c(mean = mean(x), sd = sd(x), rho1 = cor(x[-1], x[-length(x)]), min = min(x), max = max(x))
+s80 <- G$date >= as.Date("1980-03-01")
+hl_2020q2 <- G$headline[G$date == q2]
+E2020 <- G[G$date == q2, c("g_E", "g_I", "g_P")]
+
+# production fit: latest quarter
+last <- max(M13$date)
+L13  <- M13[M13$key == "m13_prod" & M13$date == last, ]
+hl_last <- G$headline[G$date == last]
+```
+
+# Abstract {.unnumbered}
+
+```{r abs-numbers}
+z13f <- pw(PWf, "m13", "m12", "z_nw"); z138 <- pw(PW8, "m13", "m12", "z_nw")
+```
+
+We treat true Australian GDP growth as a latent state observed with error through the expenditure, income and production measures, estimate thirteen Bayesian state-space specifications on the 2026 Q2 vintage, and compare them by one-step-ahead predictive density, with latent states integrated out, over 1990 Q1 to 2026 Q2. The most robust finding is that measurement errors are negatively serially correlated: on average an expenditure-side error is followed the next quarter by an error of opposite sign about `r fmt(-pv("m13_prod", "psi[1]"), 2)` times its size. Allowing for this improves prediction on both estimation samples, with and without stochastic volatility. The gain from time-varying measurement-error variance roughly halves when estimation starts in 1980 rather than 1959. The production model adds stochastic volatility to latent growth. It ranks first, but its margin is thin (Newey-West z of `r fmt(z13f, 2)` from 1959, `r fmt(z138, 2)` from 1980) and the specification was chosen after seeing related results on the same window. On 1980 Q1 to 2026 Q2 the variance of a posterior draw of latent growth is `r pc(vr("m13_prod", "1980Q1-2026Q2"))` of the variance of headline growth (90% interval `r pc(vr("m13_prod", "1980Q1-2026Q2", "ratio_q05"))` to `r pc(vr("m13_prod", "1980Q1-2026Q2", "ratio_q95"))`). On RDP 2014-12's sample (1980–2013) our closest model reproduces their baseline estimates. The evaluation is pseudo-real-time on one vintage and does not test the variance split.
+
+# Introduction {#sec-intro}
+
+The Australian Bureau of Statistics (ABS) publishes three quarterly estimates of real GDP: GDP(E) from expenditure, GDP(I) from income and GDP(P) from production. In concept they measure the same thing. In practice they are built from different source data and differ every quarter. The headline figure, GDP(A), is their simple average. A user who wants to know how fast the economy grew last quarter has to decide how much of each measure's movement is signal.
+
+This paper treats true quarterly growth as a latent state and the three published measures as noisy readings of it. The question is how much of the quarter-to-quarter movement in measured growth is measurement error, and what the error looks like: how large it is, whether it persists or reverses, whether it is correlated across the three measures, and whether its size has changed over six decades of national accounting. The answer matters for anyone who reads a single quarter's GDP print. It affects how much weight a quarterly surprise should carry in a policy assessment, how persistent true growth is, and how much the published series overstates the volatility of activity.
+
+The work began as a replication and extension of @rees2014 (hereafter RDP 2014-12). They applied the state-space approach that Aruoba et al. set out in a 2013 working paper (journal version: @aruoba2016) to Australian data from 1980 Q1 to 2013 Q2 and found that the latent series was considerably smoother than GDP(A). We revisit that question with thirteen years more data, a sample that includes the COVID-19 collapse of 2020 Q2, and a different set of extensions. The paper makes four contributions.
+
+1. **A model family.** We estimate thirteen specifications. They add, one or two at a time, an AR(1) latent state, correlated measurement errors, serially correlated (AR(1)) measurement errors, stochastic volatility (SV) in the measurement errors, SV in latent growth, a COVID-specific variance scale, and labour-market signals.
+2. **A valid comparison.** Every specification has a latent state per quarter, and some have one log-variance per quarter and measure. Pointwise leave-one-out cross-validation on such models is not informative, and an earlier version of this project relied on it. We replace it with Pareto-smoothed importance-sampling leave-future-out cross-validation (PSIS-LFO-CV; @burkner2020) of the one-step-ahead predictive density, with the latent states integrated out by exact Kalman filters or Rao-Blackwellised particle filters. We report Monte Carlo error, particle-filter bias checks, autocorrelation-robust standard errors and the effect of refit retries.
+3. **Findings on the error process.** Measurement errors are negatively autocorrelated; their variance has fallen over time; and on the post-1980 sample the expenditure and income errors are only weakly correlated with each other.
+4. **A documented production model.** The preferred specification is published as a weekly-refreshed estimate. Each change of model was made under a switch rule fixed before the candidate's results were known, and the paper reports the observed values against those rules. The later move of the estimation sample to 1980 Q1 was not made under such a rule (@sec-app-history).
+
+The main results are as follows. All numbers are in annualised percentage points (400 times the quarterly log change) unless stated otherwise.
+
+* Serially correlated measurement errors improve the predictive density by `r sg(pw(PW8, "m5", "m2"))` nats over 146 quarters when estimation starts in 1980 (Newey-West z `r fmt(pw(PW8, "m5", "m2", "z_nw"), 1)`), and by `r sg(pw(PWf, "m5", "m2"))` from 1959. The AR(1) coefficient of the expenditure error in the production model is `r pci("m13_prod", "psi[1]")` (posterior median and 90% interval).
+* Stochastic volatility in the measurement errors improves prediction by `r sg(pw(PWf, "m4", "m2"))` nats from 1959 (z `r fmt(pw(PWf, "m4", "m2", "z_nw"), 1)`) but only `r sg(pw(PW8, "m4", "m2"))` from 1980 (z `r fmt(pw(PW8, "m4", "m2", "z_nw"), 1)`). About half of the full-sample gain comes from the noisy pre-1980 data used to train the constant-variance models.
+* Stochastic volatility in latent growth gives the best model on every target. The margin over the same model without it is `r sg(pw(PWf, "m13", "m12"))` nats from 1959 (z `r fmt(z13f, 2)`) and `r sg(pw(PW8, "m13", "m12"))` from 1980 (z `r fmt(z138, 2)`). One quarter, 2020 Q2, dominates the standard error.
+* In the production model (1980 Q1 to 2026 Q2), latent volatility falls from `r fmt(dec("m13_prod", "1980s"), 1)` in the 1980s to `r fmt(dec("m13_prod", "2010s"), 1)` in the 2010s (decade averages of the innovation standard deviation) and is `r fmt(mp("m13_prod", q2, "tau_q50"), 1)` in 2020 Q2. Latent growth in 2020 Q2 is `r fmt(mp("m13_prod", q2, "mu_q50"), 1)` against a headline of `r fmt(hl_2020q2, 1)`.
+* Re-estimated on RDP 2014-12's sample period (1980 Q1 to 2013 Q2), our m2, which has the structure of their Model 1, reproduces its estimates closely: latent persistence `r fmt(pv("m2_rdp", "rho"), 2)` against `r fmt(rdpv(1, "Model 1", "rho"), 2)`, and a posterior-median path whose standard deviation is `r pc(R5$sd[R5$series == "m2_rdp"] / R5$sd[R5$series == "headline"])` of the headline's against their `r pc(rdpv(5, "Model 1", "sd", "value") / rdpv(5, "GDP(A)", "sd", "value"))`. Fitted to 2026, the same model is much less smooth, and fits ending in 2019 show that the COVID quarters cause the difference.
+
+The evidence has clear limits, which we state up front and return to in @sec-limits. The comparison is pseudo-real-time: every forecast uses the current data vintage, so we do not reproduce RDP 2014-12's real-time revision analysis. The production model was proposed after a related model's results had been seen on the same evaluation window, so its z-statistics overstate the evidence; even a two-try Bonferroni bar, itself a lower bound on the correction, would not be met. The evaluation window is the same for every model and every round of the project. Predictive scores test the model's forecasts of the observed measures, not its split of measured growth into signal and noise; models that cannot be told apart by score can imply quite different splits. And the labour-market signal we use is hours worked, not the unemployment rate used by RDP 2014-12. Our re-estimation on RDP 2014-12's sample period covers only the models in our family; their correlated-error model and their unemployment model have no counterpart here (@sec-rdp).
+
+The rest of the paper is organised as follows. @sec-lit reviews related work. @sec-data describes the data. @sec-models sets out the model family and @sec-estimation the estimation method. @sec-eval describes the evaluation, @sec-results the results and @sec-robust the robustness checks. @sec-rdp relates the results to RDP 2014-12. @sec-limits discusses limitations and @sec-conclusion concludes. The appendices record the history of the production model, full diagnostics, filter tests, results that were withdrawn, and how to reproduce every number.
+
+# Related literature {#sec-lit}
+
+**GDP measurement error.** @aruoba2016 combine US expenditure- and income-side GDP in a state-space model in which true growth is latent and the errors may be correlated with each other and with true growth, which raises an identification problem. @nalewaik2010 compares the two US measures and argues that the income side tracks the business cycle better. RDP 2014-12 [@rees2014] apply that approach to the three Australian measures. They estimate three models: independent errors (their Model 1); errors correlated with each other and with the latent innovation (Model 2), identified, following the working-paper version of Aruoba et al., by fixing the ratio of latent to GDP(E) variance at 0.5; and a fourth signal, the change in the unemployment rate (Model 3). The standard deviation of their posterior-median latent path is `r pc(1 - rdpv(5, "Model 1", "sd", "value") / rdpv(5, "GDP(A)", "sd", "value"))` (Model 1), `r pc(1 - rdpv(5, "Model 2", "sd", "value") / rdpv(5, "GDP(A)", "sd", "value"))` (Model 2) and `r pc(1 - rdpv(5, "Model 3", "sd", "value") / rdpv(5, "GDP(A)", "sd", "value"))` (Model 3) lower than that of GDP(A), and their estimates are revised less in real time. @bishop2013 document revisions to Australian GDP and find that GDP(P) is revised least. A separate literature models data revisions directly, with "true" values as a latent state and each vintage as a noisy or news-driven measurement [@jacobs2011; @kishor2012]. @croushore2011 surveys real-time analysis. We work with a single vintage and do not model revisions.
+
+**Stochastic volatility in macroeconomic models.** Stationary AR(1) log-variance processes, estimated by MCMC, go back to @jacquier1994 and @kim1998. Time-varying volatility became standard in macroeconomic time series after the evidence of a decline in output volatility from the mid-1980s [@mcconnell2000; @stock2002]. @cogley2005 and @primiceri2005 put SV into vector autoregressions. @stock2007 model US inflation as an unobserved-components model with SV in both the permanent and transitory components; our latent-plus-measurement-error SV structure is close in spirit. @clark2011 shows that SV improves real-time density forecasts.
+
+**COVID-19.** The pandemic quarters are extreme observations for any linear Gaussian time-series model. @lenza2022 propose scaling the innovation variance of a vector autoregression by estimated factors for March, April and May 2020, which then decay at an estimated rate. @carriero2024 compare that approach with SV and outlier-adjusted SV. Our specification m7 applies a related idea, a free scale for each of four COVID quarters, to the measurement errors; m10 and m13 instead let SV in latent growth absorb the shock.
+
+**State-space methods.** @durbin2012 is the standard reference for the Kalman filter and smoother. We draw latent paths by forward-filtering backward-sampling [@carter1994; @fruhwirth1994]. For the SV models we integrate the latent growth state out analytically, conditional on the log-variance paths, and use particles only for the log-variances. This is Rao-Blackwellisation [@doucet2000] or, in the form we use, a mixture Kalman filter [@chen2000]. The particle filter's likelihood estimate is unbiased, but its logarithm is biased downwards at finite particle counts [@pitt2012]; @gordon1993 and @chopin2020 give general background.
+
+**Model evaluation.** PSIS-LOO [@vehtari2017] with Pareto smoothing [@vehtari2024] approximates leave-one-out cross-validation from a single fit. @burkner2020 adapt it to time series: PSIS-LFO-CV approximates the sequence of one-step-ahead predictive densities from a few refits. The log predictive density is a strictly proper scoring rule [@gneiting2007] and is the natural score for comparing Bayesian predictive distributions [@geweke2010]. Score differences between models are averages of autocorrelated terms, so we use Newey-West standard errors [@newey1987; @andrews1991], in the spirit of @diebold1995.
+
+**Computation.** All models are written in Stan [@carpenter2017] and sampled with the No-U-Turn sampler [@hoffman2014]. Non-centred parameterisations of hierarchical states follow @papaspiliopoulos2007. We assess convergence with rank-normalised R-hat and bulk and tail effective sample sizes [@vehtari2021], and use the energy Bayesian fraction of missing information (E-BFMI) to detect poor exploration of heavy-tailed posteriors [@betancourt2016; @betancourt2017]. The LKJ prior on correlation matrices is from @lewandowski2009.
+
+# Data {#sec-data}
+
+```{r data-stats}
+mk <- function(sel, lab) {
+  rows <- lapply(c(g_E = "GDP(E)", g_I = "GDP(I)", g_P = "GDP(P)", headline = "GDP(A), headline"), function(x) NULL)
+  out <- do.call(rbind, lapply(c("g_E", "g_I", "g_P", "headline"), function(v) dstat(G[[v]][sel])))
+  data.frame(Sample = lab, Series = c("GDP(E)", "GDP(I)", "GDP(P)", "Headline"), out, check.names = FALSE)
+}
+DS <- rbind(mk(rep(TRUE, nrow(G)), "1959 Q4 – 2026 Q2"), mk(s80, "1980 Q1 – 2026 Q2"))
+cr <- function(sel) { m <- cor(G[sel, c("g_E", "g_I", "g_P")]); m[lower.tri(m)] }
+cr_full <- cr(rep(TRUE, nrow(G))); cr_80 <- cr(s80)
+vr_raw <- function(sel, v) var(G[[v]][sel]) / var(G$headline[sel])
+```
+
+**Source and vintage.** The data are ABS 5206.0, Table 24 (Selected Analytical Series): GDP(E), GDP(I) and GDP(P), chain volume measures, seasonally adjusted [@abs5206]. We use the release for the June quarter of 2026, the latest at the time of writing. The levels run from 1959 Q3 to 2026 Q2. We take $y^k_t = 400\,\Delta\log Y^k_t$ for $k \in \{E, I, P\}$, giving `r nrow(G)` quarterly growth rates from `r qlab(min(G$date))` to `r qlab(max(G$date))`. The headline series is the mean of the three, $\bar y_t = (y^E_t + y^I_t + y^P_t)/3$.
+
+**Units.** Every model is estimated in annualised percentage points, and this paper reports in that unit throughout. To convert to the quarter-on-quarter percentages the ABS and the published site use, divide by four (standard deviations) or sixteen (variances). Log predictive densities are reported in the annualised unit as well. Changing to quarterly units adds the same constant, $3\log 4 \approx$ `r fmt(3 * log(4), 2)` nats per quarter, to every model's score, so score differences are unaffected.
+
+**Two samples.** RDP 2014-12 start their data in 1980 Q1. Their reason is that the quality of the underlying source data has changed over time, "so that the pattern of measurement errors in the early years of each GDP series may be unrepresentative of their current performance" [@rees2014, section 3.2]. We estimate every model on two samples:
+
+* the **full sample**, 1959 Q4 to 2026 Q2 (T = `r nrow(G)`);
+* the **1980 sample**, 1980 Q1 to 2026 Q2 (T = `r sum(s80)`). This is the sample of the published estimate since 19 October 2026.
+
+The labour-market models use shorter samples (@sec-models). Hours worked (ABS 5206.0 Table 1) joined to GDP give 1978 Q4 to 2026 Q2 (T = `r mc(FDf, "m8", "T")`); monthly employment (ABS 6202.0) is used by one model only.
+
+@tbl-data summarises the growth rates. On the full sample GDP(E) is the most variable measure: its variance is `r fmt(vr_raw(rep(TRUE, nrow(G)), "g_E"), 2)` times that of the headline, against `r fmt(vr_raw(rep(TRUE, nrow(G)), "g_I"), 2)` for GDP(I) and `r fmt(vr_raw(rep(TRUE, nrow(G)), "g_P"), 2)` for GDP(P). From 1980 GDP(I) is the most variable (`r fmt(vr_raw(s80, "g_I"), 2)`, against `r fmt(vr_raw(s80, "g_E"), 2)` for E and `r fmt(vr_raw(s80, "g_P"), 2)` for P). The pairwise correlations of the three measures are `r fmt(min(cr_full), 2)` to `r fmt(max(cr_full), 2)` on the full sample and `r fmt(min(cr_80), 2)` to `r fmt(max(cr_80), 2)` from 1980. The individual measures have negative or small first-order autocorrelation, which is the first hint that their errors partly reverse. The COVID quarters are extreme: in 2020 Q2 the three measures are `r fmt(E2020$g_E, 1)`, `r fmt(E2020$g_I, 1)` and `r fmt(E2020$g_P, 1)`, so they agree to within `r fmt(diff(range(unlist(E2020))), 1)` percentage points on a fall of about `r fmt(-hl_2020q2, 0)`.
+
+**"Excluding COVID".** Two definitions are used, as in the project's tables, and each is named where it is used. Variance ratios "excluding COVID" drop the five quarters 2020 Q1 to 2021 Q1. Predictive scores "excluding COVID" drop the four targets 2020 Q2 to 2021 Q1. A third variant drops all twelve quarters of 2020 to 2022.
+
+```{r}
+#| label: tbl-data
+#| tbl-cap: "Summary statistics of quarterly growth, annualised per cent (400 × Δlog). $\\rho_1$ is the first-order autocorrelation. Headline is the mean of the three measures. Source: ABS 5206.0 Table 24, June quarter 2026 release."
+DSo <- DS
+DSo[, 3:7] <- lapply(DSo[, 3:7], fmt, d = 2)
+names(DSo) <- c("Sample", "Series", "Mean", "SD", "$\\rho_1$", "Min", "Max")
+tab(DSo, align = "llrrrrr")
+```
+
+# The model family {#sec-models}
+
+## The production model {#sec-m13}
+
+The production model, m13, has three layers: latent growth with time-varying volatility; serially correlated measurement errors whose innovations have time-varying volatility; and a restricted correlation structure across the three measures.
+
+**Observation equations.** For $k \in \{E, I, P\}$,
+$$
+y^k_t = \mu_t + \varepsilon^k_t, \qquad \varepsilon^k_t = \psi_k\,\varepsilon^k_{t-1} + u^k_t, \qquad |\psi_k| < 1.
+$$ {#eq-obs}
+The innovation vector $u_t = (u^E_t, u^I_t, u^P_t)'$ is Gaussian with covariance
+$$
+u_t \sim N(0, R_t), \qquad R_t = D_t\, C\, D_t, \qquad D_t = \operatorname{diag}\!\left(e^{h_{t,E}/2}, e^{h_{t,I}/2}, e^{h_{t,P}/2}\right), \qquad C = \begin{pmatrix} 1 & r & 0 \\ r & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix},
+$$ {#eq-cov}
+with $r = \rho_{EI}$. The expenditure and income errors may be correlated; the production error is independent of both. The restriction reflects how the measures are built. Real GDP(I) is obtained by deflating nominal income with the GDP(E) deflator [@rees2014, footnote 1], and the two share balancing items, while GDP(P) is built from industry value-added data.
+
+**Measurement-error volatility.** Each innovation log-variance follows a stationary AR(1),
+$$
+h_{t,k} = \mu_{h,k} + \phi_k\,(h_{t-1,k} - \mu_{h,k}) + \omega_k\,\xi_{t,k}, \qquad \xi_{t,k} \sim N(0,1).
+$$ {#eq-h}
+So $\sigma_{t,k} = e^{h_{t,k}/2}$ is the standard deviation of the innovation $u^k_t$, not of $\varepsilon^k_t$. At the long-run log-variance, the error itself has standard deviation $\bar\sigma^\varepsilon_k = e^{\mu_{h,k}/2}/\sqrt{1-\psi_k^2}$.
+
+**Latent growth.** True growth follows a stationary AR(1) with its own stochastic volatility:
+$$
+\mu_t = c + \rho\,\mu_{t-1} + e^{g_t/2}\,\eta_t, \qquad g_t = \mu_g + \phi_g\,(g_{t-1} - \mu_g) + \omega_g\,\zeta_t, \qquad \eta_t, \zeta_t \sim N(0,1).
+$$ {#eq-latent}
+We write $\tau_t = e^{g_t/2}$ for the latent innovation standard deviation and $\tau = e^{\mu_g/2}$ for its value at the long-run log-variance. The long-run mean of latent growth is $\bar\mu = c/(1-\rho)$. All shocks ($\eta$, $\zeta$, $\xi$, $u$) are mutually independent.
+
+**Initial conditions.** The log-variances start from their stationary laws, $g_1 \sim N(\mu_g, \omega_g^2/(1-\phi_g^2))$ and $h_{1,k} \sim N(\mu_{h,k}, \omega_k^2/(1-\phi_k^2))$. Latent growth starts from the stationary law it would have if its innovation variance were held at the period-1 value, $\mu_1 \sim N\!\left(c/(1-\rho),\, e^{g_1}/(1-\rho^2)\right)$. The marginal stationary law under latent SV has no closed form. The period-1 errors start from $\varepsilon_1 \sim N(0, V_1)$ with $V_{1,jk} = R_{1,jk}/(1-\psi_j\psi_k)$, the stationary covariance of the error VAR(1) at the period-1 innovation covariance. Period 1 is outside the evaluation window in every comparison.
+
+**Nesting.** With $\omega_g = 0$ (constant $\tau_t$) the model is m12. With $\psi = 0$ as well it is m9. With $\rho_{EI}$ free in a full $3\times3$ correlation matrix and constant variances it would be m3.
+
+## The other specifications
+
+@tbl-models lists the thirteen specifications. They were built in rounds, and the labels m1 to m13 record the order. m1 to m5 extend the RDP 2014-12 baseline one feature at a time. m6 imposes the structural E/I-only correlation. m7 applies a COVID variance scale. m8 to m11 add labour-market data. m12 and m13 combine the features that helped.
+
+```{r}
+#| label: tbl-models
+#| tbl-cap: "The thirteen specifications. 'E–I only' means the E and I errors have a free correlation and P is independent. SV = stochastic volatility (stationary AR(1) log-variance). T is the number of quarters on the full sample / the 1980 sample."
+mods <- data.frame(
+  Model = paste0("m", 1:13),
+  `Latent growth` = c("iid", rep("AR(1)", 9), "AR(1), monthly", "AR(1)", "AR(1)"),
+  `Latent variance` = c(rep("constant", 9), "SV", "constant", "constant", "SV"),
+  `Error correlation` = c("none", "none", "free (LKJ)", "none", "none", "E–I only", "none", "none", "E–I only", "none", "none", "E–I only", "E–I only"),
+  `Error variance` = c("constant", "constant", "constant", "SV", "constant", "constant", "constant × κ (COVID)", "constant", "SV", "SV", "constant", "SV", "SV"),
+  `Error dynamics` = c("white", "white", "white", "white", "AR(1)", "white", "white", "white", "white", "white", "white", "AR(1)", "AR(1)"),
+  `Extra signal` = c(rep("–", 7), "hours", "–", "hours", "employment (monthly)", "–", "–"),
+  check.names = FALSE)
+Tf <- FDf$T[match(mods$Model, FDf$model)]; Tf[mods$Model == "m11"] <- COV$T[COV$key == "m11_full"]
+mods$T <- paste0(Tf, "/", FD8$T[match(mods$Model, FD8$model)])
+tab(mods, align = "lllllllr")
+```
+
+Some details matter for what follows.
+
+* **m1** has independent and identically distributed latent growth around a mean $\bar\mu$; **m2** makes it AR(1). m2 is the closest of our models to RDP 2014-12's Model 1 (@sec-rdp).
+* **m3** has a free $3\times3$ error correlation matrix with an LKJ(4) prior. It is *not* RDP 2014-12's Model 2, which also lets the latent innovation correlate with the measurement errors and imposes an identifying restriction on the variance ratio.
+* **m4** has SV in each measurement error and constant latent variance. **m9** combines m4 with m6's E/I-only correlation. **m12** adds m5's AR(1) errors to m9. **m13** adds latent SV to m12.
+* **m7** multiplies all three error standard deviations by a free factor $\kappa_q$, with a LogNormal(0, 1) prior, in each of 2020 Q2, Q3, Q4 and 2021 Q1. It therefore knows in advance which quarters are the COVID quarters.
+* **m8** adds hours-worked growth as a fourth signal, $y^U_t = \alpha + \beta\mu_t + \varepsilon^U_t$, with constant variances. RDP 2014-12's fourth signal is the change in the unemployment rate; we did not use it. **m10** has SV on all four errors and SV on latent growth (see below). **m11** is a mixed-frequency model with a monthly latent state, quarterly GDP measures loading on the three-month average [a simplification of @mariano2003; see also @banbura2014], and monthly employment as a signal. Its parameters are at monthly frequency.
+
+## What the failed specifications taught us {#sec-failed}
+
+Three specifications needed diagnosis. Each episode changed the model family.
+
+**m3: weak identification of the error correlations.** With $\rho$ near zero the latent state is close to i.i.d. Then the data identify only the cross-sectional covariance $v\mathbf{1}\mathbf{1}' + \Sigma$, where $v = \tau^2/(1-\rho^2)$, plus a weak lag-1 autocovariance $\rho v$. Adding $\delta$ to every element of $\Sigma$ and subtracting it from $v$ leaves the first unchanged. This is the identification problem that @aruoba2016 and RDP 2014-12 solve by restriction. On the full sample the posterior correlation between $\tau$ and the mean off-diagonal error correlation is `r fmt(m3i("cor(tau, mean off-diagonal Omega)"), 2)`. In the lowest decile of $\tau$ draws the E–I correlation averages `r fmt(m3i("Omega[2,1]: mean in lowest-tau decile"), 2)`; in the highest decile it is `r fmt(m3i("Omega[2,1]: mean in highest-tau decile"), 2)`. The posterior standard deviations of the three correlations are `r pc(m3i("Omega[2,1]: posterior sd / prior sd"))`, `r pc(m3i("Omega[3,1]: posterior sd / prior sd"))` and `r pc(m3i("Omega[3,2]: posterior sd / prior sd"))` of their prior standard deviation. The ridge first showed up as a sampler failure. With latent growth sampled jointly, m3 had a minimum E-BFMI of `r fact("m3_old_ebfmi")` and a minimum bulk ESS of `r fact("m3_old_ess")`. After latent growth was integrated out (@sec-estimation) it sampled cleanly (@tbl-fitdiag), and the weak identification remained as a property of the model. m6's E/I-only restriction is the structural alternative.
+
+**m10: two modes, and a re-specification.** The first version of m10 had constant latent variance and SV on four measurement errors, estimated from 1978 Q4. It had two posterior modes. Of `r fact("m10_old_chains")` chains started from dispersed values, `r fact("m10_old_modeA_chains")` found mode A ($\rho \approx$ `r fact("m10_old_modeA_rho")`, $\tau \approx$ `r fact("m10_old_modeA_tau")`). In mode A latent growth in 2020 Q2 was `r fmt(fact("m10_old_modeA_mu2020q2"), 1)`, so the model read COVID as four coincident errors of about `r fmt(hl_2020q2 - fact("m10_old_modeA_mu2020q2"), 0)` in four separately compiled series, and the latent variance ratio was `r fact("m10_old_modeA_ratio")`. Another `r fact("m10_old_modeB_chains")` chains found mode B ($\tau \approx$ `r fact("m10_old_modeB_tau")`, latent 2020 Q2 `r fmt(fact("m10_old_modeB_mu2020q2"), 1)`), which inflated $\tau$ for every quarter. The remaining `r fact("m10_old_stranded_chains")` were stranded between the two. Both modes are responses to one misspecification. With a constant latent standard deviation calibrated to the post-1978 sample, the 2020 Q2 fall is a latent shock of roughly `r fact("m10_covid_latent_sigmas")` standard deviations. The model must either inflate the latent variance everywhere or call a common shock measurement error. A reparameterisation cannot fix that. We re-specified m10 with SV on latent growth (@eq-latent), using the same priors as each measurement SV block. The economic justification does not depend on the fit: output volatility fell after the mid-1980s, and COVID was a real shock on which the measures agree. After re-specification, `r sum(grepl("^dispersed", M10$run))` chains from dispersed starting values all reached one mode (log posterior `r fmt(min(M10$lp[grepl("^dispersed", M10$run)]), 0)` to `r fmt(max(M10$lp[grepl("^dispersed", M10$run)]), 0)`, latent 2020 Q2 `r fmt(min(M10$mu_2020Q2[grepl("^dispersed", M10$run)]), 1)` to `r fmt(max(M10$mu_2020Q2[grepl("^dispersed", M10$run)]), 1)`). `r sum(M10$run == "modeA")` further chains started at an old mode-A configuration all left it for the same mode. This re-specification was chosen after the old model's fit and LFO score had been seen, so the new m10's predictive gains are post hoc. m13 is m12 with the same latent SV block; @sec-results and @sec-limits discuss what that implies.
+
+**m4: an artefact of the sampling coordinates.** The first SV specification used a random-walk log-variance anchored at the start. It was unidentified (R-hat about `r fact("m4_rw_rhat")`). A stationary AR(1) log-variance replaced it. With latent growth sampled jointly, one persistence parameter then looked bimodal (R-hat `r fmt(fact("m4_ar_musampled_rhat_phi3"), 2)`). With latent growth integrated out the bimodality disappeared (@tbl-fitdiag). It was a sampler artefact of the coupling between latent growth and the log-variances, not a feature of the posterior.
+
+# Estimation {#sec-estimation}
+
+## Priors
+
+```{r}
+#| label: tbl-priors
+#| tbl-cap: "Priors of the production model m13 (annualised units). N(m, s) has standard deviation s; half-N is a normal on a positive parameter; normals on (−1, 1) parameters are truncated. Source: stan/m13_serial_latent_sv.stan and priors.md."
+pri <- data.frame(
+  Parameter = c("$c$", "$\\rho$", "$\\mu_g$", "$\\phi_g$", "$\\omega_g$", "$\\mu_{h,k}$", "$\\phi_k$", "$\\omega_k$", "$\\rho_{EI}$", "$\\psi_k$"),
+  Role = c("latent intercept; $\\bar\\mu = c/(1-\\rho)$", "latent persistence", "latent log-variance, long-run mean", "latent log-variance persistence", "latent log-variance innovation sd",
+           "error log-variance, long-run mean", "error log-variance persistence", "error log-variance innovation sd", "E–I innovation correlation", "error AR(1) coefficient"),
+  Prior = c("N(1.5, 1)", "N(0.5, 0.3) on (−1, 1)", "N(2, 1)", "Uniform(−1, 1)", "half-N(0, 0.5)", "N(2, 1)", "Uniform(−1, 1)", "half-N(0, 0.5)", "N(0, 0.5) on (−1, 1)", "N(0, 0.5) on (−1, 1)"))
+tab(pri, align = "lll")
+```
+
+@tbl-priors lists m13's priors. The other three-measure models use the same priors for the parameters they share with m13, with three exceptions. Models with a constant latent standard deviation (all except m10 and m13) put a half-N(0, 2) prior on $\tau$, and the constant-variance models put half-N(0, 2) priors on the error standard deviations. m1 has a N(3, 2) prior on its mean $\bar\mu$. m11 works at monthly frequency and has its own priors (for example $\rho \sim N(0.9, 0.1)$ and half-N(0, 5) on its monthly latent and employment standard deviations; see priors.md). The scales are weakly informative for growth of about 3% a year with swings of a few percentage points. At $\mu_g \sim N(2,1)$ the prior median of $\tau$ is $e \approx 2.7$. The scales were set by hand from sample moments. A prior predictive simulation, run for this paper after the comparison, is reported in @sec-ppc.
+
+## Integrating out latent growth
+
+Conditional on the log-variance paths $g$ and $h$ and the hyperparameters, m13 is linear and Gaussian in $\mu$. Quasi-differencing removes the AR(1) errors exactly:
+$$
+y_t - \psi \circ y_{t-1} = \mathbf{1}\mu_t - \psi\,\mu_{t-1} + u_t, \qquad t \ge 2,
+$$ {#eq-qd}
+where $\circ$ is the element-wise product. The quasi-differenced data load on the two-dimensional state $(\mu_t, \mu_{t-1})$. A Kalman filter on that state gives $\log p(y \mid g, h, \theta)$ exactly, and the model block adds it to the target. Hamiltonian Monte Carlo then explores only the hyperparameters and the log-variances. In generated quantities, latent growth is drawn exactly from $p(\mu \mid y, g, h, \theta)$ by forward-filtering backward-sampling [@carter1994; @fruhwirth1994]. The backward step uses the joint filtered law of $(\mu_{t+1}, \mu_t)$, because $y_{t+1}$ also depends on $\mu_t$. When this step was developed for m12, the tests showed that reusing m9's scalar-state backward step would give a worst error of `r fact("ffbs_wrong_mcse")` Monte Carlo standard errors against the dense smoother. The log-determinant and quadratic form of the innovation covariance are written as sums of squares (via the Cauchy–Binet and Lagrange identities), so no term can cancel numerically.
+
+The same Rao-Blackwellisation is used in every SV model. It was the most important computational change in the project. Before it, the production model of the time (m9) sampled latent growth jointly with the log-variances. That produced a funnel whose pathologies grew with the sample: on the 2026 Q2 vintage the last continuous-integration fit with joint sampling had `r fact("m9_old_div_ci")` divergences in 8,000 draws and a minimum E-BFMI of `r fact("m9_old_ebfmi_ci")`.
+
+## Parameterisation and the stall diagnosis
+
+The log-variances are non-centred [@papaspiliopoulos2007]: the sampler works with the standardised innovations $\xi_{t,k}$ and $\zeta_t$, and $h$ and $g$ are built from them.
+
+The E–I correlation is sampled as $z_{EI} = \operatorname{atanh}(\rho_{EI})$, with the Jacobian added explicitly. The prior on $\rho_{EI}$ is unchanged. The reason is numerical. With Stan's built-in $(-1, 1)$ transform, a warmup-stall harness found that `r fact("m9_stall_bound_default_stalled")` of 100 chains from Stan's default random initial values (and `r fact("m9_stall_bound_init05_stalled")` of 100 with narrower initial values) stalled in early warmup. Their step size collapsed and they ran at maximum tree depth without moving. Most sat at $\rho_{EI} = -1$, where $1-\rho_{EI}^2$ rounds to zero. Writing $1 \pm \rho_{EI} = 2\,\mathrm{logit}^{-1}(\pm 2 z_{EI})$ avoids the cancellation. With this form `r fact("m9_stall_tanh_stalled")` of `r fact("m9_stall_tanh_chains")` chains stalled. The same harness on m13 found `r fact("m13_stall_init2_stalled")` stalls in `r fact("m13_stall_init2_chains")` chains with default initial values and `r fact("m13_stall_init05_stalled")` in `r fact("m13_stall_init05_chains")` with narrower ones.
+
+## Sampler settings, the publication gate and computing time
+
+Every full fit uses 4 chains of 2,000 warmup and 2,000 sampling iterations (8,000 draws), seed 1. The SV models use a target acceptance rate (adapt_delta) of 0.99 and a maximum tree depth of 12. Models are fitted through cmdstanr; the continuous-integration production run uses CmdStan `r DIAG$cmdstan_version`.
+
+The published estimate is produced only if the fit passes a gate fixed in advance: divergent transitions below 0.1% of draws; minimum E-BFMI over chains at least 0.3; R-hat at most 1.01 on every hyperparameter and at most 1.05 on every $\mu_t$, $h_{t,k}$ and $g_t$; bulk and tail ESS at least 400 on every hyperparameter and every $\mu_t$. Any missing diagnostic counts as a failure.
+
+The production fit on the 1980 sample (seed 1) had `r round(gate(G138, 1, "divergences") * 8000)` divergences, a minimum E-BFMI of `r fmt(gate(G138, 1, "min E-BFMI"), 3)`, a maximum hyperparameter R-hat of `r fmt(gate(G138, 1, "max R-hat, hyperparameters"), 4)` and a minimum hyperparameter bulk ESS of `r fmt(gate(G138, 1, "min bulk ESS, hyperparameters"), 0)` (on `r gate(G138, 1, "min bulk ESS, hyperparameters", "worst")`). Sampling took `r fmt(G138$sampling_secs_total[G138$seed == 1][1], 0)` seconds with four parallel chains on a six-core machine. A seed-2 fit also passed (@tbl-gate). The full-sample fit of m13 took `r fmt(G13f$wall_secs[G13f$seed == 1][1], 0)` seconds of wall time. m4, m9 and m10 took between `r fmt(min(FDf$wall_secs[FDf$model %in% c("m4", "m9", "m10")]), 0)` and `r fmt(max(FDf$wall_secs[FDf$model %in% c("m4", "m9", "m10")]), 0)` seconds on the full sample. m12's research fit took `r fmt(FDf$wall_secs[FDf$model == "m12"], 0)` seconds with only `r fact("m12_research_fit_parallel_chains")` parallel chains; its production run with four took `r fmt(fact("m12_prod_fit_secs"), 0)` seconds. Constant-variance models take under two minutes (@tbl-fitdiag). According to the repository README, the whole continuous-integration job for the 1980-sample production fit takes about `r fact("ci_job_minutes")` minutes on GitHub's runners.
+
+The estimate on the public site is refitted weekly by a continuous-integration job on GitHub's runners. That run gave different draws from the local fit with the same seed. The repository does not document why; CmdStan does not guarantee identical draws across machines. Its diagnostics (`docs/diagnostics.json`) are `r DIAG$num_divergent` divergences, minimum E-BFMI `r fmt(DIAG$ebfmi_min, 3)`, maximum hyperparameter R-hat `r fmt(DIAG$rhat_max_hyper, 4)` and minimum hyperparameter bulk ESS `r num(DIAG$ess_bulk_min_hyper)`. The published median path differs from the local one by at most `r fmt(max(abs(EST$mu_median - M13$mu_q50[M13$key == "m13_prod"] / 4)), 3)` quarter-on-quarter percentage points. All estimates in this paper come from the local fit.
+
+# Evaluation method {#sec-eval}
+
+## Why pointwise leave-one-out was invalid
+
+An earlier version of this project ranked models by PSIS-LOO on the saved pointwise log-likelihood $\log p(y_t \mid \mu_t, h_t, \theta)$. That comparison was not evidence, for three reasons.
+
+1. **The latent states were not integrated out.** Every specification has a latent $\mu_t$ per quarter, and the SV models have $h_{t,k}$ as well. The pointwise term conditions on states that were fitted to the left-out observation. Leaving $y_t$ out requires a large change in the posterior of $\mu_t$, which importance sampling from the full posterior cannot capture.
+2. **The effective number of parameters was close to T.** On the full sample, $p_{\text{loo}}$ was `r fact("loo_ploo_min")` to `r fact("loo_ploo_max")` for T = 267.
+3. **Most Pareto $\hat k$ values exceeded 0.7:** `r fact("loo_khigh_min")` to `r fact("loo_khigh_max")` of 267 for the three-measure models. The PSIS estimates were unreliable for most observations.
+
+The withdrawn claims, which included a gain of about `r fact("loo_old_sv_gain")` nats for SV, are listed in @sec-app-withdrawn.
+
+## PSIS-LFO-CV with latent states integrated out
+
+The score is the sum of one-step-ahead log predictive densities over an evaluation window $W$:
+$$
+\mathrm{elpd}_{\mathrm{LFO}} = \sum_{t \in W} \log p(y_t \mid y_{1:t-1}), \qquad p(y_t \mid y_{1:t-1}) = \int p(y_t \mid y_{1:t-1}, \theta)\, p(\theta \mid y_{1:t-1})\, d\theta.
+$$ {#eq-elpd}
+Here $\theta$ collects only the hyperparameters. The latent states, including the log-variance paths, are integrated out by a filter, so each term conditions only on the past. The target is the vector of three measures, so the score rewards a model for predicting each measure, not only the headline.
+
+**Approximation.** Following @burkner2020, we fit the model to $y_{1:i^*}$ and reuse its draws $\theta_s$ for later targets. Importance ratios $r_s = \prod_{j=i^*+1}^{i} p(y_j \mid y_{1:j-1}, \theta_s)$ turn them into draws from $p(\theta \mid y_{1:i})$. The ratios are Pareto-smoothed [@vehtari2024], and the target density is $\sum_s w_s\, p(y_{i+1} \mid y_{1:i}, \theta_s)$. When the Pareto $\hat k$ of the ratios exceeds 0.7, the model is refitted on $y_{1:i}$. Refits use 4 chains of 1,000 warmup and 1,000 sampling iterations with each model's own sampler settings, and at most 12 refits are allowed per model.
+
+**Window.** The window is 1990 Q1 to 2026 Q2, `r MCf$n_pred[1]` targets, the same calendar quarters for every model. The initial training sample is 1959 Q4 to 1989 Q4 (121 quarters) for the full-sample run and 1980 Q1 to 1989 Q4 (40 quarters) for the 1980 run. The labour models start later (@tbl-models).
+
+**Filters.** The linear-Gaussian specifications use an exact Kalman filter on every posterior draw. The SV specifications (m4, m9, m10, m12, m13) use a Rao-Blackwellised particle filter: particles over the log-variances $(g, h)$, and an exact Kalman filter over latent growth for each particle [@doucet2000; @chen2000]. The m10 and m13 filters use a locally adapted proposal for $g$ with an exact weight correction. At a fixed 2,000 particles, the adapted proposal halved the run-to-run standard deviation of the COVID-quarter scores (`r fact("pf_adapt_covid_runsd")` against `r fact("pf_boot_covid_runsd")` nats on 12 test draws) relative to the bootstrap proposal [@gordon1993].
+
+**Particle schedule.** A pilot pass on 200 draws measures the particle effective sample size in each quarter. The particle count is 2,000 by default and is raised, up to 100,000, where the pilot's 10% quantile of the ESS fraction is low, mainly in the COVID quarters. The filter runs on every second posterior draw of each refit (every fourth for m10, whose filter is slower). Because the schedule is fixed before the pass that uses it, each pass's likelihood estimate remains unbiased.
+
+**Refit rule.** A refit is accepted if divergences are at most 1% of draws, the maximum hyperparameter R-hat is at most 1.05, the minimum E-BFMI is at least 0.2 and the minimum hyperparameter bulk ESS is at least 100. The rule is looser than the production gate because refits have half as many draws. A failing refit is retried with a new seed, up to four attempts. Every attempt is recorded.
+
+## Uncertainty
+
+**Monte Carlo error.** Each SV model is scored by four independent filter passes over the same draws and particle schedules. The reported score is the mean of the four pass totals; its Monte Carlo standard error (MCSE) is the standard deviation of the totals divided by two. With four passes the MCSE has three degrees of freedom, so it is itself imprecise.
+
+**Particle-filter bias.** The logarithm of an unbiased likelihood estimate is biased downwards [@pitt2012]. We measure that bias on the COVID quarters (2020 Q1 to 2021 Q1) and on the twenty quarters of 2015 to 2019. Each check compares the scheduled filter, and a fixed 2,000-particle filter, with high-particle reference runs of up to 400,000 particles. 2020 Q2 has three reference runs; other quarters have one.
+
+**Standard errors of score differences.** For models $a$ and $b$ the difference is $\sum_t d_t$ with $d_t = \log p_a(y_t \mid y_{1:t-1}) - \log p_b(y_t \mid y_{1:t-1})$. The i.i.d. standard error $\sqrt{n\,\widehat{\operatorname{var}}(d_t)}$ ignores serial correlation in $d_t$, which is positive for most SV-against-constant-variance pairs. We therefore also report a Newey-West standard error with a Bartlett kernel and a lag of 8 quarters [@newey1987]; z-statistics are differences divided by that standard error. The lag is a choice. We report sensitivity to lags of 4 to 16.
+
+**Seed selection.** Keeping the first refit attempt that passes the rule is a form of seed selection. For every retried fit we rescore the targets it serves twice: with the first attempt's draws only, and with all attempts' chains pooled.
+
+# Results {#sec-results}
+
+## Posterior of the production model
+
+```{r}
+#| label: tbl-post
+#| tbl-cap: "Posterior of m13: medians and 90% intervals, annualised units. 1980 sample = production fit (1980 Q1–2026 Q2, T = 186); full sample = 1959 Q4–2026 Q2 (T = 267). $\\tau = e^{\\mu_g/2}$; $\\bar\\mu = c/(1-\\rho)$; $\\bar\\sigma^\\varepsilon_k = e^{\\mu_{h,k}/2}/\\sqrt{1-\\psi_k^2}$ is the error sd at the long-run log-variance."
+vv <- c("mu_bar", "rho", "tau", "mu_g", "phi_g", "omega_g", "psi[1]", "psi[2]", "psi[3]", "rho_EI",
+        "eps_sd_bar[1]", "eps_sd_bar[2]", "eps_sd_bar[3]", "mu_h[1]", "mu_h[2]", "mu_h[3]", "phi[1]", "phi[2]", "phi[3]", "omega[1]", "omega[2]", "omega[3]")
+lab <- c("$\\bar\\mu$ (long-run mean)", "$\\rho$ (latent persistence)", "$\\tau = e^{\\mu_g/2}$", "$\\mu_g$", "$\\phi_g$", "$\\omega_g$", "$\\psi_E$", "$\\psi_I$", "$\\psi_P$", "$\\rho_{EI}$",
+         "$\\bar\\sigma^\\varepsilon_E$", "$\\bar\\sigma^\\varepsilon_I$", "$\\bar\\sigma^\\varepsilon_P$", "$\\mu_{h,E}$", "$\\mu_{h,I}$", "$\\mu_{h,P}$", "$\\phi_E$", "$\\phi_I$", "$\\phi_P$", "$\\omega_E$", "$\\omega_I$", "$\\omega_P$")
+cell <- function(key, v) paste0(fmt(pv(key, v), 2), " ", ci(pv(key, v, "q05"), pv(key, v, "q95"), 2))
+tp <- data.frame(Parameter = lab, `1980 sample` = sapply(vv, cell, key = "m13_prod"),
+                 `Full sample` = sapply(vv, cell, key = "m13_full"), check.names = FALSE, row.names = NULL)
+tab(tp, align = "lrr")
+```
+
+@tbl-post reports the posterior of m13 on both samples.
+
+**Measurement errors partly reverse.** All three AR(1) coefficients are negative: `r pci("m13_prod", "psi[1]")` for expenditure, `r pci("m13_prod", "psi[2]")` for income and `r pci("m13_prod", "psi[3]")` for production. The expenditure and income intervals exclude zero on both samples. The production interval reaches zero on the 1980 sample. A negative coefficient means that a quarter's error is partly undone the next quarter. This is what one would expect if errors in the *level* of GDP do not accumulate. According to RDP 2014-12, the ABS has reconciled the three measures to equal annual totals through supply-use tables for all years since 1994 except the latest one or two [@rees2014, appendix B]. A growth-rate error then has to be reversed within the year.
+
+**The E–I correlation is small.** $\rho_{EI}$ is `r pci("m13_prod", "rho_EI")` on the 1980 sample and `r pci("m13_full", "rho_EI")` on the full sample. The zero correlations between the production error and the other two are imposed, not estimated. m3, which frees them, finds all three correlations weakly identified (@sec-failed), and imposing the zeros changes predictive scores little (m6 − m2 and m9 − m4, @sec-comparison).
+
+**Error sizes.** At the long-run log-variance the error standard deviations are `r fmt(pv("m13_prod", "eps_sd_bar[1]"), 2)` (E), `r fmt(pv("m13_prod", "eps_sd_bar[2]"), 2)` (I) and `r fmt(pv("m13_prod", "eps_sd_bar[3]"), 2)` (P) on the 1980 sample. Production is the cleanest single measure, as in RDP 2014-12 and in every specification we estimated. On the full sample the expenditure error is larger (`r fmt(pv("m13_full", "eps_sd_bar[1]"), 2)`): the 1960s and 1970s contribute large expenditure-side errors.
+
+**Latent dynamics.** Latent growth is moderately persistent ($\rho$ = `r pci("m13_prod", "rho")`), more so on the 1980 sample than on the full sample (`r pci("m13_full", "rho")`). Its long-run mean is `r fmt(pv("m13_prod", "mu_bar"), 2)` per cent a year from 1980. Latent log-volatility is persistent ($\phi_g$ = `r pci("m13_prod", "phi_g")`) and variable ($\omega_g$ = `r pci("m13_prod", "omega_g")`).
+
+**A weakly identified persistence.** On the 1980 sample the persistence of expenditure-side volatility, $\phi_E$, has a long left tail (`r pci("m13_prod", "phi[1]")`). It has the lowest ESS of m13's hyperparameters on both seeds (@tbl-gate). Before 2020 the expenditure error's log-variance barely moves on this sample, so its persistence is close to unidentified (@sec-robust-sample).
+
+## The latent path {#sec-path}
+
+```{r}
+#| label: fig-path
+#| fig-cap: "Latent growth (m13, 1980 sample; posterior median and 90% band) and headline growth (mean of E, I and P), annualised per cent. Panel (b) restricts the vertical axis to −8 to 12, so 2020 Q2 and Q3 are off the scale."
+pp <- M13[M13$key == "m13_prod", ]
+pp$headline <- G$headline[match(pp$date, G$date)]
+base <- ggplot(pp, aes(date)) +
+  geom_ribbon(aes(ymin = mu_q05, ymax = mu_q95), fill = "#9ecae1", alpha = 0.8) +
+  geom_line(aes(y = headline, colour = "Headline"), linewidth = 0.3) +
+  geom_line(aes(y = mu_q50, colour = "Latent (median)"), linewidth = 0.5) +
+  scale_colour_manual(NULL, values = c("Headline" = "grey40", "Latent (median)" = "#08519c")) +
+  labs(x = NULL, y = "% (annualised)") + theme_minimal(base_size = 9) + theme(legend.position = "bottom")
+pa <- base + ggtitle("(a) 1980 Q1 – 2026 Q2")
+pb <- base + coord_cartesian(ylim = c(-8, 12)) + ggtitle("(b) Same, restricted scale")
+f1 <- "figures/fig1_latent_vs_headline.png"
+ggsave(f1, pa / pb + plot_layout(guides = "collect") & theme(legend.position = "bottom"), width = 6.5, height = 6, dpi = 200)
+knitr::include_graphics(f1)
+```
+
+```{r path-numbers}
+w90 <- pp$mu_q95 - pp$mu_q05
+wpre <- w90[pp$date < as.Date("2020-01-01")]
+mad_hl <- mean(abs(pp$mu_q50 - pp$headline))
+```
+
+@fig-path shows the latent path against headline growth. The latent series follows the headline's cycle but removes much of its quarter-to-quarter noise. The 90% band is wide: its average width is `r fmt(mean(wpre), 1)` percentage points before 2020 (`r fmt(mean(wpre) / 4, 2)` points quarter-on-quarter). That is comparable to the quarter-to-quarter movements of the headline itself. On average the posterior median differs from the headline by `r fmt(mad_hl, 2)` points. Through the COVID quarters the latent series follows the headline closely: `r fmt(mp("m13_prod", q2, "mu_q50"), 1)` `r ci(mp("m13_prod", q2, "mu_q05"), mp("m13_prod", q2, "mu_q95"))` in 2020 Q2, against a headline of `r fmt(hl_2020q2, 1)`. The model attributes the collapse to real activity because the three measures agreed, and because latent SV lets the latent innovation variance jump.
+
+```{r}
+#| label: fig-recent
+#| fig-cap: "Recent quarters (2022 Q1 – 2026 Q2): latent growth (m13, 1980 sample; median, 50% and 90% bands), the three measures and the headline, annualised per cent. Divide by four for quarter-on-quarter rates."
+rr <- pp[pp$date >= as.Date("2022-03-01"), ]
+obs <- G[G$date >= as.Date("2022-03-01"), ]
+ol <- rbind(data.frame(date = obs$date, v = obs$g_E, s = "GDP(E)"), data.frame(date = obs$date, v = obs$g_I, s = "GDP(I)"),
+            data.frame(date = obs$date, v = obs$g_P, s = "GDP(P)"), data.frame(date = obs$date, v = obs$headline, s = "Headline"))
+p4 <- ggplot(rr, aes(date)) +
+  geom_ribbon(aes(ymin = mu_q05, ymax = mu_q95), fill = "#c6dbef") +
+  geom_ribbon(aes(ymin = mu_q25, ymax = mu_q75), fill = "#9ecae1") +
+  geom_line(aes(y = mu_q50), colour = "#08519c", linewidth = 0.6) +
+  geom_point(data = ol, aes(date, v, shape = s, colour = s), size = 1.6) +
+  scale_shape_manual(NULL, values = c(16, 17, 15, 4)) +
+  scale_colour_manual(NULL, values = c("#d95f02", "#7570b3", "#1b9e77", "black")) +
+  labs(x = NULL, y = "% (annualised)") + theme_minimal(base_size = 9) + theme(legend.position = "bottom")
+f4 <- "figures/fig2_recent_quarters.png"
+ggsave(f4, p4, width = 6.5, height = 3.4, dpi = 200)
+knitr::include_graphics(f4)
+```
+
+@fig-recent shows the most recent quarters. For `r qlab(last)` the latent median is `r fmt(L13$mu_q50, 2)` per cent annualised `r ci(L13$mu_q05, L13$mu_q95, 2)`, or `r fmt(L13$mu_q50 / 4, 2)` per cent quarter-on-quarter `r ci(L13$mu_q05 / 4, L13$mu_q95 / 4, 2)`. The headline is `r fmt(hl_last / 4, 2)` per cent quarter-on-quarter. The published estimate from the continuous-integration run is `r fmt(LATEST$mu_median, 2)` `r ci(LATEST$mu_q05, LATEST$mu_q95, 2)`. In this quarter GDP(E) (`r fmt(G$g_E[G$date == last] / 4, 2)` per cent) is weaker than GDP(I) and GDP(P) (`r fmt(G$g_I[G$date == last] / 4, 2)` and `r fmt(G$g_P[G$date == last] / 4, 2)`), and the latent median is above the headline.
+
+## Latent volatility {#sec-tau}
+
+```{r}
+#| label: fig-tau
+#| fig-cap: "Latent innovation standard deviation $\\tau_t = e^{g_t/2}$, annualised: posterior median and 90% band from the 1980-sample production fit, and the full-sample fit's median (dashed). Log scale."
+tf <- M13[M13$key == "m13_full", ]
+p2 <- ggplot() +
+  geom_ribbon(data = pp, aes(date, ymin = tau_q05, ymax = tau_q95), fill = "#fdd0a2") +
+  geom_line(data = pp, aes(date, tau_q50, linetype = "1980 sample (production)"), colour = "#a63603", linewidth = 0.5) +
+  geom_line(data = tf, aes(date, tau_q50, linetype = "Full sample"), colour = "grey20", linewidth = 0.4) +
+  scale_linetype_manual(NULL, values = c("1980 sample (production)" = "solid", "Full sample" = "dashed")) +
+  scale_y_log10(breaks = c(0.5, 1, 2, 5, 10, 20)) +
+  labs(x = NULL, y = "τ_t, % (annualised, log scale)") + theme_minimal(base_size = 9) + theme(legend.position = "bottom")
+f2 <- "figures/fig3_latent_volatility.png"
+ggsave(f2, p2, width = 6.5, height = 3.3, dpi = 200)
+knitr::include_graphics(f2)
+```
+
+```{r}
+#| label: tbl-decades
+#| tbl-cap: "Latent innovation sd $\\tau_t$ by decade: posterior median and 90% interval of each decade's average of $\\tau_t$, annualised. The 2020s cover 2020 Q1–2026 Q2."
+ds <- c("1960s", "1970s", "1980s", "1990s", "2000s", "2010s", "2020s")
+cellD <- function(key, d) if (length(dec(key, d))) paste(fmt(dec(key, d), 2), ci(dec(key, d, "q05"), dec(key, d, "q95"), 2)) else "–"
+tab(data.frame(Decade = ds, `1980 sample` = sapply(ds, cellD, key = "m13_prod"), `Full sample` = sapply(ds, cellD, key = "m13_full"),
+               check.names = FALSE, row.names = NULL), align = "lrr")
+```
+
+@fig-tau and @tbl-decades show the latent volatility path. The decade average of $\tau_t$ falls from `r fmt(dec("m13_prod", "1980s"), 2)` in the 1980s to `r fmt(dec("m13_prod", "2000s"), 2)` in the 2000s and `r fmt(dec("m13_prod", "2010s"), 2)` in the 2010s. It rises to `r fmt(mp("m13_prod", q2, "tau_q50"), 1)` `r ci(mp("m13_prod", q2, "tau_q05"), mp("m13_prod", q2, "tau_q95"))` in 2020 Q2 and is `r fmt(L13$tau_q50, 2)` in `r qlab(last)`. The full-sample fit adds the 1960s (`r fmt(dec("m13_full", "1960s"), 2)`) and 1970s (`r fmt(dec("m13_full", "1970s"), 2)`). For comparison, m12, which has the same structure but a constant latent standard deviation, estimates that constant at `r pci("m12_1980", "tau")` on the 1980 sample and `r pci("m12_full", "tau")` on the full sample. (On the 1980 sample m12's constant is pulled down because that fit treats 2020 Q2 as measurement error; @sec-robust-sample.) On either sample a constant latent standard deviation is too large for the 2000s and 2010s and far too small for 2020. This is the source of m13's predictive gain (@sec-comparison). The decline is consistent with the international evidence of lower output volatility since the mid-1980s [@mcconnell2000; @stock2002]. The two samples give similar paths; the 1980 fit has a lower long-run level ($\tau$ `r fmt(pv("m13_prod", "tau"), 2)` against `r fmt(pv("m13_full", "tau"), 2)`) and less persistent, more variable latent volatility.
+
+## Measurement-error volatility {#sec-sigma}
+
+```{r}
+#| label: fig-sigma
+#| fig-cap: "Measurement-error innovation standard deviations $\\sigma_{t,k} = e^{h_{t,k}/2}$, annualised: posterior median and 90% band from the 1980-sample production fit; dashed line, full-sample fit's median."
+sl <- do.call(rbind, lapply(c("E", "I", "P"), function(k) rbind(
+  data.frame(date = pp$date, m = pp[[paste0("sig", k, "_q50")]], lo = pp[[paste0("sig", k, "_q05")]], hi = pp[[paste0("sig", k, "_q95")]], k = paste0("GDP(", k, ")"), s = "1980"),
+  data.frame(date = tf$date, m = tf[[paste0("sig", k, "_q50")]], lo = NA, hi = NA, k = paste0("GDP(", k, ")"), s = "full"))))
+p3 <- ggplot(sl[sl$s == "1980", ], aes(date)) +
+  geom_ribbon(aes(ymin = lo, ymax = hi), fill = "#c7e9c0") +
+  geom_line(aes(y = m), colour = "#006d2c", linewidth = 0.5) +
+  geom_line(data = sl[sl$s == "full", ], aes(date, m), linetype = "dashed", colour = "grey30", linewidth = 0.3) +
+  facet_wrap(~k, ncol = 3) + labs(x = NULL, y = "σ_t,k, % (annualised)") + theme_minimal(base_size = 9)
+f3 <- "figures/fig4_measurement_volatility.png"
+ggsave(f3, p3, width = 6.5, height = 3, dpi = 200)
+knitr::include_graphics(f3)
+sig_at <- function(key, k, d) mp(key, d, paste0("sig", k, "_q50"))
+d1 <- as.Date("1980-03-01")
+tfE <- tf[which.max(tf$sigE_q50), ]
+```
+
+@fig-sigma shows the innovation standard deviations of the three measurement errors. All three fall over the sample. On the 1980 fit they are `r fmt(sig_at("m13_prod", "E", d1), 2)`, `r fmt(sig_at("m13_prod", "I", d1), 2)` and `r fmt(sig_at("m13_prod", "P", d1), 2)` (E, I, P) in 1980 Q1, and `r fmt(sig_at("m13_prod", "E", last), 2)`, `r fmt(sig_at("m13_prod", "I", last), 2)` and `r fmt(sig_at("m13_prod", "P", last), 2)` in `r qlab(last)`. On the full sample the expenditure error peaks at `r fmt(tfE$sigE_q50, 1)` in `r qlab(tfE$date)`. The COVID quarters show little increase in measurement-error volatility in m13: the expenditure-side innovation standard deviation is `r fmt(sig_at("m13_prod", "E", as.Date("2019-12-01")), 2)` in 2019 Q4 and `r fmt(sig_at("m13_prod", "E", q2), 2)` in 2020 Q2. The collapse is attributed to latent growth. The bands are wide, especially early in the sample.
+
+## How much of headline variance is measurement error? {#sec-vardecomp}
+
+```{r}
+#| label: tbl-vardecomp
+#| tbl-cap: "Variance of latent growth relative to headline growth: per-draw ratio $\\mathrm{var}_t(\\mu_t^{(s)})/\\mathrm{var}_t(\\bar y_t)$, posterior median and 90% interval. 'Excl. COVID' drops 2020 Q1–2021 Q1. The last column is the ratio for the posterior-median path, which understates latent variance. m8 and m10 use hours data and start in 1978 Q4 on the full sample; their full-sample column is over 1978 Q4–2026 Q2."
+cellV <- function(key, w) { if (!length(vr(key, w))) return("–"); paste(fmt(vr(key, w), 2), ci(vr(key, w, "ratio_q05"), vr(key, w, "ratio_q95"), 2)) }
+ms3 <- paste0("m", c(1:10, 12, 13))
+wfull <- ifelse(ms3 %in% c("m8", "m10"), "1978Q4-2026Q2", "1959Q4-2026Q2")
+tv <- data.frame(Model = ms3,
+  `Full fit, whole sample` = mapply(cellV, paste0(ms3, "_full"), wfull),
+  `1980 fit, 1980–2026` = sapply(paste0(ms3, "_1980"), cellV, w = "1980Q1-2026Q2"),
+  `1980 fit, excl. COVID` = sapply(paste0(ms3, "_1980"), cellV, w = "1980Q1-2026Q2 excl. 2020Q1-2021Q1"),
+  `1980 fit, median path` = sapply(paste0(ms3, "_1980"), function(k) fmt(vr(k, "1980Q1-2026Q2", "ratio_medianpath"), 2)),
+  check.names = FALSE, row.names = NULL)
+tab(tv, align = "lrrrr")
+```
+
+For each posterior draw $s$ we compute $\operatorname{var}_t(\mu^{(s)}_t)/\operatorname{var}_t(\bar y_t)$ over a window and report the distribution across draws. One minus this ratio is a rough measure of the share of headline variance that is measurement error. It is not an exact decomposition, because latent growth and the average error need not be uncorrelated in a given sample.
+
+On the 1980 sample, m13's ratio is `r fmt(vr("m13_prod", "1980Q1-2026Q2"), 3)` `r ci(vr("m13_prod", "1980Q1-2026Q2", "ratio_q05"), vr("m13_prod", "1980Q1-2026Q2", "ratio_q95"), 3)`. By this measure about an eighth of headline variance since 1980 is measurement error. Excluding 2020 Q1 to 2021 Q1 the ratio is `r fmt(vr("m13_prod", "1980Q1-2026Q2 excl. 2020Q1-2021Q1"), 3)` `r ci(vr("m13_prod", "1980Q1-2026Q2 excl. 2020Q1-2021Q1", "ratio_q05"), vr("m13_prod", "1980Q1-2026Q2 excl. 2020Q1-2021Q1", "ratio_q95"), 3)`, about a fifth. The COVID quarters raise the ratio because they add a large common movement that the model assigns to latent growth. On the full sample the ratio is `r fmt(vr("m13_full", "1959Q4-2026Q2"), 3)` (`r fmt(vr("m13_full", "1959Q4-2026Q2 excl. 2020Q1-2021Q1"), 3)` excluding COVID). The difference between the samples is almost entirely a matter of which quarters are covered, not of the estimates. Restricted to 1980 Q1 to 2026 Q2, the full-sample fit gives `r fmt(vr("m13_full", "1980Q1-2026Q2"), 3)` (`r fmt(vr("m13_full", "1980Q1-2026Q2 excl. 2020Q1-2021Q1"), 3)` excluding COVID).
+
+**Per-draw ratios, not the ratio of a summary path.** The posterior median or mean path averages over draws and is smoother than any plausible single path. Its variance understates the variance of latent growth. For m13 on the 1980 sample the median path's ratio is `r fmt(vr("m13_prod", "1980Q1-2026Q2", "ratio_medianpath"), 3)` against a per-draw median of `r fmt(vr("m13_prod", "1980Q1-2026Q2"), 3)`. On the full sample the gap is wider for some models: m12's median path gives `r fmt(vr("m12_full", "1959Q4-2026Q2", "ratio_medianpath"), 3)` against `r fmt(vr("m12_full", "1959Q4-2026Q2"), 3)`. An earlier version of this project reported mean-path ratios of about `r fact("meanpath_ratio_old")` and concluded that measured growth overstated true variance by a third. That conclusion was withdrawn.
+
+**The ratio depends on the model, and the comparison does not test it.** On the full sample the three-measure models other than m7 give `r fmt(min(sapply(paste0(c("m1","m2","m3","m4","m5","m6","m9","m12","m13"), "_full"), vr, w = "1959Q4-2026Q2")), 2)` to `r fmt(max(sapply(paste0(c("m1","m2","m3","m4","m5","m6","m9","m12","m13"), "_full"), vr, w = "1959Q4-2026Q2")), 2)`. On the 1980 sample, m4, m9 and m12 give `r fmt(min(sapply(paste0(c("m4","m9","m12"), "_1980"), vr, w = "1980Q1-2026Q2")), 2)` to `r fmt(max(sapply(paste0(c("m4","m9","m12"), "_1980"), vr, w = "1980Q1-2026Q2")), 2)`. That is a specification failure, discussed in @sec-robust-sample, not a finding. Scores and splits do not line up. m7 and m1 cannot be told apart by score on the full sample (m7 − m1 `r sg(pw(PWf, "m7", "m1"))`, z `r fmt(pw(PWf, "m7", "m1", "z_nw"), 2)`), yet their ratios are `r fmt(vr("m7_full", "1959Q4-2026Q2"), 2)` and `r fmt(vr("m1_full", "1959Q4-2026Q2"), 2)`. Conversely, the ranking by score need not match the ranking by ratio. Over 1978 Q4 to 2026 Q2 excluding 2020 Q1 to 2021 Q1, the full-sample m13 gives `r fmt(vr("m13_full", "1978Q4-2026Q2 excl. 2020Q1-2021Q1"), 2)`, m12 `r fmt(vr("m12_full", "1978Q4-2026Q2 excl. 2020Q1-2021Q1"), 2)` and m10 (with hours) `r fmt(vr("m10_full", "1978Q4-2026Q2 excl. 2020Q1-2021Q1"), 2)`, although m13 scores better than both. With a time-varying latent variance, disagreement among the measures in a quiet period is attributed more to measurement error. Predictive scores evaluate forecasts of the observed measures. They do not identify the split between signal and noise, which rests on the model's structure.
+
+## Model checking: prior and posterior predictive checks {#sec-ppc}
+
+```{r}
+#| label: tbl-ppc
+#| tbl-cap: "Predictive checks of m13 (1980 sample). Observed: statistic of the data, 1980 Q1–2026 Q2, annualised units. Cells give the median and 90% interval of the replicated statistic. Full: series simulated from posterior hyperparameters with a fresh latent history (1,000 draws). Conditional: measurement errors simulated given posterior draws of the latent path and the error log-variances. p: share of replications at least as large as the observed value."
+lab_st <- c(sd_head = "sd, headline", sd_head_pre2020 = "sd, headline, pre-2020", sd_E = "sd, GDP(E)", sd_P = "sd, GDP(P)",
+            ac1_head = "ρ₁, headline", ac1_P = "ρ₁, GDP(P)", sd_EI = "sd, E − I", sd_EP = "sd, E − P",
+            ac1_EI = "ρ₁, E − I", ac1_EP = "ρ₁, E − P", cor_EI = "corr(E, I)", min_head = "min, headline",
+            max_head = "max, headline", n_head_below_m4 = "quarters with headline < −4",
+            sd_EI_1980s = "sd, E − I, 1980s", sd_EI_2010s = "sd, E − I, 2010s")
+lab_st <- sub("ρ₁", "$\\\\rho_1$", lab_st)
+cellQ <- function(kind, st, d = 2) paste0(fmt(ppc(kind, st, "q50"), d), " ", ci(ppc(kind, st, "q05"), ppc(kind, st, "q95"), d), "; p ", fmt(ppc(kind, st), 2))
+tpc <- data.frame(Statistic = unname(lab_st), Observed = sapply(names(lab_st), function(st) fmt(ppc("full", st, "observed"), 2)),
+                  `Full replication` = sapply(names(lab_st), cellQ, kind = "full"),
+                  `Conditional replication` = sapply(names(lab_st), cellQ, kind = "conditional"), check.names = FALSE)
+tab(tpc, align = "lrrr")
+```
+
+No prior predictive or posterior predictive checks were part of the original research suite. We ran both for the production model after the comparison was complete (`paper/ppc_m13.R`). Replicated series are simulated in R from the model equations; no Stan model is refitted. The fit's own replicated data are not used, because they condition on the observed value of the previous quarter.
+
+**Prior predictive.** Over 4,000 draws from the priors, the long-run mean of latent growth has a prior median of `r fmt(ppr("long-run mean of latent growth c/(1-rho)"), 1)` per cent a year (90% interval `r ci(ppr("long-run mean of latent growth c/(1-rho)", "q05"), ppr("long-run mean of latent growth c/(1-rho)", "q95"))`). The standard deviation of simulated headline growth has a prior median of `r fmt(ppr("sd of headline growth"), 1)` `r ci(ppr("sd of headline growth", "q05"), ppr("sd of headline growth", "q95"))`, against `r fmt(PPR$observed[PPR$quantity == "sd of headline growth"], 1)` in the data. The long-run expenditure-error standard deviation is `r fmt(ppr("long-run error sd, E"), 1)` `r ci(ppr("long-run error sd, E", "q05"), ppr("long-run error sd, E", "q95"))`, and $\tau$ is `r fmt(ppr("tau = exp(mu_g/2)"), 1)` `r ci(ppr("tau = exp(mu_g/2)", "q05"), ppr("tau = exp(mu_g/2)", "q95"))`. The priors are therefore centred on plausible values. They are also heavy-tailed: `r pc(PPR$share_sd_head_10_or_more[PPR$quantity == "sd of headline growth"])` of prior draws give a headline standard deviation above 10, and the 99th percentile of the largest absolute quarterly growth rate is `r fmt(ppr("max |headline| (min and max)", "q99"), 0)` per cent annualised. The tails come from persistence parameters near one, which make the stationary variances of the AR(1) processes very large, and from $\rho$ near one, which makes $c/(1-\rho)$ large. The observed statistics all fall well inside the prior predictive range (the observed headline standard deviation is at prior percentile `r fmt(100 * PPR$p_obs_below[PPR$quantity == "sd of headline growth"], 0)`). The priors do not rule out the data, but they put noticeable mass on implausibly volatile economies. A tighter prior on the persistence parameters would be a reasonable refinement; we have not tested its effect.
+
+**Posterior predictive.** @tbl-ppc compares statistics of the data with their replicated distributions. In the full replication, which draws a fresh latent and volatility history, every posterior predictive p-value lies between `r fmt(min(PPC$p_rep_ge_obs[PPC$kind == "full"]), 2)` and `r fmt(max(PPC$p_rep_ge_obs[PPC$kind == "full"]), 2)`. The model reproduces the negative first-order autocorrelation of the differences between measures (E − I: observed `r fmt(ppc("full", "ac1_EI", "observed"), 2)`, replicated median `r fmt(ppc("full", "ac1_EI", "q50"), 2)`), the correlation between the measures and the size of the extremes. Its replications are more volatile than the data in typical quarters: the observed pre-2020 headline standard deviation, `r fmt(ppc("full", "sd_head_pre2020", "observed"), 2)`, is below `r pc(ppc("full", "sd_head_pre2020"))` of replications. That is expected of a model whose latent volatility can wander: a fresh history rarely reproduces the long calm of the 2000s and 2010s. In the conditional replication, which keeps the posterior latent path and error log-variances, the 90% pointwise intervals cover `r pc(PPV$cover90[PPV$measure == "E"])` (E), `r pc(PPV$cover90[PPV$measure == "I"])` (I) and `r pc(PPV$cover90[PPV$measure == "P"])` (P) of the observations, and the 50% intervals `r pc(PPV$cover50[PPV$measure == "E"])`, `r pc(PPV$cover50[PPV$measure == "I"])` and `r pc(PPV$cover50[PPV$measure == "P"])`. Production is over-covered: given the latent path, the model's production-error variance is somewhat too large, or the latent path absorbs part of the production signal. The weakest conditional check is the autocorrelation of GDP(P) (p = `r fmt(ppc("conditional", "ac1_P"), 2)`): the observed value, `r fmt(ppc("conditional", "ac1_P", "observed"), 2)`, is above most replications. None of these checks indicates a gross misfit. They are in-sample checks and use the data twice.
+
+## Model comparison {#sec-comparison}
+
+```{r}
+#| label: tbl-lfo
+#| tbl-cap: "PSIS-LFO-CV scores of the three-measure models: sum of one-step-ahead log predictive densities over 146 targets (1990 Q1–2026 Q2), annualised units. Δ is the difference from m13 with i.i.d. and Newey-West (lag 8) standard errors. MCSE: Monte Carlo SE of the particle filter (4 passes); 'exact' for Kalman-filter models. Fits: initial fit plus refits, with the number retried (passed only after a new seed) in brackets."
+g1 <- c("m13", "m12", "m9", "m4", "m5", "m7", "m6", "m1", "m3", "m2")
+mkL <- function(MC, m) c(fmt(mc(MC, m, "elpd_lfo"), 1), fmt(mc(MC, m, "elpd_diff_vs_best"), 1),
+                         if (m == "m13") "–" else paste0(fmt(mc(MC, m, "se_diff_vs_best"), 1), "/", fmt(mc(MC, m, "se_diff_vs_best_nw"), 1)),
+                         if (is.na(mc(MC, m, "mcse_elpd"))) "exact" else fmt(mc(MC, m, "mcse_elpd"), 2),
+                         paste0(mc(MC, m, "n_fits"), " (", mc(MC, m, "n_fits_retried"), ")"))
+tl <- do.call(rbind, lapply(g1, function(m) c(m, mkL(MCf, m), mkL(MC8, m))))
+colnames(tl) <- c("Model", "elpd, full", "Δ, full", "SE iid/NW", "MCSE", "fits", "elpd, 1980", "Δ, 1980", "SE iid/NW ", "MCSE ", "fits ")
+tab(as.data.frame(tl), align = "lrrrrrrrrrr")
+rank_f <- MCf$model[MCf$group == 1][order(-MCf$elpd_lfo[MCf$group == 1])]
+rank_8 <- MC8$model[MC8$group == 1][order(-MC8$elpd_lfo[MC8$group == 1])]
+```
+
+@tbl-lfo reports the scores of the ten three-measure models on both samples. The ranking on the full sample is `r paste(rank_f, collapse = ", ")`. On the 1980 sample it is `r paste(rank_8, collapse = ", ")`. On the full sample three groups stand out: m13; the measurement-SV models m12, m9 and m4; and the constant-variance models. On the 1980 sample m7 joins the middle group, and the constant-variance models move closer to it. The scores are summed over 146 quarters, so a difference of 10 nats is about 0.07 nats per quarter.
+
+```{r}
+#| label: tbl-pairs
+#| tbl-cap: "Key score differences a − b (nats over 146 targets), with i.i.d. and Newey-West SEs and the Newey-West z. Most pairs add one feature; m12 − m5 adds two (measurement SV and the E–I-only structure) and m13 − m5 three. 'Not nested' pairs differ in more than one way."
+pairs <- list(
+  c("m5", "m2", "serial errors (constant variance)", G1), c("m12", "m9", "serial errors (with measurement SV)", G1),
+  c("m4", "m2", "measurement SV (independent errors)", G1), c("m9", "m6", "measurement SV (E–I correlation)", G1),
+  c("m12", "m5", "measurement SV + E–I, with serial errors", G1), c("m13", "m12", "latent SV", G1),
+  c("m9", "m4", "E–I-only restriction (with SV)", G1), c("m6", "m2", "E–I-only restriction (constant)", G1),
+  c("m7", "m1", "COVID variance scale", G1), c("m13", "m5", "all three features", G1),
+  c("m9", "m5", "not nested: adds SV, drops serial errors", G1), c("m4", "m1", "not nested: adds SV and latent AR(1)", G1))
+cellP <- function(PW, a, b, comp) paste0(sg(pw(PW, a, b, comp = comp)), " (", fmt(pw(PW, a, b, "se_diff", comp), 1), "/", fmt(pw(PW, a, b, "se_diff_nw", comp), 1), "), z ", fmt(pw(PW, a, b, "z_nw", comp), 2))
+tpp <- do.call(rbind, lapply(pairs, function(p) data.frame(`a − b` = paste0(p[1], "−", p[2]), Feature = p[3],
+  `Full sample` = cellP(PWf, p[1], p[2], p[4]), `1980 sample` = cellP(PW8, p[1], p[2], p[4]), check.names = FALSE)))
+tab(tpp, align = "llrr")
+```
+
+@tbl-pairs isolates each feature by comparing nested models.
+
+**Serially correlated measurement errors: the robust gain.** Adding AR(1) errors to the constant-variance model improves the score by `r sg(pw(PWf, "m5", "m2"))` nats on the full sample and `r sg(pw(PW8, "m5", "m2"))` on the 1980 sample. The Newey-West z-statistics, `r fmt(pw(PWf, "m5", "m2", "z_nw"), 1)` and `r fmt(pw(PW8, "m5", "m2", "z_nw"), 1)`, are the largest in the comparison. Adding them to the measurement-SV model (m12 against m9) gives `r sg(pw(PWf, "m12", "m9"))` (z `r fmt(pw(PWf, "m12", "m9", "z_nw"), 2)`) and `r sg(pw(PW8, "m12", "m9"))` (z `r fmt(pw(PW8, "m12", "m9", "z_nw"), 2)`). m5 − m2 is positive in every sub-period on both samples (@tbl-sub). m12 − m9 is positive in every sub-period on the 1980 sample, but on the full sample it is `r sg(fv("m12", "m9", "2020"))` in 2020. Serial correlation is therefore the feature whose gain holds on both samples and with or without SV; only in the constant-variance comparison does it hold in every sub-period on both.
+
+**SV in the measurement errors: a real gain that roughly halves from 1980.** The two comparisons that add only measurement SV are m4 − m2 (independent errors) and m9 − m6 (E–I correlation). On the full sample they are `r sg(pw(PWf, "m4", "m2"))` (z `r fmt(pw(PWf, "m4", "m2", "z_nw"), 2)`) and `r sg(pw(PWf, "m9", "m6"))` (z `r fmt(pw(PWf, "m9", "m6", "z_nw"), 2)`). On the 1980 sample they are `r sg(pw(PW8, "m4", "m2"))` (z `r fmt(pw(PW8, "m4", "m2", "z_nw"), 2)`) and `r sg(pw(PW8, "m9", "m6"))` (z `r fmt(pw(PW8, "m9", "m6", "z_nw"), 2)`). The reason is discussed in @sec-robust-sample. Before 2020 the gains on the 1980 sample are `r sg(fv("m4", "m2", "pre-2020", "diff_sample"))` (z `r fmt(fv("m4", "m2", "pre-2020", "z_nw_sample"), 2)`) and `r sg(fv("m9", "m6", "pre-2020", "diff_sample"))` (z `r fmt(fv("m9", "m6", "pre-2020", "z_nw_sample"), 2)`). On both samples they are largest in 2008–19 and 2023–26, after measurement-error variance had fallen (@fig-sigma).
+
+**SV in latent growth: first, but by a thin and post hoc margin.** m13 − m12 is `r sg(pw(PWf, "m13", "m12"))` nats on the full sample (SE `r fmt(pw(PWf, "m13", "m12", "se_diff"), 1)` i.i.d., `r fmt(pw(PWf, "m13", "m12", "se_diff_nw"), 1)` Newey-West; z `r fmt(z13f, 2)`). On the 1980 sample it is `r sg(pw(PW8, "m13", "m12"))` (SE `r fmt(pw(PW8, "m13", "m12", "se_diff"), 1)` / `r fmt(pw(PW8, "m13", "m12", "se_diff_nw"), 1)`; z `r fmt(z138, 2)`). One quarter dominates the uncertainty. 2020 Q2 alone contributes `r sg(d1312f$d[d1312f$date == q2])` nats on the full sample and `r sg(d13128$d[d13128$date == q2])` on the 1980 sample: m12's constant latent variance cannot accommodate the collapse. Outside 2020 Q2 to 2021 Q1 the full-sample gain is `r sg(fv("m13", "m12", "all excl. COVID"))` (NW SE `r fmt(fv("m13", "m12", "all excl. COVID", "se_nw_full"), 1)`); before 2020 it is `r sg(fv("m13", "m12", "pre-2020"))` (z `r fmt(fv("m13", "m12", "pre-2020", "z_nw_full"), 1)`). m13 is ahead in `r sum(d1312f$d > 0)` of 146 quarters. Outside 2020 the gain per quarter grows over the window, as latent volatility falls further below m12's constant. On the 1980 sample the pre-2020 gain is only `r sg(fv("m13", "m12", "pre-2020", "diff_sample"))` (z `r fmt(fv("m13", "m12", "pre-2020", "z_nw_sample"), 2)`), and m13 is ahead in `r sum(d13128$d > 0)` quarters. Excluding all of 2020 to 2022, the gain is `r sg(sum(ex2022(d1312f)$d))` (z `r fmt(sum(ex2022(d1312f)$d) / nw(ex2022(d1312f)$d), 2)`) on the full sample and `r sg(sum(ex2022(d13128)$d))` (z `r fmt(sum(ex2022(d13128)$d) / nw(ex2022(d13128)$d), 2)`) on the 1980 sample.
+
+m13 was proposed after the re-specified m10, which has latent SV, had been scored on the same window and had beaten m12 on the GDP-only target. m13 is therefore a second latent-SV specification evaluated on the same data. Counting only those two tries, a Bonferroni-adjusted two-sided 5% bar is z ≈ `r fmt(qnorm(1 - 0.05 / 4), 2)`, which `r fmt(z13f, 2)` does not meet. That bar is a lower bound on the correction: the old m10, the re-specified m10, m12 and m13 were all scored on the same 146 targets. The direction of the evidence is clear: latent volatility has changed a great deal over the sample (@fig-tau). Its strength as a test of predictive improvement is modest.
+
+**The structural restriction is predictively neutral.** m9 − m4 is `r sg(pw(PWf, "m9", "m4"))` (z `r fmt(pw(PWf, "m9", "m4", "z_nw"), 2)`) on the full sample, and m6 − m2 is `r sg(pw(PWf, "m6", "m2"), 2)`. On the 1980 sample they are `r sg(pw(PW8, "m9", "m4"))` and `r sg(pw(PW8, "m6", "m2"), 2)`. m9 − m4 on the 1980 sample is within the particle-filter uncertainty of these models in 2020 Q2 (@sec-robust-pf) and falls to `r sg(rs(RS8, "m9", "m4", "first"), 2)` with first refit attempts only. We keep the restriction because it reflects how the measures are built, not because the data favour it.
+
+**COVID variance scale.** m7 − m1 is `r sg(pw(PWf, "m7", "m1"))` (z `r fmt(pw(PWf, "m7", "m1", "z_nw"), 2)`) on the full sample. Its gain comes from 2020, and m7 knows in advance which quarters to scale. On the full sample m7's 2020 Q2 scale factor is `r pci("m7_full", "kappa[1]", 1)`, while the scale factors for the other three quarters have medians of `r fmt(pv("m7_full", "kappa[2]"), 2)`, `r fmt(pv("m7_full", "kappa[3]"), 2)` and `r fmt(pv("m7_full", "kappa[4]"), 2)`. m7 therefore treats essentially all of the 2020 Q2 collapse as measurement error: its latent growth in 2020 Q2 has posterior mean `r sg(cov("m7_full"))` on the full sample and `r sg(cov("m7_1980"))` on the 1980 sample, against a headline of `r fmt(hl_2020q2, 1)`. Its variance ratio, `r fmt(vr("m7_full", "1959Q4-2026Q2"), 2)`, is the lowest of the full-sample models.
+
+```{r}
+#| label: tbl-sub
+#| tbl-cap: "Score differences by sub-period (nats). Each cell gives the full-sample run / the 1980-sample run. 'Excl. COVID' drops 2020 Q2–2021 Q1. Newey-West SEs for the longer periods are in the text and in output/sample_1980/tables/lfo_full_vs_sample.csv."
+prs <- list(c("m5", "m2"), c("m12", "m9"), c("m4", "m2"), c("m9", "m6"), c("m9", "m4"), c("m13", "m12"))
+per <- c("1990-99", "2000-07", "2008-19", "2020", "2021-22", "2023-26", "pre-2020", "all excl. COVID", "all")
+cellS <- function(a, b, p) {
+  x <- paste0(fmt(fv(a, b, p, "diff_full"), 1), "/", fmt(fv(a, b, p, "diff_sample"), 1))
+  x }
+ts <- sapply(prs, function(p) sapply(per, cellS, a = p[1], b = p[2]))
+ts <- data.frame(Period = c("1990–99", "2000–07", "2008–19", "2020", "2021–22", "2023–26", "pre-2020", "excl. COVID", "all 146"), ts, check.names = FALSE)
+names(ts)[-1] <- sapply(prs, function(p) paste0(p[1], " − ", p[2]))
+tab(ts, align = "lrrrrrr")
+```
+
+```{r}
+#| label: fig-cum
+#| fig-cap: "Cumulative score differences over the 146 LFO targets (nats). Left: full-sample run (training from 1959 Q4). Right: 1980-sample run (training from 1980 Q1)."
+cumd <- function(LP, a, b, s) { x <- pdiff(LP, a, b); data.frame(date = x$date, cum = cumsum(x$d), pair = paste(a, "−", b), s = s) }
+cd <- rbind(do.call(rbind, lapply(prs[c(1, 2, 3, 6)], function(p) cumd(LPf, p[1], p[2], "Full sample"))),
+            do.call(rbind, lapply(prs[c(1, 2, 3, 6)], function(p) cumd(LP8, p[1], p[2], "1980 sample"))))
+cd$s <- factor(cd$s, levels = c("Full sample", "1980 sample"))
+p5 <- ggplot(cd, aes(date, cum, colour = pair)) + geom_hline(yintercept = 0, colour = "grey60") +
+  geom_step(linewidth = 0.5) + facet_wrap(~s) +
+  scale_colour_manual(NULL, values = c("#1b9e77", "#d95f02", "#7570b3", "#e7298a")) +
+  labs(x = NULL, y = "cumulative Δ elpd (nats)") + theme_minimal(base_size = 9) + theme(legend.position = "bottom")
+f5 <- "figures/fig5_lfo_cumulative.png"
+ggsave(f5, p5, width = 6.5, height = 3.3, dpi = 200)
+knitr::include_graphics(f5)
+```
+
+@tbl-sub and @fig-cum show where the differences arise. The serial-correlation gain (m5 − m2) accumulates steadily, mostly in the 1990s and 2000s. The measurement-SV gain (m4 − m2) builds from 2000 and is largest in 2008–19 and 2023–26. It falls back in 2020 on the full sample. The latent-SV gain (m13 − m12) is small in the 1990s, grows through the 2010s and jumps in 2020 Q2. On the 1980 sample m12 is slightly ahead of m13 in 1990–99 (`r fmt(fv("m13", "m12", "1990-99", "diff_sample"), 1)`, NW z `r fmt(fv("m13", "m12", "1990-99", "z_nw_sample"), 2)`).
+
+**Labour-market models.** On the hours subsample the re-specified m10 is ahead of m8, which has constant variances, by `r sg(pw(PWf, "m10", "m8", comp = G2))` nats on the joint four-signal target (z `r fmt(pw(PWf, "m10", "m8", "z_nw", G2), 2)`). This gain is post hoc in the sense above. On the GDP-only target, $\log p(y^{E,I,P}_t \mid y_{1:t-1})$ with hours in the past but not in the target, m13 is ahead of m10 by `r sg(pw(PWf, "m13", "m10", comp = GO))` (z `r fmt(pw(PWf, "m13", "m10", "z_nw", GO), 2)`) and of the mixed-frequency m11 by `r sg(pw(PWf, "m13", "m11", comp = GO))` (z `r fmt(pw(PWf, "m13", "m11", "z_nw", GO), 2)`). These gaps do not measure the value of labour data. m10 has neither AR(1) errors nor the E–I correlation, m11 has no SV, and no m13-plus-hours model was fitted. m11 also conditions on employment inside the target quarter, which is released before GDP.
+
+# Robustness {#sec-robust}
+
+## Starting in 1980 instead of 1959 {#sec-robust-sample}
+
+The 146 targets are identical in the two runs. What differs is the training data: 40 against 121 quarters before the first target, and no 1960s or 1970s. Each change therefore mixes two effects: dropping data whose errors may be unrepresentative, and estimating parameters from less history.
+
+**What survives.** m13 is first on every target on both samples. Serially correlated errors help on both samples, with and without SV; in the constant-variance comparison they help in every sub-period (@tbl-sub). m13's AR(1) coefficients barely move (@tbl-post). The structural restriction is still unsupported. Production remains the cleanest measure in every specification. m10's lead over m8 is essentially unchanged (`r sg(pw(PW8, "m10", "m8", comp = G2))`, z `r fmt(pw(PW8, "m10", "m8", "z_nw", G2), 2)`). m13's latent path is almost the same: on the common quarters the posterior mean paths have correlation `r fmt(rob("m13_full", "m13_prod", "mu_mean_cor"), 4)` and differ by `r fmt(rob("m13_full", "m13_prod", "mu_mean_mad"), 2)` points on average (at most `r fmt(rob("m13_full", "m13_prod", "mu_mean_max"), 2)`).
+
+**What weakens.** The latent-SV evidence: m13 − m12 is `r sg(pw(PW8, "m13", "m12"))` with z `r fmt(z138, 2)`. Newey-West z-statistics at lags 4, 8, 12 and 16 are `r paste(fmt(lagz(d13128), 2), collapse = ", ")` (full sample `r paste(fmt(lagz(d1312f), 2), collapse = ", ")`). The z ≥ 2 condition that was used to switch production to m13 (@sec-app-history) would not be met on this sample. Part of the 1980 margin is in 2021–22 (`r sg(fv("m13", "m12", "2021-22", "diff_sample"))`, against `r sg(fv("m13", "m12", "2021-22"))` on the full sample). In that period m12's 1980 fit mishandles the aftermath of COVID (below), so part of the margin scores that failure rather than a general gain. Measurement SV also weakens: the nested gains roughly halve (@tbl-pairs).
+
+**Why the measurement-SV gain halves.** Before 2020 every model scores better when trained from 1980, but the constant-variance models gain about twice as much. Their error variances, GDP(E)'s above all, are no longer inflated by the noisy early decades. The pre-2020 change from the later start is `r sg(fvsm_pre <- (sum(LP8$elpd[LP8$model == "m2" & as.Date(LP8$date) < as.Date("2020-01-01")]) - sum(LPf$elpd[LPf$model == "m2" & as.Date(LPf$date) < as.Date("2020-01-01")])))` for m2 against `r sg(sum(LP8$elpd[LP8$model == "m4" & as.Date(LP8$date) < as.Date("2020-01-01")]) - sum(LPf$elpd[LPf$model == "m4" & as.Date(LPf$date) < as.Date("2020-01-01")]))` for m4. In the constant-variance models the expenditure error standard deviation falls from `r fmt(pv("m2_full", "sigma[1]"), 2)` to `r fmt(pv("m2_1980", "sigma[1]"), 2)` (m2). That is the pattern RDP 2014-12's argument for a 1980 start predicts. About half of the full-sample measurement-SV gain came from pre-1980 training data. The rest survives the later start, but less cleanly: before 2020 the nested gains are `r sg(fv("m4", "m2", "pre-2020", "diff_sample"))` and `r sg(fv("m9", "m6", "pre-2020", "diff_sample"))` on the 1980 sample against `r sg(fv("m4", "m2", "pre-2020"))` and `r sg(fv("m9", "m6", "pre-2020"))` on the full sample, and the 1980 fits of m4 and m9 lose to the constant-variance models in 2021–22 (`r fmt(fv("m4", "m2", "2021-22", "diff_sample"), 1)` and `r fmt(fv("m9", "m6", "2021-22", "diff_sample"), 1)`).
+
+**What fails: m4, m9 and m12 on COVID.** On the 1980 sample these three models, which have measurement SV but a constant latent variance, treat the 2020 Q2 collapse as a common measurement error (@fig-covid). Their latent growth in 2020 Q2 is `r fmt(cov("m4_1980"), 1)` (m4), `r fmt(cov("m9_1980"), 1)` (m9) and `r fmt(cov("m12_1980"), 1)` (m12), against `r fmt(cov("m4_full"), 1)`, `r fmt(cov("m9_full"), 1)` and `r fmt(cov("m12_full"), 1)` on the full sample and a headline of `r fmt(hl_2020q2, 1)`. Their variance ratios fall to `r fmt(min(sapply(paste0(c("m4","m9","m12"), "_1980"), vr, w = "1980Q1-2026Q2")), 2)`–`r fmt(max(sapply(paste0(c("m4","m9","m12"), "_1980"), vr, w = "1980Q1-2026Q2")), 2)`. This is the same failure as the old m10's mode A. In m12 the expenditure-volatility persistence collapses to `r pci("m12_1980", "phi[1]")`, against `r pci("m12_full", "phi[1]")` on the full sample, while its volatility of volatility rises to `r fmt(pv("m12_1980", "omega[1]"), 2)`. Expenditure-side SV then behaves as i.i.d. heavy-tailed noise that can absorb one huge quarter. The prior on that persistence is Uniform(−1, 1), so a posterior centred near zero with a wide interval is close to the prior. We checked that this is not a stranded mode. For each of m4, m9 and m12, four extra chains were started from full-sample draws, where COVID is in latent growth. All twelve chains moved to the measurement-error solution and matched the reference fit. Warmup draws were saved for m4 and m12, and there every chain left the starting region within `r fact("mode_check_1980_first_iter_min")` to `r fact("mode_check_1980_first_iter_max")` warmup iterations. That is evidence about one alternative region, not proof that no other mode exists. m13 and m10, which have latent SV, keep COVID in latent growth on both samples. So, mostly, do the constant-variance models: their latent 2020 Q2 is `r fmt(min(sapply(paste0(c("m1","m2","m3","m5","m6"), "_1980"), cov)), 1)` to `r fmt(max(sapply(paste0(c("m1","m2","m3","m5","m6"), "_1980"), cov)), 1)` on the 1980 sample.
+
+```{r}
+#| label: fig-covid
+#| fig-cap: "Latent growth in 2020 Q2 by model and sample: posterior mean and 90% interval, annualised per cent. Dashed line: headline growth in 2020 Q2. m11's value is the quarterly aggregate of its monthly state."
+cv <- COV[COV$key %in% c(paste0("m", 1:13, "_full"), paste0("m", 1:13, "_1980")), ]
+cv$model <- factor(cv$model, levels = rev(paste0("m", 1:13)))
+cv$Sample <- ifelse(cv$sample == "full", "Full sample", "1980 sample")
+p6 <- ggplot(cv, aes(y = model, x = mu_mean, colour = Sample)) +
+  geom_vline(xintercept = hl_2020q2, linetype = "dashed", colour = "grey40") +
+  geom_pointrange(aes(xmin = mu_q05, xmax = mu_q95), position = position_dodge(width = 0.6), size = 0.2) +
+  scale_colour_manual(NULL, values = c("Full sample" = "grey30", "1980 sample" = "#d7301f")) +
+  labs(x = "latent growth in 2020 Q2, % (annualised)", y = NULL) + theme_minimal(base_size = 9) + theme(legend.position = "bottom")
+f6 <- "figures/fig6_covid_by_model.png"
+ggsave(f6, p6, width = 6.5, height = 3.8, dpi = 200)
+knitr::include_graphics(f6)
+```
+
+**What changes.** m7 rises from sixth to fourth on the 1980 sample, level with m9 and m4. m13's variance ratio is higher on the 1980 sample, but only because the window excludes the 1960s and 1970s (@sec-vardecomp).
+
+**Does the later start improve prediction?** m13 trained from 1980 scores `r sg(FVSM$change[FVSM$model == "m13"])` nats better on the same 146 targets than m13 trained from 1959 (NW SE `r fmt(FVSM$se_nw_change[FVSM$model == "m13"], 2)`, z `r fmt(FVSM$change[FVSM$model == "m13"] / FVSM$se_nw_change[FVSM$model == "m13"], 2)`). Most of the gain is in 1990–99 (`r sg(sum(ds_9099))`). These are the targets nearest the dropped data, and they have the shortest 1980 training sets. From 2000 on the gain is `r sg(sum(ds_2000))` (z `r fmt(sum(ds_2000) / nw(ds_2000), 2)`). For current estimates the start date hardly matters for prediction. The published estimate moved to the 1980 sample on 19 October 2026. That was a decision based on RDP 2014-12's argument about early measurement errors, not the outcome of a pre-set rule (@sec-app-history).
+
+## Prior sensitivity
+
+The posterior median of $\omega_g$ on the full sample (`r fmt(pv("m13_full", "omega_g"), 2)`) sits at percentile `r fmt(100 * (2 * pnorm(pv("m13_full", "omega_g") / 0.5) - 1), 0)` of its half-N(0, 0.5) prior. On the 1980 sample (`r fmt(pv("m13_prod", "omega_g"), 2)`) it sits at percentile `r fmt(100 * (2 * pnorm(pv("m13_prod", "omega_g") / 0.5) - 1), 0)`. The prior may therefore restrain it. We refitted the full-sample m13 with a half-N(0, 1) prior; the refit also passed the gate. $\omega_g$ moved from `r pci("m13_full", "omega_g")` to `r pci("m13_full_omegag1", "omega_g")`, and $\tau$ from `r fmt(pv("m13_full", "tau"), 2)` to `r fmt(pv("m13_full_omegag1", "tau"), 2)`. The median $\tau_t$ path changed by `r pc(rob("m13_full", "m13_full_omegag1", "tau_median_rel_mean"), 1)` on average (at most `r pc(rob("m13_full", "m13_full_omegag1", "tau_median_rel_max"), 1)`). The median latent path moved by `r fmt(rob("m13_full", "m13_full_omegag1", "mu_median_mad"), 3)` points on average (at most `r fmt(rob("m13_full", "m13_full_omegag1", "mu_median_max"), 2)`). The variance ratio went from `r fmt(vr("m13_full", "1959Q4-2026Q2"), 3)` to `r fmt(vr("m13_full_omegag1", "1959Q4-2026Q2"), 3)`. The results are insensitive to this widening.
+
+For this paper the same refit was run on the production sample, 1980 Q1 to 2026 Q2 (`R/fit_m13.R --omega_g_sd=1`). There the prior matters more, because the 1980 posterior of $\omega_g$ sits further into the prior's tail. The refit `r ifelse(all(G1O$pass), "passed", "did not pass")` the production gate (`r nd1 <- round(G1O$value[grepl("divergences", G1O$metric)] * 8000); nd1` divergence`r ifelse(nd1 == 1, "", "s")`, minimum E-BFMI `r fmt(G1O$value[grepl("E-BFMI", G1O$metric)], 3)`, maximum hyperparameter R-hat `r fmt(G1O$value[grepl("max R-hat, hyperparameters", G1O$metric)], 4)`, minimum hyperparameter bulk ESS `r fmt(G1O$value[grepl("min bulk ESS, hyperparameters", G1O$metric)], 0)`). $\omega_g$ moved from `r pci("m13_prod", "omega_g")` to `r pci("m13_1980_omegag1", "omega_g")`, $\phi_g$ from `r fmt(pv("m13_prod", "phi_g"), 2)` to `r fmt(pv("m13_1980_omegag1", "phi_g"), 2)` and $\tau$ from `r fmt(pv("m13_prod", "tau"), 2)` to `r fmt(pv("m13_1980_omegag1", "tau"), 2)`. The median $\tau_t$ path changed by `r pc(rob("m13_prod", "m13_1980_omegag1", "tau_median_rel_mean"), 1)` on average (at most `r pc(rob("m13_prod", "m13_1980_omegag1", "tau_median_rel_max"), 1)`, in `r qlab(rob("m13_prod", "m13_1980_omegag1", "tau_median_rel_max_date"))`); 2020 Q2's $\tau_t$ went from `r fmt(mp("m13_prod", q2, "tau_q50"), 1)` to `r fmt(mp("m13_1980_omegag1", q2, "tau_q50"), 1)`. The median latent path moved by `r fmt(rob("m13_prod", "m13_1980_omegag1", "mu_median_mad"), 3)` points on average (at most `r fmt(rob("m13_prod", "m13_1980_omegag1", "mu_median_max"), 2)`), and the variance ratio went from `r fmt(vr("m13_prod", "1980Q1-2026Q2"), 3)` to `r fmt(vr("m13_1980_omegag1", "1980Q1-2026Q2"), 3)` (`r fmt(vr("m13_prod", "1980Q1-2026Q2 excl. 2020Q1-2021Q1"), 3)` to `r fmt(vr("m13_1980_omegag1", "1980Q1-2026Q2 excl. 2020Q1-2021Q1"), 3)` excluding 2020 Q1–2021 Q1). The latent path and the variance ratio are again insensitive. The latent-volatility path is less so: it moves by up to a sixth in some quarters, so statements about $\tau_t$ in individual quarters carry prior uncertainty beyond their posterior intervals. No other prior was varied, and the wider prior was not scored by LFO.
+
+## Seeds
+
+```{r}
+#| label: tbl-seeds
+#| tbl-cap: "Seed robustness of m13: second-seed fits against seed 1. Path differences are in annualised percentage points; $\\tau_t$ differences are relative changes of the posterior median."
+sd <- data.frame(
+  Sample = c("Full", "1980"),
+  `Gate passed (seed 2)` = c(ifelse(all(G13f$pass[G13f$seed == 2]), "yes", "no"), ifelse(all(G138$pass[G138$seed == 2]), "yes", "no")),
+  `Median $\\mu$ path: mean / max abs. Δ` = c(paste(fmt(rob("m13_full", "m13_full_seed2", "mu_median_mad"), 3), "/", fmt(rob("m13_full", "m13_full_seed2", "mu_median_max"), 3)),
+                                       paste(fmt(rob("m13_prod", "m13_1980_seed2", "mu_median_mad"), 3), "/", fmt(rob("m13_prod", "m13_1980_seed2", "mu_median_max"), 3))),
+  `Median $\\tau_t$: mean / max rel. Δ` = c(paste(pc(rob("m13_full", "m13_full_seed2", "tau_median_rel_mean"), 1), "/", pc(rob("m13_full", "m13_full_seed2", "tau_median_rel_max"), 1)),
+                                      paste(pc(rob("m13_prod", "m13_1980_seed2", "tau_median_rel_mean"), 1), "/", pc(rob("m13_prod", "m13_1980_seed2", "tau_median_rel_max"), 1))),
+  `Variance ratio, seed 1 / seed 2` = c(paste(fmt(vr("m13_full", "1959Q4-2026Q2"), 3), "/", fmt(vr("m13_full_seed2", "1959Q4-2026Q2"), 3)),
+                                        paste(fmt(vr("m13_prod", "1980Q1-2026Q2"), 3), "/", fmt(vr("m13_1980_seed2", "1980Q1-2026Q2"), 3))),
+  `$\\psi_E$, seed 1 / seed 2` = c(paste(fmt(pv("m13_full", "psi[1]"), 3), "/", fmt(pv("m13_full_seed2", "psi[1]"), 3)),
+                            paste(fmt(pv("m13_prod", "psi[1]"), 3), "/", fmt(pv("m13_1980_seed2", "psi[1]"), 3))),
+  check.names = FALSE)
+tab(sd, align = "llrrrr")
+```
+
+@tbl-seeds compares second-seed fits with seed 1. Both pass the gate, and the latent path, the volatility path and the variance ratio agree to within Monte Carlo noise.
+
+## Refit retries and seed selection
+
+```{r retry}
+nfit_f <- sum(MCf$n_fits); nfit_8 <- sum(MC8$n_fits); nref_f <- sum(MCf$n_refits); nref_8 <- sum(MC8$n_refits)
+fail_f <- sum(MCf$n_attempts_failed); fail_8 <- sum(MC8$n_attempts_failed)
+wk_f <- sum(MCf$n_fits_weak_mixing); wk_8 <- sum(MC8$n_fits_weak_mixing)
+```
+
+On the full sample all `r nfit_f` stored LFO fits (`r nrow(MCf)` initial fits and `r nref_f` refits) meet the refit rule. `r sum(MCf$n_fits_retried)` of them met it only after `r fail_f` failed attempts. The retried fits are m9 on data to 2006 Q3 and to 2020 Q4, and m12 on data to 2020 Q4. Just after COVID, four chains of 1,000 draws do not sample the latent variance reliably in the constant-latent-variance models. On the 1980 sample all `r nfit_8` fits meet the rule and one (m4, on data to 2016 Q2) needed a second attempt. `r wk_f` full-sample and `r wk_8` 1980-sample fits meet the rule but have bulk ESS below 400. Rescoring without seed selection changes the key comparisons little. m13 − m12 on the full sample is `r sg(rs(RSf, "m13", "m12", "main"), 2)` as reported, `r sg(rs(RSf, "m13", "m12", "first"), 2)` with first attempts only (z `r fmt(rs(RSf, "m13", "m12", "first", "z_nw"), 2)`), and `r sg(rs(RSf, "m13", "m12", "pooled"), 2)` with all attempts pooled. m12 − m9 is `r sg(rs(RSf, "m12", "m9", "main"), 2)`, `r sg(rs(RSf, "m12", "m9", "first"), 2)` (z `r fmt(rs(RSf, "m12", "m9", "first", "z_nw"), 2)`) and `r sg(rs(RSf, "m12", "m9", "pooled"), 2)`. On the 1980 sample m4 − m2 is `r sg(rs(RS8, "m4", "m2", "main"), 1)` as reported and `r sg(rs(RS8, "m4", "m2", "first"), 1)` with first attempts only. m13 needed no retry on either sample. The largest Pareto $\hat k$ used without a refit was `r fmt(max(MCf$max_k_used, MC8$max_k_used), 4)`, below the 0.7 threshold.
+
+## Particle-filter accuracy {#sec-robust-pf}
+
+```{r}
+#| label: tbl-pf
+#| tbl-cap: "Particle-filter bias against high-particle references (nats), summed over 2020 Q1–2021 Q1 (COVID) and over 2015 Q1–2019 Q4. 'Schedule' is the adaptive particle count used for scoring; 'N = 2000' a fixed count. COVID biases use the mean of three reference passes at 2020 Q2. MCSE: Monte Carlo SE of the model's total score."
+pfr <- function(PFC, PFP, MC, m, s) {
+  a <- PFC[PFC$model == m, ]; b <- PFP[PFP$model == m, ]
+  data.frame(Sample = s, Model = m, `COVID, schedule` = fmt(sum(a$bias_sched_vs_refmean), 2), `COVID, N = 2000` = fmt(sum(a$bias_N2000_vs_refmean), 2),
+             `2015–19, schedule` = if (nrow(b)) fmt(sum(b$bias_sched), 3) else "not run",
+             `2020 Q2 reference SE` = fmt(a$elpd_ref_se[a$date == "2020-06-01"], 3),
+             MCSE = fmt(mc(MC, m, "mcse_elpd"), 2), check.names = FALSE)
+}
+tpf <- rbind(do.call(rbind, lapply(c("m13", "m12", "m9", "m4", "m10"), pfr, PFC = PFCf, PFP = PFPf, MC = MCf, s = "Full")),
+             do.call(rbind, lapply(c("m13", "m12", "m9", "m4"), pfr, PFC = PFC8, PFP = PFP8, MC = MC8, s = "1980")))
+tab(tpf, align = "llrrrrr")
+```
+
+@tbl-pf reports the particle-filter checks. Under the adaptive schedule the bias summed over the COVID quarters is small for every model on the full sample. A fixed 2,000-particle filter would have been biased by a few tenths of a nat, downwards for every model except m10 (`r sg(sum(PFCf$bias_N2000_vs_refmean[PFCf$model == "m10"]), 2)`). The 1980 sample is harder. For the three models that treat COVID as measurement error, the 2020 Q2 predictive density needs all three measurement volatilities to jump at once. Its estimate varies by more than a nat between passes even at 100,000 particles, and a fixed 2,000-particle filter would be biased by about −3 nats. Comparisons involving m4, m9 or m12 on the 1980 sample therefore carry one to two nats of particle uncertainty from that quarter. That is small against m13 − m12 but not against m9 − m4. For m13 the 2020 Q2 reference has a standard error of `r fmt(PFC8$elpd_ref_se[PFC8$model == "m13" & PFC8$date == "2020-06-01"], 3)` nats on the 1980 sample, and its total MCSE is `r fmt(mc(MC8, "m13", "mcse_elpd"), 2)`. With four passes each MCSE has only three degrees of freedom. The checks for 2015–19 were not run for m9 (1980 sample), m4 or m10, and the COVID check was not run for m10 on the 1980 sample.
+
+## Mode checks
+
+Besides the m10 diagnosis (@sec-failed) and the 1980-sample restarts of m4, m9 and m12 (@sec-robust-sample), the m13 fits show no sign of multiple modes. All four chains of each fit agree (maximum hyperparameter R-hat `r fmt(max(G13f$value[grepl("max R-hat, hyperparameters", G13f$metric)], G138$value[grepl("max R-hat, hyperparameters", G138$metric)]), 4)` across both samples and seeds), and the two seeds agree (@tbl-seeds). Tempered or optimisation-based searches for other modes were not run.
+
+# Relation to RDP 2014-12 {#sec-rdp}
+
+RDP 2014-12 is the starting point of this project. This section sets out what differs between the two studies. It then reports a re-estimation of six of our models on RDP 2014-12's sample period, which makes part of the comparison like-for-like.
+
+**What differs.**
+
+* **Sample end and vintage.** RDP 2014-12 use data from 1980 Q1 to 2013 Q2, on the vintage available in 2014. Our 1980 sample has the same start but ends in 2026 Q2, on the 2026 vintage. It therefore includes the COVID quarters and thirteen years of revisions to the earlier data. The re-estimation below uses their sample period on our vintage.
+* **Fourth signal.** Their Model 3 adds the change in the unemployment rate. Our m8 and m10 are in the spirit of that model but add hours worked; we have not used unemployment.
+* **Error correlations.** Their Model 2 lets the latent innovation correlate with each measurement error and identifies the model by fixing the ratio of latent to GDP(E) variance at 0.5. None of our models has latent–error correlation, and our m3 (errors only, LKJ prior) does not impose that restriction.
+* **Variances.** Their models have constant variances. Our preferred models have stochastic volatility in latent growth and in the errors, and AR(1) errors.
+* **Units and priors.** They work in quarterly percentages with inverse-gamma priors on variances and a beta prior on persistence. We work in annualised percentages with half-normal priors on standard deviations and a truncated normal on persistence.
+* **Estimation and evaluation.** They use random-walk Metropolis-Hastings; they report marginal data densities but do not use them to choose between models. We use HMC and compare models by leave-future-out predictive density.
+* **Real-time analysis.** They evaluate revisions to real-time model estimates from 2001 to 2009. We use the current vintage only.
+
+## Re-estimation on the RDP sample {#sec-rdp-refit}
+
+```{r rdp-setup}
+RDPD <- rd("../output/sample_rdp/tables/fit_diagnostics.csv")
+E19D <- if (file.exists("../output/sample_rdp/end2019/tables/fit_diagnostics.csv")) rd("../output/sample_rdp/end2019/tables/fit_diagnostics.csv") else RDPD[0, ]
+DALL <- rbind(RDPD, E19D)
+q <- function(x) x / 4
+wR <- "1980Q1-2013Q2"
+taubar <- function(key) mean(M13$tau_q50[M13$key == key & M13$date <= as.Date("2013-06-01")]) / 4
+r5 <- function(s, c) R5[R5$series == s, c]
+r4 <- function(s, c) R4[R4$series == s, c]
+sdr <- function(key) r5(key, "sd") / r5("headline", "sd")
+m6 <- c("m2", "m4", "m5", "m9", "m12", "m13")
+key80 <- function(m) if (m == "m13") "m13_prod" else paste0(m, "_1980")
+vr_rdp <- sapply(paste0(m6, "_rdp"), vr, w = wR)
+sdr_rdp <- sapply(paste0(m6, "_rdp"), sdr)
+```
+
+We refitted m2, m4, m5, m9, m12 and m13 on 1980 Q1 to 2013 Q2 (T = 134), on the 2026 vintage, with the production sampler settings (`paper/fit_rdp_sample.R`). To separate the effect of the COVID quarters from that of the 2013–19 data, m2 and m13 were also fitted on 1980 Q1 to 2019 Q4. Across the `r nrow(DALL)` fits there was at most `r max(DALL$divergences)` divergence in 8,000 draws, a minimum E-BFMI of `r fmt(min(DALL$min_ebfmi), 2)` and a minimum hyperparameter bulk ESS of `r fmt(min(DALL$min_ess_bulk_hyper), 0)`. The largest hyperparameter R-hat is `r fmt(max(DALL$max_rhat_hyper), 4)` (m13 to 2019 Q4, on the persistence of the production-error volatility), just above the production gate's 1.01; the m13 fit to 2013 Q2 has `r fmt(RDPD$max_rhat_hyper[RDPD$model == "m13"], 4)`. On these shorter samples m13's latent-volatility parameters are weakly identified: on 1980 Q1–2013 Q2, $\phi_g$ is `r pci("m13_rdp", "phi_g")` and $\omega_g$ `r pci("m13_rdp", "omega_g")`, against `r pci("m13_prod", "omega_g")` when 2020–26 is included. Each fit took at most `r fmt(max(DALL$wall_secs) / 60, 0)` minutes. No LFO comparison was run on these samples.
+
+Their Model 1, an AR(1) latent state with independent constant-variance errors, has the same structure as our m2 except for priors. @tbl-rdp sets the two side by side. All numbers are in quarterly units: our annualised estimates divided by four. Panel B describes the posterior-median latent path over RDP 2014-12's window, 1980 Q1 to 2013 Q2, whatever the end of the estimation sample.
+
+```{r}
+#| label: tbl-rdp
+#| tbl-cap: "RDP 2014-12's Model 1 against our m2 and m13 fitted on three sample ends, quarterly units (per cent per quarter). RDP: values as published (Tables 1, 4 and 5; sample 1980 Q1–2013 Q2; sds are square roots of median variances). Ours: posterior medians, all samples starting in 1980 Q1, 2026 vintage. Panels B and C are computed over 1980 Q1–2013 Q2 for every column. For m13 the latent sd is the average median $\\tau_t$ over 1980 Q1–2013 Q2 and the error sds are $\\bar\\sigma^\\varepsilon_k$ (at the long-run log-variance), so they are not like-for-like with constant-variance sds. In Panel B the sd of GDP(A) is RDP 2014-12's value (2014 vintage) and ours (2026 vintage)."
+cols <- list(c("m2_rdp", "m2, to 2013 Q2"), c("m2_e2019", "m2, to 2019 Q4"), c("m2_1980", "m2, to 2026 Q2"),
+             c("m13_rdp", "m13, to 2013 Q2"), c("m13_e2019", "m13, to 2019 Q4"), c("m13_prod", "m13, to 2026 Q2"))
+cols <- Filter(function(cc) any(P$key == cc[1]), cols)
+colA <- function(key) {
+  if (grepl("^m2", key)) c(pv(key, "rho"), q(pv(key, "tau")), q(pv(key, "sigma[1]")), q(pv(key, "sigma[2]")), q(pv(key, "sigma[3]")), q(pv(key, "mu_bar")))
+  else c(pv(key, "rho"), taubar(key), q(pv(key, "eps_sd_bar[1]")), q(pv(key, "eps_sd_bar[2]")), q(pv(key, "eps_sd_bar[3]")), q(pv(key, "mu_bar")))
+}
+colB <- function(key) c(r5("headline", "sd"), r5(key, "sd"), sdr(key), r5(key, "rho1"), vr(key, wR), vr(key, wR, "ratio_medianpath"))
+colC <- function(key) c(r4(key, "w_E"), r4(key, "w_I"), r4(key, "w_P"))
+rdpA <- c(rdpv(1, "Model 1", "rho"), sqrt(rdpv(1, "Model 1", "sigma2_G")), sqrt(rdpv(1, "Model 1", "sigma2_E")),
+          sqrt(rdpv(1, "Model 1", "sigma2_I")), sqrt(rdpv(1, "Model 1", "sigma2_P")), rdpv(1, "Model 1", "mu"))
+rdpB <- c(rdpv(5, "GDP(A)", "sd", "value"), rdpv(5, "Model 1", "sd", "value"), rdpv(5, "Model 1", "sd", "value") / rdpv(5, "GDP(A)", "sd", "value"),
+          rdpv(5, "Model 1", "rho1", "value"), NA, (rdpv(5, "Model 1", "sd", "value") / rdpv(5, "GDP(A)", "sd", "value"))^2)
+rdpC <- c(rdpv(4, "Model 1", "w_E", "value"), rdpv(4, "Model 1", "w_I", "value"), rdpv(4, "Model 1", "w_P", "value"))
+f2 <- function(x) ifelse(is.na(x), "–", fmt(x, 2))
+tr <- data.frame(
+  Statistic = c("A. $\\rho$ (latent persistence)", "Latent innovation sd", "Error sd, E", "Error sd, I", "Error sd, P", "Long-run mean",
+                "B. sd, GDP(A)", "sd, latent median path", "ratio of the two sds", "$\\rho_1$, latent median path",
+                "variance ratio, per draw", "variance ratio, median path",
+                "C. Closest combination: weight on E", "weight on I", "weight on P"),
+  `RDP Model 1` = f2(c(rdpA, rdpB, rdpC)), check.names = FALSE)
+for (cc in cols) tr[[cc[2]]] <- f2(c(colA(cc[1]), colB(cc[1]), colC(cc[1])))
+tab(tr, align = paste0("l", strrep("r", ncol(tr) - 1)))
+```
+
+Four results stand out.
+
+1. **On RDP 2014-12's sample, m2 reproduces their Model 1 closely.** Latent persistence is `r fmt(pv("m2_rdp", "rho"), 2)` against their `r fmt(rdpv(1, "Model 1", "rho"), 2)`. The latent innovation standard deviation is `r fmt(q(pv("m2_rdp", "tau")), 2)` against `r fmt(sqrt(rdpv(1, "Model 1", "sigma2_G")), 2)`. The error standard deviations are `r fmt(q(pv("m2_rdp", "sigma[1]")), 2)`, `r fmt(q(pv("m2_rdp", "sigma[2]")), 2)` and `r fmt(q(pv("m2_rdp", "sigma[3]")), 2)` (E, I, P) against `r fmt(sqrt(rdpv(1, "Model 1", "sigma2_E")), 2)`, `r fmt(sqrt(rdpv(1, "Model 1", "sigma2_I")), 2)` and `r fmt(sqrt(rdpv(1, "Model 1", "sigma2_P")), 2)`, with the same ordering: income noisiest, production cleanest. The posterior-median path has a standard deviation of `r fmt(r5("m2_rdp", "sd"), 2)` (RDP 2014-12: `r fmt(rdpv(5, "Model 1", "sd", "value"), 2)`) and first-order autocorrelation `r fmt(r5("m2_rdp", "rho1"), 2)` (`r fmt(rdpv(5, "Model 1", "rho1", "value"), 2)`). The weights of the closest fixed combination of E, I and P (their section 4.5.2) are `r fmt(r4("m2_rdp", "w_E"), 2)`, `r fmt(r4("m2_rdp", "w_I"), 2)` and `r fmt(r4("m2_rdp", "w_P"), 2)` against `r fmt(rdpv(4, "Model 1", "w_E", "value"), 2)`, `r fmt(rdpv(4, "Model 1", "w_I", "value"), 2)` and `r fmt(rdpv(4, "Model 1", "w_P", "value"), 2)`: somewhat more weight on production and less on expenditure. The largest gap is in the expenditure error, `r pc(q(pv("m2_rdp", "sigma[1]")) / sqrt(rdpv(1, "Model 1", "sigma2_E")) - 1)` larger in our fit. Different priors, a different sampler and thirteen years of data revisions otherwise change little. The published series over 1980–2013 also look the same on both vintages: the headline standard deviation is `r fmt(r5("headline", "sd"), 2)` on ours and `r fmt(rdpv(5, "GDP(A)", "sd", "value"), 2)` on theirs.
+2. **The sample end changes the constant-variance model a great deal.** Fitted to 2026, m2 has persistence `r fmt(pv("m2_1980", "rho"), 2)` and a latent innovation standard deviation of `r fmt(q(pv("m2_1980", "tau")), 2)`, and its median path over 1980–2013 is less smooth (`r pc(sdr("m2_1980"))` of the headline standard deviation, against `r pc(sdr("m2_rdp"))` when fitted to 2013). `r if (any(P$key == "m2_e2019")) paste0("Fitted to 2019 Q4, m2 is close to the 2013 fit (persistence ", fmt(pv("m2_e2019", "rho"), 2), ", innovation sd ", fmt(q(pv("m2_e2019", "tau")), 2), ", path sd ", pc(sdr("m2_e2019")), " of the headline's). So the change comes from the COVID quarters, not from the 2013–19 data: a constant latent variance must accommodate a fall of ", fmt(-hl_2020q2 / 4, 1), " quarterly percentage points in 2020 Q2, which inflates the latent variance for every quarter and lowers persistence.") else ""`
+3. **The latent-SV model is much less sensitive to the sample end.** m13's per-draw variance ratio over 1980–2013 is `r fmt(vr("m13_rdp", wR), 2)` when fitted to 2013 and `r fmt(vr("m13_prod", wR), 2)` when fitted to 2026; for m2 the two numbers are `r fmt(vr("m2_rdp", wR), 2)` and `r fmt(vr("m2_1980", wR), 2)`. m13's latent volatility can rise in 2020 without raising it in the 1990s.
+4. **RDP 2014-12's headline result holds like-for-like, and the statistic matters.** Their posterior-median latent paths have standard deviations `r pc(1 - rdpv(5, "Model 1", "sd", "value") / rdpv(5, "GDP(A)", "sd", "value"))`, `r pc(1 - rdpv(5, "Model 2", "sd", "value") / rdpv(5, "GDP(A)", "sd", "value"))` and `r pc(1 - rdpv(5, "Model 3", "sd", "value") / rdpv(5, "GDP(A)", "sd", "value"))` below GDP(A)'s (Models 1–3). On the same sample and with the same statistic, our six models give `r pc(1 - max(sdr_rdp))` to `r pc(1 - min(sdr_rdp))` (@tbl-rdp-all). In variance terms the median paths have `r pc(min(sdr_rdp)^2)` to `r pc(max(sdr_rdp)^2)` of headline variance. The per-draw ratio of @sec-vardecomp is higher, `r pc(min(vr_rdp))` to `r pc(max(vr_rdp))`: a single plausible latent path is less smooth than the median path. By the per-draw measure, about `r pc(1 - max(vr_rdp))` to `r pc(1 - min(vr_rdp))` of measured variance over 1980–2013 is attributed to measurement error, against roughly half by the median-path measure.
+
+```{r}
+#| label: tbl-rdp-all
+#| tbl-cap: "Six models fitted to 2013 Q2 (RDP 2014-12's sample end) and to 2026 Q2, all from 1980 Q1, statistics over 1980 Q1–2013 Q2. Variance ratio: per-draw var(μ)/var(headline), median and 90% interval. Path sd: sd of the posterior-median latent path relative to the sd of the headline."
+ta <- data.frame(Model = m6,
+  `Variance ratio, fit to 2013` = sapply(paste0(m6, "_rdp"), function(k) paste(fmt(vr(k, wR), 2), ci(vr(k, wR, "ratio_q05"), vr(k, wR, "ratio_q95"), 2))),
+  `Variance ratio, fit to 2026` = sapply(m6, function(m) { k <- key80(m); paste(fmt(vr(k, wR), 2), ci(vr(k, wR, "ratio_q05"), vr(k, wR, "ratio_q95"), 2)) }),
+  `Path sd, fit to 2013` = sapply(paste0(m6, "_rdp"), function(k) fmt(sdr(k), 2)),
+  `Path sd, fit to 2026` = sapply(m6, function(m) fmt(sdr(key80(m)), 2)), check.names = FALSE)
+tab(ta, align = "lrrrr")
+```
+
+@tbl-rdp-all shows the same comparison for all six models. On the RDP sample the models agree closely. On the longer sample they spread out. The constant-variance models m2 and m5 rise to `r fmt(vr("m2_1980", wR), 2)` and `r fmt(vr("m5_1980", wR), 2)`, because COVID inflates their constant latent variance. The measurement-SV models m4, m9 and m12 barely move over this window, although their 1980–2026 fits treat 2020 Q2 itself as measurement error (@sec-robust-sample). m13 moves much less than m2 and m5 (`r fmt(vr("m13_rdp", wR), 2)` to `r fmt(vr("m13_prod", wR), 2)`).
+
+**What remains not comparable.** Estimating RDP 2014-12's Model 2 would need the latent–error correlations and the variance-ratio restriction, which none of our Stan programs has. Their Model 3 would need the unemployment rate. Their real-time results (Table 6) would need the 2001–2013 data vintages. None of these is in the repository.
+
+# Limitations and further work {#sec-limits}
+
+1. **Pseudo-real-time only.** Every forecast uses the 2026 Q2 vintage for all past quarters. The evaluation rewards models for predicting revised data, not first releases, and ignores revisions. RDP 2014-12 showed that their latent estimates were revised less than GDP(A) in real time [@rees2014, Table 6]; we cannot say whether ours are. Real-time scoring requires the ABS vintages and a refit per vintage.
+2. **The production model is post hoc and its margin is thin.** m13 was proposed after the re-specified m10's results had been seen on the same evaluation window. Its margin over m12 is z = `r fmt(z13f, 2)` on the full sample and `r fmt(z138, 2)` on the 1980 sample. A two-try Bonferroni bar would not be met on either, and that bar understates the correction because at least four specifications in this line were scored on the same targets. The switch rule's extra condition (z ≥ 2 with first refit attempts only) guards against seed selection, not against specification search. The economic case for latent SV is strong (@fig-tau). The predictive case is suggestive.
+3. **The evaluation window is reused.** All thirteen models, both samples and every round of the project use the same 146 targets. Re-scoring on the 1980 sample is not independent evidence. The cleanest test of the production model is its record on future ABS releases, scored as they arrive.
+4. **The comparison does not test the variance decomposition.** Predictive scores evaluate forecasts of the observed measures. The split of measured growth into latent growth and error depends on the model's structure, and models that cannot be told apart by score can imply different splits (m7 and m1; @sec-vardecomp). The "about an eighth" (or "about a fifth excluding COVID") figure is a property of m13 on the 1980 sample.
+5. **Labour signals.** Our fourth signal is hours worked, not RDP 2014-12's unemployment rate. No model combines m13's structure with a labour signal, so the value of labour data for the production model is unknown.
+6. **Limited model checking.** Prior and posterior predictive checks were run only for the production model and only after the comparison (@sec-ppc). The priors are heavy-tailed; the effect of tighter priors on the persistence parameters is untested.
+7. **Weak identification in places.** On the 1980 sample the persistence of expenditure-side volatility is close to its prior in m4, m9 and m12 and has a long tail in m13. m3's error correlations are weakly identified on both samples.
+8. **One-step-ahead only.** We do not evaluate multi-step forecasts or the accuracy of the latent estimate itself (which is unobservable).
+9. **Process.** Some diagnostics behind statements in this paper exist only in the project's research log, not as tables: the warmup-stall counts, the 1980-sample restart checks, and the old m10 mode table. Two long computing jobs stopped without an exit status and were resumed from checkpoints; resumed results were checked against re-created fits. The production fit's run time on GitHub's runners is known only from the repository README (about `r fact("ci_job_minutes")` minutes for the whole job).
+
+Further work follows from the list: real-time scoring on ABS vintages; RDP 2014-12's Models 2 and 3; an m13 model with a labour signal; tighter priors on the persistence parameters; and scoring on future releases.
+
+# Conclusion {#sec-conclusion}
+
+We estimated thirteen state-space models of Australian GDP growth observed through the expenditure, income and production measures, and compared them by leave-future-out predictive density with latent states integrated out. Three conclusions are supported with different strength.
+
+The strongest is that measurement errors are negatively serially correlated: a quarter's error is partly reversed the next quarter. The predictive gain holds on both samples and with or without stochastic volatility, and in the constant-variance comparison in every sub-period. It is consistent with the ABS reconciling the levels of the three measures annually.
+
+The second is that the volatility of both measurement errors and true growth has changed a great deal. Measurement errors were much larger before 1980, and latent volatility fell from the 1980s to the 2010s before the COVID shock. Allowing measurement-error variance to change improves prediction, but about half the full-sample gain reflects the noisy pre-1980 data. Allowing latent variance to change gives the best model on every target, but by a thin, post hoc margin.
+
+The third, and least tested, is the size of the measurement-error share. In the production model the variance of latent growth over 1980–2026 is `r pc(vr("m13_prod", "1980Q1-2026Q2"))` of headline variance; the COVID quarters, which the model assigns to true growth, raise that share. Over RDP 2014-12's window, 1980–2013, it is `r pc(vr("m13_prod", "1980Q1-2013Q2"))`. Re-estimated on their sample, our models put the latent share between `r pc(min(vr_rdp))` and `r pc(max(vr_rdp))`, and on their own statistic, the standard deviation of the median path, they reproduce their finding of a substantially smoother series. The predictive comparison does not discriminate between models that imply different shares. The most useful next step is real-time scoring on data vintages, which would also give an evaluation that does not reuse the window.
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+```{=latex}
+\appendix
+```
+
+# Production-model history and switch rules {#sec-app-history}
+
+```{r}
+#| label: tbl-history
+#| tbl-cap: "Production-model changes. Each model switch was decided by a rule fixed before the candidate's LFO results were known. All values are on the full sample unless stated. Times are local run times with four parallel chains on a six-core machine (m12: CmdStan sampling time; m13: wall time)."
+g12ok <- all(G12$pass); g13ok <- all(G13f$pass); g138ok <- all(G138$pass)
+hist <- data.frame(
+  Change = c("m9 → m12 (2026-10-17)", "", "", "", "m12 → m13 (2026-10-18)", "", "", "", "", "Full sample → 1980 Q1 (2026-10-19)", "", ""),
+  Condition = c("passes the gate on two seeds", "reliable LFO score (MCSE of difference)", "beats incumbent by z_NW ≥ 2", "local fit ≤ 30 min",
+                "passes the gate on two seeds", "reliable LFO score (MCSE of difference)", "beats incumbent by z_NW ≥ 2", "z_NW ≥ 2 with first refit attempts only", "local fit ≤ 30 min",
+                "no pre-set rule; owner's decision following RDP 2014-12's argument", "m13 passes the gate on two seeds (1980 sample)", "prediction: m13 from 1980 − m13 from 1959"),
+  Observed = c(ifelse(g12ok, "yes (seeds 1, 2)", "no"), fmt(pw(PWf, "m12", "m9", "mcse_diff"), 2),
+               paste0(sg(pw(PWf, "m12", "m9"), 2), " / ", fmt(pw(PWf, "m12", "m9", "se_diff_nw"), 2), " = ", fmt(pw(PWf, "m12", "m9", "z_nw"), 2)),
+               paste0(fmt(fact("m12_prod_fit_secs") / 60, 0), " min"),
+               ifelse(g13ok, "yes (seeds 1, 2)", "no"), fmt(pw(PWf, "m13", "m12", "mcse_diff"), 2),
+               paste0(sg(pw(PWf, "m13", "m12"), 2), " / ", fmt(pw(PWf, "m13", "m12", "se_diff_nw"), 2), " = ", fmt(z13f, 2)),
+               paste0(sg(rs(RSf, "m13", "m12", "first"), 2), " / ", fmt(rs(RSf, "m13", "m12", "first", "se_nw"), 2), " = ", fmt(rs(RSf, "m13", "m12", "first", "z_nw"), 2)),
+               paste0(fmt(G13f$wall_secs[G13f$seed == 1][1] / 60, 1), " min (seed 1); ", fmt(G13f$wall_secs[G13f$seed == 2][1] / 60, 1), " min (seed 2, machine under load)"),
+               "–", ifelse(g138ok, "yes (seeds 1, 2)", "no"),
+               paste0(sg(FVSM$change[FVSM$model == "m13"], 2), ", NW z ", fmt(FVSM$change[FVSM$model == "m13"] / FVSM$se_nw_change[FVSM$model == "m13"], 2), " (below the z ≥ 2 bar)")))
+tab(hist, align = "lll")
+```
+
+The production model was m9 (structural correlation and measurement SV) until 17 October 2026. It became m12 (adding AR(1) errors) and then, a day later, m13 (adding latent SV). Each switch rule was written down before the candidate's comparison results were known, and every model-switch condition in @tbl-history was met. The m12 → m13 rule added a fifth condition because m13 was a post-hoc candidate. The condition requires the z ≥ 2 margin to hold when every LFO refit uses its first sampling attempt, so that no retry with a new seed can create the margin. m13 needed no retry, so the condition changed nothing. The comparison author recommended treating m13 as a leading candidate rather than switching automatically, given the thin margin; the pre-set rule decided.
+
+The move of the production sample to 1980 Q1 was not governed by a rule. The author of the comparison recommended keeping the full sample; the move was the project owner's decision, taken on RDP 2014-12's rationale. The prediction evidence was below the bar used for model switches, and the latent path barely moved. The decision rests on RDP 2014-12's argument that early measurement errors are unrepresentative, and on the evidence in @sec-robust-sample that pre-1980 data inflate the constant-variance models' error variances.
+
+# Diagnostics {#sec-app-diag}
+
+```{r}
+#| label: tbl-fitdiag
+#| tbl-cap: "Full fits: 4 chains × (2000 warmup + 2000 draws), seed 1. div: divergent transitions of 8000; E-BFMI: minimum over chains; R-hat: maximum over hyperparameters; ESS: minimum bulk / tail over hyperparameters; s: sampling seconds. Full sample, then 1980 sample. m11's full-sample fit is not in the diagnostics table."
+fdrow <- function(FD, s) data.frame(Sample = s, Model = FD$model, `adapt / depth` = paste0(FD$adapt_delta, " / ", FD$max_treedepth), div = FD$divergences,
+  `E-BFMI` = fmt(FD$min_ebfmi, 3), `R-hat (var)` = paste0(fmt(FD$max_rhat_hyper, 4), " (", FD$worst_rhat_var, ")"),
+  ESS = paste0(round(FD$min_ess_bulk_hyper), "/", round(FD$min_ess_tail_hyper)), `R-hat $\\mu$` = fmt(FD$max_rhat_mu, 4), `ESS $\\mu$` = round(FD$min_ess_bulk_mu),
+  s = round(FD$wall_secs), check.names = FALSE)
+tab(rbind(fdrow(FDf, "Full"), fdrow(FD8, "1980")), align = "llrrrrrrrr")
+```
+
+```{r}
+#| label: tbl-gate
+#| tbl-cap: "Production gate for m13, both samples and both seeds. Thresholds: divergences < 0.1%; min E-BFMI ≥ 0.3; R-hat ≤ 1.01 (hyperparameters), ≤ 1.05 ($\\mu_t$, $h_{t,k}$, $g_t$); bulk and tail ESS ≥ 400 (hyperparameters, $\\mu_t$)."
+gt <- function(GT, s) {
+  mets <- unique(sub(" \\(.*", "", GT$metric))
+  do.call(rbind, lapply(1:2, function(sd) { x <- GT[GT$seed == sd, ]
+    data.frame(Sample = s, Seed = sd, Metric = sub(" \\(.*", "", x$metric),
+               Value = ifelse(grepl("divergences", x$metric), paste0(round(x$value * 8000), " of 8000"),
+                              ifelse(grepl("ESS", x$metric), fmt(x$value, 0), fmt(x$value, 4))),
+               Worst = x$worst, Pass = ifelse(x$pass, "yes", "no")) }))
+}
+gg <- rbind(gt(G13f, "Full"), gt(G138, "1980"))
+gg$Value <- paste0(gg$Value, ifelse(gg$Worst != "", paste0(" (", gg$Worst, ")"), ""))
+gg$key <- paste0(gg$Sample, ", seed ", gg$Seed)
+wide <- reshape(gg[, c("Metric", "key", "Value")], idvar = "Metric", timevar = "key", direction = "wide")
+names(wide) <- sub("^Value\\.", "", names(wide)); rownames(wide) <- NULL
+tab(wide, align = "lrrrr")
+```
+
+```{r}
+#| label: tbl-lfodiag
+#| tbl-cap: "LFO fits by model: number of stored fits, retried fits, failed attempts, fits with bulk ESS < 400 (weak mixing), and the worst diagnostics among stored fits. Full sample / 1980 sample."
+lf <- function(m) {
+  a <- LFDf[LFDf$model == m, ]; b <- LFD8[LFD8$model == m, ]
+  data.frame(Model = m, Fits = paste(nrow(a), "/", nrow(b)), Retried = paste(mc(MCf, m, "n_fits_retried"), "/", mc(MC8, m, "n_fits_retried")),
+             `Failed attempts` = paste(mc(MCf, m, "n_attempts_failed"), "/", mc(MC8, m, "n_attempts_failed")),
+             `Weak mixing` = paste(sum(a$weak_mixing), "/", sum(b$weak_mixing)),
+             `Max div` = paste(max(a$divergences), "/", max(b$divergences)),
+             `Min E-BFMI` = paste(fmt(min(a$min_ebfmi), 2), "/", fmt(min(b$min_ebfmi), 2)),
+             `Max R-hat` = paste(fmt(max(a$max_rhat), 3), "/", fmt(max(b$max_rhat), 3)),
+             `Min bulk ESS` = paste(fmt(min(a$min_ess_bulk), 0), "/", fmt(min(b$min_ess_bulk), 0)), check.names = FALSE)
+}
+tab(do.call(rbind, lapply(paste0("m", 1:13), lf)), align = "lrrrrrrrr")
+```
+
+All stored LFO fits meet the refit rule (@tbl-lfodiag). On the full sample the weakest-mixing fits are those trained on data ending just after COVID, where the constant-latent-variance models' latent standard deviation mixes slowly. Weak mixing is not confined to those models: m13 has `r sum(LFDf$weak_mixing[LFDf$model == "m13"])` weak-mixing fits on the full sample and `r sum(LFD8$weak_mixing[LFD8$model == "m13"])` on the 1980 sample, all trained on data ending before 2020. On the 1980 sample the first attempt of m4's refit to 2016 Q2 failed badly (E-BFMI `r fmt(LRA8$min_ebfmi[LRA8$model == "m4" & !LRA8$kept], 3)`, R-hat `r fmt(LRA8$max_rhat[LRA8$model == "m4" & !LRA8$kept], 2)`); its second attempt passed. The diagnostics table records each fit's lowest bulk ESS but not the variable that has it.
+
+# Filter tests {#sec-app-tests}
+
+```{r}
+#| label: tbl-tests
+#| tbl-cap: "Unit tests of the filters (counts of passed expectations, from the test logs in output/sample_1980/logs/). All tests use the full-sample fits."
+tab(data.frame(`Test file` = paste0("tests/", TESTS$file), `Passed expectations` = TESTS$passed, `Failed blocks` = TESTS$failed_blocks, check.names = FALSE), align = "lrr")
+```
+
+Every filter used in estimation or evaluation is tested against a dense multivariate-normal computation (@tbl-tests; `r sum(TESTS$passed)` expectations in all, none failed). For m13 the tests check:
+
+* the Stan Kalman filter's total and per-period log-likelihood against the dense multivariate-normal density of $y$ (to $10^{-9}$), for five settings of $\psi$ including $\psi = 0$, equal $\psi_E = \psi_I$ and $|\psi|$ up to 0.95, with non-constant $g$ and $h$, a jump of +5 in $g$, very small variances and extreme $z_{EI}$;
+* bit-identity with m12's filter when $\tau_t$ is constant;
+* FFBS draws against the dense smoother (20,000 draws; worst mean error about two Monte Carlo standard errors);
+* the C++ filter used for LFO against the Stan filter (to $10^{-11}$) and against the fit's stored predictive log-likelihood on posterior draws;
+* the particle filter against the exact Kalman filter as the volatilities of volatility go to zero, against m12's particle filter at $\omega_g = 0$, and against brute-force Monte Carlo over 200,000 simulated $(g, h)$ paths with a latent-volatility jump. The bootstrap and adapted proposals gave `r fact("pf_brute_force_boot")` and `r fact("pf_brute_force_adapt")` against a brute-force value of `r fact("pf_brute_force_ref")` (standard error 0.005).
+
+Equivalent tests exist for m12, m3 and m10 and for the Kalman filters of the linear-Gaussian models.
+
+# Withdrawn results {#sec-app-withdrawn}
+
+The project's record keeps superseded claims next to their corrections. The following were withdrawn and play no part in this paper.
+
+* **PSIS-LOO rankings.** "m9 is best by LOO, `r fact("loo_old_m9_m4")` nats ahead of m4"; "SV gains about `r fact("loo_old_sv_gain")` nats"; an hours-model gain over m8 by LOO. These were invalid for the reasons in @sec-eval.
+* **"Latent growth is 30–35% less variable than headline."** This was the variance of the posterior-mean path. The per-draw measure is in @sec-vardecomp.
+* **The old m10's scores and variance ratio.** These came from a fit in mode A (@sec-failed); its particle-filter estimate for that mode did not converge in the particle count.
+* **"m9 fixes m4's bimodal persistence."** The bimodality was a sampler artefact.
+* **"The measurement-SV gain largely disappears from 1980."** This rested on two non-nested comparisons, m9 − m5 (`r sg(pw(PW8, "m9", "m5"))`, z `r fmt(pw(PW8, "m9", "m5", "z_nw"), 2)`) and m4 − m1 (`r sg(pw(PW8, "m4", "m1"))`, z `r fmt(pw(PW8, "m4", "m1", "z_nw"), 2)`). m9 drops the serial correlation that m5 has, and m4 adds a latent AR(1). The nested comparisons give the "roughly halves" result in @sec-comparison.
+* **"m13 is the only three-measure model that keeps COVID in latent growth on both samples."** The constant-variance models also keep most of it there (@fig-covid).
+
+# Reproduction {#sec-app-repro}
+
+Every number in this paper is computed when the document is rendered, from four sources: `paper/data/*.csv`, `output/tables/*.csv`, `output/sample_1980/tables/*.csv` and `docs/*.json|csv`. The CSVs in `paper/data/` are extracted from the local fit objects by `paper/build_inputs.R`; no model is fitted there. Three of them are transcriptions rather than extractions, and say so: `rdp2014_reported.csv` (values published in RDP 2014-12), `record_facts.csv` (facts recorded only in the project's research log or Stan file headers, each with its source) and `test_counts.csv` (parsed from the test logs).
+
+To rebuild from scratch:
+
+1. `Rscript R/01_fetch_data.R` and `Rscript R/01b_fetch_research_data.R` (data; the ABS may have released a newer vintage).
+2. The research suite on the full sample: `Rscript R/02_fit_models.R`, `Rscript R/fit_m11.R`, `Rscript R/fit_m12.R`, `Rscript R/fit_m13.R` (seeds 1 and 2, and `--omega_g_sd=1`), then `Rscript R/03_compare.R` (several hours).
+3. The same on the 1980 sample, with `LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980` (drivers in `output/sample_1980/`).
+4. `Rscript R/fit_production.R` (the production fit).
+5. The analyses added for this paper: `Rscript paper/fit_rdp_sample.R` (RDP-sample fits, output in `output/sample_rdp/`), `Rscript paper/fit_rdp_sample.R --end=2019-12-01 --out=output/sample_rdp/end2019 m2 m13` (fits ending in 2019 Q4), `LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980 Rscript R/fit_m13.R --omega_g_sd=1 --out=output/sample_1980/fit_m13_omegag1.rds` (prior sensitivity on the production sample) and `Rscript paper/ppc_m13.R` (predictive checks). The driver `output/sample_rdp/run_new_analyses.sh` runs the fits in order.
+6. `Rscript paper/build_inputs.R` (about a minute), then `quarto render paper/latentgdp_wp.qmd`.
+
+Steps 1–4 are documented in the repository's README. The fits are large (about 0.1–0.3 GB each) and are not committed; the tables and the CSVs in `paper/data/` are small and can be.

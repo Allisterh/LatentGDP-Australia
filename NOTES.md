@@ -2,10 +2,12 @@
 
 This is the research record. Sections dated 2026-10 replace earlier results
 that turned out to be wrong; the superseded claims are noted where they were
-made so the history stays readable. The newest section is "1980Q1 sample
-(RDP 2014-12 alignment)" below. It re-runs the whole research suite on data
-starting in 1980 Q1 and leaves production on the full sample. It does not
-supersede the full-sample results: those stay as recorded. It does say which
+made so the history stays readable. The newest section is "Production
+sample moved to 1980 Q1, 2026-10-19": production m13 is now fitted on
+1980 Q1 onward. Before it, "1980Q1 sample (RDP 2014-12 alignment)" re-ran
+the whole research suite on data starting in 1980 Q1 (at the time leaving
+production on the full sample). It does not supersede the full-sample
+research results: those stay as recorded. It does say which
 full-sample conclusions survive the later start. The round before it, "Round
 of 2026-10-18", added m13 (m12 + latent SV), which is now the production
 model. "Round of 2026-10-17" added m12 (production from 2026-10-17 to
@@ -14,8 +16,8 @@ m10 sections.
 
 ## Paper
 
-RBA RDP 2014-12, "Estimating the Australian Output Gap and Other State-Space
-Refinements to GDP Measurement", by Daniel Rees, David Lancaster & Richard Finlay.
+RBA RDP 2014-12, "A State-space Approach to Australian GDP Measurement",
+by Daniel Rees, David Lancaster & Richard Finlay.
 https://www.rba.gov.au/publications/rdp/2014/2014-12.html
 
 ## Data (refreshed 2026-10-16, ABS release for 2026 Q2)
@@ -126,6 +128,13 @@ At the user's request the production estimate is now fitted on 1980 Q1 - 2026 Q2
   (mu), 1.0015 (h), 1.0017 (g), min bulk/tail ESS 1315/882 (hyperparameters)
   and 5531/6268 (mu); 18 min wall. The draws reproduce the research fit
   `output/sample_1980/fit_m13.rds` exactly.
+- **Local vs published run.** The figures above are from the local seed-1
+  fit (`output/fit_production.rds`), which reproduces the 1980 research fit
+  draw for draw. The published `docs/` come from the forced CI run on
+  2026-10-19 (commit d623f3d), which has different draws: 2 divergences,
+  min E-BFMI 0.846, max R-hat 1.003 on hyperparameters, min bulk / tail ESS
+  1285 / 915. Its median latent path differs from the local fit's by at most
+  0.017 pp quarter-on-quarter.
 - **Published numbers.** 2026 Q2 latent growth +0.48% QoQ [0.31, 0.64] (full
   sample: +0.48% [0.30, 0.63]). Variance ratio 0.87 [0.81, 0.94] over
   1980 Q1 - 2026 Q2 (full-sample fit: 0.79 [0.70, 0.89] over 1959 Q4 - 2026 Q2).
@@ -146,8 +155,9 @@ The whole research suite was re-run on data starting in 1980 Q1:
 
 Fits ran on 2026-10-18 and the LFO from 21:16 on 2026-10-18 to 04:21 on
 2026-10-19. The data vintage is the 2026 Q2 release used everywhere else.
-**Production is unchanged**: it still fits m13 on the full sample (1959 Q4 -
-2026 Q2). Every 1980-sample output is under `output/sample_1980/`, and no
+**Production was unchanged at the time** (it fitted m13 on the full sample,
+1959 Q4 - 2026 Q2; *superseded 2026-10-19*, see "Production sample moved to
+1980 Q1"). Every 1980-sample output is under `output/sample_1980/`, and no
 full-sample output (`output/fit_*.rds`, `output/lfo/`, `output/tables/`,
 `output/figures/`, `output/fit_production.rds`, `docs/`) was changed. All
 numbers below come from `output/sample_1980/tables/` unless another source
@@ -155,8 +165,8 @@ is named.
 
 ### Why 1980 Q1
 
-RBA RDP 2014-12 (Rees, Lancaster & Finlay 2014, "Estimating the Australian
-Output Gap and Other State-Space Refinements to GDP Measurement"), section
+RBA RDP 2014-12 (Rees, Lancaster & Finlay 2014, "A State-space Approach to
+Australian GDP Measurement"), section
 3.2:
 
 > "Our data span 1980:Q1-2013:Q2. The starting date reflects the fact that,
@@ -2349,11 +2359,16 @@ genuine multimodality.
 
 **Models**
 - `stan/m{1..13}_*.stan`: the 13 specifications.
-  - m1-m5: original replication of Rees-Lancaster-Finlay.
+  - m1-m5: baseline family motivated by Rees-Lancaster-Finlay. RDP Model 1
+    (AR(1) latent, independent errors) corresponds to m2; m1 has an iid
+    latent state. RDP Model 2 (latent innovation correlated with the errors,
+    zeta = 0.5 restriction) has no counterpart: m3 frees the error
+    correlations instead. RDP Model 3 adds the unemployment rate.
   - m6: structural Sigma restriction (a cheap novel extension).
   - m7: Lenza-Primiceri COVID variance scale.
-  - m8: 4-signal (Rees-Lancaster-Finlay Model 4, but with hours worked as
-    the fourth signal where the paper uses the unemployment rate).
+  - m8: 4-signal, in the spirit of RDP Model 3 (the paper has three
+    models), but with hours worked as the fourth signal where the paper
+    uses the unemployment rate.
   - m9: m6 + SV (production until 2026-10-17; tied with m4 on LFO).
   - m10: m8 + SV on the measurement errors and on latent growth
     (re-specified 2026-10-17; the old constant-tau version was multimodal).
@@ -2389,7 +2404,7 @@ genuine multimodality.
   - `logs/`;
   - the fits driver `run_1980.sh`.
 
-  It is not yet gitignored: its `*.rds` files total about 1.7 GB.
+  Its `*.rds` files (about 1.7 GB) are gitignored (`output/sample_*/**/*.rds`).
 
 **Documentation**
 - `priors.md`: every prior, as coded.

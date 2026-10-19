@@ -1,0 +1,105 @@
+sample start 1980-03-01; output root output/sample_1980 
+Prior sensitivity: omega_g ~ half-N(0, 1); Stan file /var/folders/l8/j684zy8n0gg_l_8x97yw_m980000gn/T//Rtmpqo7buV/m13_prior/m13_omegag_sd1.stan
+  changed line: omega_g ~ normal(0, 1);
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 2 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 3 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 4 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 1 Iteration:  500 / 4000 [ 12%]  (Warmup) 
+Chain 3 Iteration:  500 / 4000 [ 12%]  (Warmup) 
+Chain 4 Iteration:  500 / 4000 [ 12%]  (Warmup) 
+Chain 2 Iteration:  500 / 4000 [ 12%]  (Warmup) 
+Chain 3 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 1 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 4 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 2 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 3 Iteration: 1500 / 4000 [ 37%]  (Warmup) 
+Chain 1 Iteration: 1500 / 4000 [ 37%]  (Warmup) 
+Chain 4 Iteration: 1500 / 4000 [ 37%]  (Warmup) 
+Chain 2 Iteration: 1500 / 4000 [ 37%]  (Warmup) 
+Chain 3 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 3 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 2 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 4 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 1 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 3 Iteration: 2500 / 4000 [ 62%]  (Sampling) 
+Chain 3 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 2 Iteration: 2500 / 4000 [ 62%]  (Sampling) 
+Chain 4 Iteration: 2500 / 4000 [ 62%]  (Sampling) 
+Chain 1 Iteration: 2500 / 4000 [ 62%]  (Sampling) 
+Chain 3 Iteration: 3500 / 4000 [ 87%]  (Sampling) 
+Chain 3 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 3 finished in 1596.7 seconds.
+Chain 2 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 4 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 1 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 2 Iteration: 3500 / 4000 [ 87%]  (Sampling) 
+Chain 4 Iteration: 3500 / 4000 [ 87%]  (Sampling) 
+Chain 1 Iteration: 3500 / 4000 [ 87%]  (Sampling) 
+Chain 2 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 2 finished in 1862.5 seconds.
+Chain 4 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 4 finished in 1865.6 seconds.
+Chain 1 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 1 finished in 1873.3 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 1799.5 seconds.
+Total execution time: 1873.5 seconds.
+
+Warning: 1 of 8000 (0.0%) transitions ended with a divergence.
+See https://mc-stan.org/misc/warnings for details.
+
+
+Saved output/sample_1980/fit_m13_omegag1.rds
+
+=== m13 fit (seed 1, omega_g ~ half-N(0, 1)) ===
+# A tibble: 22 × 10
+   variable         mean  median     sd    mad      q5     q95  rhat ess_bulk
+   <chr>           <dbl>   <dbl>  <dbl>  <dbl>   <dbl>   <dbl> <dbl>    <dbl>
+ 1 mu_bar         2.61    2.61   0.198  0.195   2.29    2.94    1.00    6882.
+ 2 rho            0.396   0.398  0.0946 0.0957  0.237   0.548   1.00    5016.
+ 3 tau            1.79    1.74   0.442  0.367   1.21    2.55    1.00    4969.
+ 4 mu_g           1.11    1.10   0.460  0.427   0.378   1.87    1.00    4969.
+ 5 phi_g          0.776   0.793  0.113  0.106   0.565   0.926   1.00    1923.
+ 6 omega_g        1.05    1.02   0.269  0.264   0.655   1.53    1.01    2206.
+ 7 rho_EI         0.0848  0.0869 0.0985 0.0973 -0.0809  0.245   1.00    9478.
+ 8 psi[1]        -0.425  -0.424  0.0753 0.0769 -0.549  -0.302   1.00   13269.
+ 9 psi[2]        -0.352  -0.353  0.0776 0.0776 -0.479  -0.225   1.00   11889.
+10 psi[3]        -0.180  -0.183  0.115  0.113  -0.367   0.0136  1.00    9832.
+11 phi[1]         0.835   0.945  0.309  0.0582  0.105   0.994   1.00    1208.
+12 phi[2]         0.968   0.978  0.0315 0.0207  0.906   0.997   1.00    3434.
+13 phi[3]         0.961   0.973  0.0398 0.0259  0.886   0.997   1.00    3017.
+14 omega[1]       0.277   0.237  0.159  0.127   0.0974  0.600   1.00    2028.
+15 omega[2]       0.312   0.296  0.121  0.115   0.144   0.530   1.00    2732.
+16 omega[3]       0.379   0.358  0.149  0.140   0.176   0.654   1.00    3241.
+17 mu_h[1]        1.58    1.57   0.409  0.311   0.944   2.23    1.00    4789.
+18 mu_h[2]        1.67    1.64   0.665  0.580   0.605   2.81    1.00    6717.
+19 mu_h[3]        1.21    1.10   0.773  0.709   0.138   2.66    1.00    4931.
+20 eps_sd_bar[1]  2.50    2.43   0.564  0.387   1.77    3.40    1.00    4900.
+21 eps_sd_bar[2]  2.61    2.43   0.957  0.695   1.45    4.41    1.00    6797.
+22 eps_sd_bar[3]  2.04    1.77   0.943  0.605   1.10    3.88    1.00    4933.
+# ℹ 1 more variable: ess_tail <dbl>
+Sampling time (fit$time()$total): 1873 s; wall time of $sample(): 1881 s (parallel_chains = 4); per-chain total s: 1873, 1862, 1597, 1866
+
+=== Convergence gate (R/fit_production.R thresholds; hyperparameters + psi, mu_g, phi_g, omega_g; R-hat on g[t]) ===
+Per-chain E-BFMI: 0.928, 0.880, 0.866, 0.874
+Max-treedepth hits: 0 of 8000 draws (informational)
+metric                                              value  threshold  status worst
+divergences (1 of 8000 draws, 4 chains)            0.013%  < 0.1%     PASS   
+min E-BFMI over chains                              0.866  >= 0.3     PASS   chain 3
+max R-hat, hyperparameters                         1.0064  <= 1.01    PASS   omega_g
+max R-hat, mu[t]                                   1.0009  <= 1.05    PASS   mu[176]
+max R-hat, h[t,k]                                  1.0026  <= 1.05    PASS   h[165,1]
+max R-hat, g[t]                                    1.0027  <= 1.05    PASS   g[165]
+min bulk ESS, hyperparameters                        1208  >= 400     PASS   phi[1]
+min tail ESS, hyperparameters                         828  >= 400     PASS   phi[1]
+min bulk ESS, mu[t]                                  5432  >= 400     PASS   mu[165]
+min tail ESS, mu[t]                                  6008  >= 400     PASS   mu[127]
+
+Fit quality gate passed: all checks within thresholds.
