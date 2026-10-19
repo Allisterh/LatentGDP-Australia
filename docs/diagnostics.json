@@ -1,6 +1,6 @@
 {
-  "run_time_utc": "2026-10-18 23:53:01",
-  "input_hash": "03d7f7015f0a9762588f0687a2acd112af9f8576535300cc2aae1bbe9d28780e",
+  "run_time_utc": "2026-10-19 00:03:58",
+  "input_hash": "80c30b971264ff6aeaf64bf35759cdb743fd10f8e8aa9a25eae7127c4f4591cd",
   "cmdstan_version": "2.39.0",
   "T": 186,
   "sample_start": "1980-03-01",
@@ -14,15 +14,15 @@
   "total_draws": 8000,
   "adapt_delta": 0.99,
   "max_treedepth": 12,
-  "num_divergent": 2,
-  "divergent_pct": 0.025,
+  "num_divergent": 0,
+  "divergent_pct": 0,
   "num_max_treedepth": 0,
-  "ebfmi_min": 0.846,
+  "ebfmi_min": 0.882,
   "hyperparameters": ["c", "rho", "tau", "rho_EI", "mu_h", "phi", "omega", "psi", "mu_bar", "mu_g", "phi_g", "omega_g"],
-  "rhat_max_hyper": 1.0031,
-  "rhat_max_mu": 1.0009,
-  "ess_bulk_min": 1285,
-  "ess_tail_min": 915,
-  "ess_bulk_min_hyper": 1285,
-  "ess_tail_min_hyper": 915
+  "rhat_max_hyper": 1.0013,
+  "rhat_max_mu": 1.0013,
+  "ess_bulk_min": 1315,
+  "ess_tail_min": 882,
+  "ess_bulk_min_hyper": 1315,
+  "ess_tail_min_hyper": 882
 }

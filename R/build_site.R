@@ -82,7 +82,7 @@ p_full <- ggplot(estimates, aes(x = date)) +
              label = off_scale_note, size = 3, hjust = 1, colour = "grey40")} +
   labs(
     title = sprintf("Australian latent GDP growth, %s-present", sample_start_q),
-    subtitle = "Model m13 (structural Sigma + SV + AR(1) errors + latent SV). Blue = posterior median + 90% CI. Grey = headline.",
+    subtitle = "Blue = estimated true growth (median and 90% interval). Grey = headline (average of the three ABS measures).",
     x = NULL, y = "quarter-on-quarter growth, %",
     caption = paste("Data: ABS 5206.0 Table 24. Run:", diag$run_time_utc, "UTC.")
   )
@@ -198,14 +198,11 @@ html_top <- sprintf('<!doctype html>
   <img src="chart_recent.png" alt="Latent GDP growth vs three measures, post-2022">
 
   <h2>About</h2>
-  <p>This page publishes a Bayesian state-space estimate of Australian
-  quarterly GDP growth that filters measurement error out of the three
-  ABS measures (Expenditure, Income, Production-based GDP).
-  The model is m13 from <a href="https://github.com/DavidAStephan/LatentGDP">this
-  repo</a>: an AR(1) latent state whose volatility changes over time,
-  measurement errors that follow their own AR(1) with stochastic volatility,
-  and a construction-based zero restriction on the Production-side error
-  covariance. Background: RBA RDP 2014-12 (Rees, Lancaster &amp; Finlay).</p>
+  <p>This page publishes an estimate of Australian quarterly GDP growth
+  with measurement error filtered out of the three ABS measures
+  (expenditure, income and production based GDP). How the estimate is
+  made is described below. Background: RBA Research Discussion Paper
+  2014-12 (Rees, Lancaster &amp; Finlay).</p>
 
   <p>Data: ABS Cat. 5206.0 Table 24 (Selected Analytical Series),
   seasonally adjusted, chain volume measures. The page is rebuilt
@@ -229,130 +226,51 @@ html_top <- sprintf('<!doctype html>
 )
 
 html_model <- '
-  <h2>Model details</h2>
+  <h2>How the estimate is made</h2>
 
-  <h3>Observation equations</h3>
-  <div class="eq">y<sub>t</sub><sup>k</sup> = &mu;<sub>t</sub> + &epsilon;<sub>t</sub><sup>k</sup>,  k = E, I, P
-&epsilon;<sub>t</sub><sup>k</sup> = &psi;<sub>k</sub> &epsilon;<sub>t-1</sub><sup>k</sup> + u<sub>t</sub><sup>k</sup>
-(u<sub>t</sub><sup>E</sup>, u<sub>t</sub><sup>I</sup>)  ~  MVN(0, &Sigma;<sub>EI,t</sub>),   u<sub>t</sub><sup>P</sup>  ~  N(0, &sigma;<sub>P,t</sub><sup>2</sup>)</div>
-  <p>Each measurement error follows an AR(1) with coefficient
-  &psi;<sub>k</sub>, so an error in one quarter can be partly carried into,
-  or reversed in, the next. &Sigma;<sub>EI,t</sub> has standard deviations
-  &sigma;<sub>E,t</sub>, &sigma;<sub>I,t</sub> and a constant correlation
-  &rho;<sub>EI</sub>: E and I share national-accounts balancing items. P is
-  built from independent industry surveys, so its error is independent of
-  E and I by construction (the &quot;structural Sigma&quot;). The first
-  quarter&apos;s errors start from the stationary distribution at that
-  quarter&apos;s variances.</p>
+  <p>Each quarter the ABS publishes three estimates of GDP growth built
+  from different sources: spending (E), incomes (I) and industry
+  production (P). They never agree exactly, because each contains
+  measurement error. The model treats true GDP growth as an unobserved
+  series, treats each published measure as true growth plus its own error,
+  and works out the most likely path of true growth given all three.</p>
 
-  <h3>Latent state and stochastic volatility</h3>
-  <div class="eq">&mu;<sub>t</sub> = c + &rho; &middot; &mu;<sub>t-1</sub> + &tau;<sub>t</sub> &eta;<sub>t</sub>,  &eta;<sub>t</sub> ~ N(0, 1),  &tau;<sub>t</sub> = exp(g<sub>t</sub> / 2)
-&mu;<sub>1</sub> ~ N(c / (1 - &rho;), &tau;<sub>1</sub><sup>2</sup> / (1 - &rho;<sup>2</sup>))
-g<sub>t</sub> = &mu;<sub>g</sub> + &phi;<sub>g</sub> (g<sub>t-1</sub> - &mu;<sub>g</sub>) + &omega;<sub>g</sub> &zeta;<sub>t</sub>,  &zeta;<sub>t</sub> ~ N(0, 1),  g<sub>1</sub> stationary
-h<sub>k,t</sub> = &mu;<sub>h,k</sub> + &phi;<sub>k</sub> (h<sub>k,t-1</sub> - &mu;<sub>h,k</sub>) + &omega;<sub>k</sub> &xi;<sub>k,t</sub>,  &xi;<sub>k,t</sub> ~ N(0, 1),  h<sub>k,1</sub> stationary
-&sigma;<sub>k,t</sub><sup>2</sup> = exp(h<sub>k,t</sub>) = Var(u<sub>t</sub><sup>k</sup>),  k = E, I, P</div>
-  <p>There are two kinds of volatility. The measurement-error volatility
-  h lets the size of each measure&apos;s errors change over time. The
-  latent volatility &tau;<sub>t</sub> lets the volatility of true growth
-  change too: in the current fit it is about {{TAU_1980S}} (annualised,
-  decade average) in the 1980s and about {{TAU_2010S}} in the 2010s, and
-  rises to about {{TAU_2020Q2}} in 2020 Q2. COVID is therefore treated as a
-  large real shock, not as measurement error: the three measures agreed in
-  2020 Q2, so the collapse goes into &mu;<sub>t</sub>.
-  The estimated &psi; are about {{PSI_E}}, {{PSI_I}} and {{PSI_P}} for E, I and P
-  (posterior medians); negative values mean that the
-  measurement errors partly reverse the next quarter.
-  Given both volatility paths, &mu; is integrated out by a Kalman filter on
-  the quasi-differenced data y<sub>t</sub> &minus; &psi; y<sub>t-1</sub>
-  during sampling, and drawn by forward-filtering backward-sampling.
-  With &tau;<sub>t</sub> held constant the model is m12, the previous
-  production model.</p>
-
-  <h3>Priors</h3>
-  <p>In the model&apos;s annualised units (400&times;dlog; this page shows
-  quarter-on-quarter, i.e. divided by 4). N(m, s) has sd s.</p>
-  <div class="eq">c           ~ N(1.5, 1)
-&rho;           ~ N(0.5, 0.3)    constrained to (-1, 1)
-&mu;<sub>g</sub>          ~ N(2, 1)
-&phi;<sub>g</sub>          ~ Uniform(-1, 1)
-&omega;<sub>g</sub>          ~ half-N(0, 0.5)
-&mu;<sub>h,k</sub>         ~ N(2, 1)
-&phi;<sub>k</sub>          ~ Uniform(-1, 1)
-&omega;<sub>k</sub>          ~ half-N(0, 0.5)
-&rho;<sub>EI</sub>         ~ N(0, 0.5)    constrained to (-1, 1)
-&psi;<sub>k</sub>          ~ N(0, 0.5)    constrained to (-1, 1)</div>
-  <p>All priors for all models:
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/priors.md">priors.md</a>.
-  Nothing is published unless the fit has &lt;0.1% divergences, E-BFMI
-  &ge; 0.3, R-hat &le; 1.01 (hyperparameters) / 1.05 (latent growth and
-  both volatility paths) and ESS &ge; 400.</p>
-
-  <h3>Why this specification</h3>
-  <p>The 13 specifications were compared by leave-future-out
-  cross-validation: one-step-ahead predictive density, latent states
-  integrated out, 146 quarters from 1990 Q1 (current-vintage data). They
-  were compared in three groups with different data: the three measures
-  from 1959 Q4 (m1&ndash;m7, m9, m12, m13); the three measures plus
-  hours from 1978 (m8, m10); and the mixed-frequency m11, which also sees
-  monthly employment inside the predicted quarter.</p>
+  <p>It rests on four assumptions:</p>
   <ul>
-    <li>Three features help, each measured as one step added to a model
-      that has the ones before (whether the gains add up was not tested):
-      stochastic volatility
-      in the measurement errors, serially correlated measurement errors,
-      and stochastic volatility in latent growth. m13 has all three. It
-      beats m12 (the first two only) by 59.6 nats (SE 24.7 assuming
-      independent quarters, 28.9 allowing for serial correlation; z = 2.1).
-      One quarter, 2020 Q2, contributes 23.7 nats and most of that SE.
-      Without the COVID quarters the gain is 28.5 nats (SE 6.0), and m13 is
-      ahead in 122 of the 146 quarters.</li>
-    <li>m13 replaced m12 in October 2026 under a rule fixed before
-      m13&apos;s comparison results were known: pass the publication checks
-      on two seeds, have a reliable score, beat m12 by at least 2
-      serial-correlation-robust SEs (also when no refit is allowed a retry
-      with a new seed), and fit in under 30 minutes. It met every
-      condition, with thin margins (z = 2.06; 23 minutes). m13 was proposed after the hours
-      model m10, re-specified with the same latent volatility, had been
-      scored on the same quarters, so its gain is not a pre-registered
-      test. m12 had replaced m9 the day before under the same kind of rule
-      (+16.8 nats, z = 2.7).</li>
-    <li>Since 19 October 2026 the production fit uses data from 1980 Q1,
-      the sample of RBA RDP 2014-12, because the early measurement errors
-      may not represent current ones. The comparison above starts every
-      model in 1959 Q4. Re-run with every model starting in 1980 Q1, m13 is
-      still first, but its lead over m12 is weaker (+57.4 nats, z = 1.6;
-      +6.4 before 2020) and would not have met the switch rule.</li>
-    <li>The structural restriction itself is not supported by prediction
-      (m9 against m4, the same model without it: +1.5 nats, SE 1.5 assuming
-      independent quarters, 2.2 allowing for serial correlation). It is
-      kept because it reflects how GDP(P) is built.</li>
-    <li>On GDP prediction, the hours model m10, which also has latent
-      volatility, is behind m13 by 12.6 nats (SE 5.5) and the employment
-      model m11 is behind by 68 (SE 18; both SEs allow for serial
-      correlation). These gaps do not show that hours or employment are
-      unhelpful: m10 lacks m13&apos;s serially correlated measurement errors
-      and E/I-only error correlation and is estimated only from 1978, m11
-      has no stochastic volatility, and no m13-plus-hours model has been
-      fitted.</li>
+    <li><strong>True growth</strong> moves around a long-run average and
+      partly persists from one quarter to the next. How volatile it is can
+      change over time. The typical size of a quarterly shock to true growth
+      is estimated at about {{TAU_1980S}} percentage points in the 1980s,
+      {{TAU_2010S}} in the 2010s and {{TAU_2020Q2}} in 2020 Q2. Because the
+      three measures agreed on the size of the 2020 Q2 fall, the model
+      treats COVID as a genuine collapse in activity rather than a
+      measurement problem.</li>
+    <li><strong>Measurement errors change in size over time.</strong> Each
+      measure&apos;s errors can be larger in some periods than in others.</li>
+    {{PSI_ITEM}}
+    <li><strong>Only some errors are linked.</strong> The spending and
+      income measures share some of the same balancing adjustments, so their
+      errors may move together. The production measure is built from
+      separate industry surveys, so its errors are assumed independent of
+      the other two.</li>
   </ul>
-  <p>The comparison scores predictions of the observed measures, not the
-  split between true growth and measurement error, and models that
-  predict about equally well can imply very different splits. In the
-  production fit (1980 Q1 onward) m13&apos;s latent path has {{VR_FULL}}% of
-  headline variance. In research fits from 1959 Q4, m13 has 79% and m12
-  78%, but over 1978&ndash;2026 excluding 2020 Q1&ndash;2021 Q1 m13&apos;s has
-  75%, m12&apos;s 88% and the hours model m10&apos;s 56%. Apart from the
-  production figure, these splits come from research-suite fits on the
-  2026 Q2 data and are not updated by the weekly run. The variance figure above is
-  therefore a property of m13, not something the comparison confirms.</p>
-  <p>An earlier PSIS-LOO comparison on this page (m9 +6 over m4, SV
-  +240) was invalid and has been withdrawn.</p>
 
-  <p>Full research record (all 13 specs, the comparison tables and the
-  caveats) at
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/NOTES.md">NOTES.md</a>.
-  Stan source at
-  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/stan/m13_serial_latent_sv.stan">stan/m13_serial_latent_sv.stan</a>.</p>
+  <p>The model is estimated on data from 1980 Q1 onward, following the
+  RBA paper, because measurement errors before then may not reflect how the
+  ABS measures behave today. Over that period the estimated true-growth
+  path has {{VR_FULL}}% of the variance of headline growth, so roughly
+  {{NOISE}}% of the variance of quarterly headline growth is measurement
+  noise. Estimation is Bayesian, so every figure comes with an
+  interval that shows its uncertainty.</p>
+
+  <p>Before anything is published, the estimate has to pass automatic
+  checks that the statistical sampling worked properly. If any check
+  fails, this page is not updated.</p>
+
+  <p>The model was chosen by comparing a range of alternatives on how well
+  each forecast the next quarter&apos;s published figures. The comparison,
+  its caveats and the code are on
+  <a href="https://github.com/DavidAStephan/LatentGDP/blob/master/NOTES.md">GitHub</a>.</p>
 '
 
 html_foot <- sprintf('
@@ -376,22 +294,44 @@ if (!grepl("^[0-9a-f]{40}$", repo_ref)) repo_ref <- "master"
 html_model <- gsub("/LatentGDP/blob/master/", sprintf("/LatentGDP/blob/%s/", repo_ref),
                    html_model, fixed = TRUE)
 
-# Fill the posterior numbers in the model description from model_summary.json.
-# (The variance splits of other models in "Why this specification" are research-suite
-# results, labelled as such, and are edited by hand when the research suite is rerun.)
+# Fill the posterior numbers in the model description from model_summary.json and
+# the latest estimate, so the text always matches the published fit. Latent
+# volatility is converted from the model's annualised units to quarter-on-quarter
+# percentage points (divide by 4), the units used everywhere else on the page.
 num <- function(x, fmt) {
   if (is.null(x) || length(x) != 1 || !is.finite(x)) stop("model_summary.json: missing value", call. = FALSE)
   s <- sprintf(fmt, x)
   if (x < 0) paste0("&minus;", sub("^-", "", s)) else s
 }
+# The list item on how measurement errors carry into the next quarter, written
+# from the signs of the estimated AR(1) coefficients psi (E, I, P).
+psi_item <- function(psi) {
+  v <- vapply(c("E", "I", "P"), function(k) {
+    x <- psi[[k]]
+    if (is.null(x) || length(x) != 1 || !is.finite(x)) stop("model_summary.json: missing psi", call. = FALSE)
+    x
+  }, numeric(1))
+  pc <- sprintf("%.0f%%", 100 * abs(v))
+  if (all(v < 0)) {
+    sprintf(paste0('<li><strong>Errors partly unwind.</strong> In the quarter after an error,\n',
+                   '      about %s of it is reversed for the spending measure, %s for\n',
+                   '      income and %s for production.</li>'), pc[1], pc[2], pc[3])
+  } else {
+    dir <- ifelse(v < 0, "reversed", "carried over")
+    sprintf(paste0('<li><strong>Errors partly carry over.</strong> In the quarter after an\n',
+                   '      error, about %s of it is %s for the spending measure, %s is %s\n',
+                   '      for income and %s is %s for production.</li>'),
+            pc[1], dir[1], pc[2], dir[2], pc[3], dir[3])
+  }
+}
+vr <- latest$variance_ratio_vs_headline
 fills <- c(
-  "{{TAU_1980S}}"  = num(msum$latent_sd_decade_avg[["1980s"]], "%.1f"),
-  "{{TAU_2010S}}"  = num(msum$latent_sd_decade_avg[["2010s"]], "%.1f"),
-  "{{TAU_2020Q2}}" = num(msum$latent_sd_2020q2, "%.0f"),
-  "{{PSI_E}}"      = num(msum$psi[["E"]], "%.2f"),
-  "{{PSI_I}}"      = num(msum$psi[["I"]], "%.2f"),
-  "{{PSI_P}}"      = num(msum$psi[["P"]], "%.2f"),
-  "{{VR_FULL}}"    = num(100 * latest$variance_ratio_vs_headline, "%.0f"))
+  "{{TAU_1980S}}"  = num(msum$latent_sd_decade_avg[["1980s"]] / 4, "%.1f"),
+  "{{TAU_2010S}}"  = num(msum$latent_sd_decade_avg[["2010s"]] / 4, "%.1f"),
+  "{{TAU_2020Q2}}" = num(msum$latent_sd_2020q2 / 4, "%.1f"),
+  "{{PSI_ITEM}}"   = psi_item(msum$psi),
+  "{{VR_FULL}}"    = num(100 * vr, "%.0f"),
+  "{{NOISE}}"      = num(100 - round(100 * vr), "%.0f"))
 for (k in names(fills)) html_model <- gsub(k, fills[[k]], html_model, fixed = TRUE)
 stopifnot(!grepl("{{", html_model, fixed = TRUE))
 

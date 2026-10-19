@@ -92,7 +92,7 @@ latest_json <- list(
   variance_ratio_vs_headline_q05 = round(var_ratio_q[1], 4),
   variance_ratio_vs_headline_q95 = round(var_ratio_q[3], 4),
   units = "quarter-on-quarter growth, % (100 x dlog of chain volume measures)",
-  model = "m13: structural Sigma (Cov(eps_P, .) = 0) + stochastic volatility + AR(1) measurement errors + stochastic volatility on latent growth",
+  model = "latent growth with time-varying volatility; measurement errors with time-varying size, partial reversal next quarter, and correlation between the spending and income measures only",
   data_source = "ABS 5206.0 Table 24, seasonally adjusted, chain volume measures"
 )
 
