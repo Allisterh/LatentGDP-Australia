@@ -11,7 +11,8 @@ renders to `latentgdp_wp.pdf` (and `latentgdp_wp.html`).
 | `references.bib` | Bibliography. Each entry was checked against Crossref, the publisher or an official page. |
 | `build_inputs.R` | Extracts what the paper needs from the local fit objects into `data/`. |
 | `fit_rdp_sample.R` | Fits m2, m4, m5, m9, m12, m13 on RDP 2014-12's sample, 1980 Q1 - 2013 Q2 (`--end`, `--out` for another end date; output only under `output/sample_rdp/`). |
-| `ppc_m13.R` | Prior and posterior predictive checks of the production model (writes `data/ppc_*.csv` and `output/ppc/ppc_draws.rds`). |
+| `ppc_m13.R` | Prior and posterior predictive checks of the production model (writes `data/ppc_*.csv` and `output/ppc/ppc_draws.rds`); `--variant=tight` does the same for the tighter-prior variant (`data/ppc_tight_*.csv`). |
+| `prior_candidates.R` | Prior predictive choice of the tighter priors (m13 and candidates C1-C3 against a pre-set target; writes `data/prior_candidates.csv`, `data/prior_target.csv`, `data/prior_tail_diagnosis.csv`). No fit. |
 | `data/*.csv` | Small extracted inputs (each well under 1 MB). Safe to commit. |
 | `figures/*.png` | Figures, written by the .qmd when it renders. |
 | `latentgdp_wp.pdf` | Rendered paper. |
@@ -34,7 +35,8 @@ From the repository root:
 # 1. Only if the fits changed: re-extract the inputs (about 1 minute; reads
 #    output/fit_production.rds, output/fit_m*.rds, output/sample_1980/fit_m*.rds,
 #    output/fit_m13_seed2.rds, output/fit_m13_omegag1.rds,
-#    output/sample_1980/fit_m13_omegag1.rds, output/sample_rdp/**/fit_m*.rds and
+#    output/sample_1980/fit_m13_omegag1.rds, output/sample_1980/fit_m13_tight*.rds,
+#    output/sample_rdp/**/fit_m*.rds and
 #    data/processed/gdp_growth.rds; writes only paper/data/).
 Rscript paper/build_inputs.R
 

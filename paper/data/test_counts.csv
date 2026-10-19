@@ -1,5 +1,6 @@
 "file","log","passed","blocks","failed_blocks"
 "test_filters.R","output/sample_1980/logs/test_filters.log",63,8,0
 "test_m12.R","output/sample_1980/logs/test_m12.log",57,8,0
+"test_m13_tight.R","output/sample_1980/logs/test_m13_tight.log",23,3,0
 "test_m13.R","output/sample_1980/logs/test_m13.log",133,9,0
 "test_m3_m10.R","output/sample_1980/logs/test_m3_m10.log",30,9,0

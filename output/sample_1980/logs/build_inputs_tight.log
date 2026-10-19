@@ -1,0 +1,60 @@
+wrote growth.csv                            267 rows    13351 bytes
+fits found: 42 
+m1_full            T=267    2.1 s
+m2_full            T=267    1.9 s
+m3_full            T=267    2.0 s
+m4_full            T=267    2.8 s
+m5_full            T=267    2.0 s
+m6_full            T=267    2.0 s
+m7_full            T=267    2.0 s
+m8_full            T=191    1.4 s
+m9_full            T=267    2.7 s
+m10_full           T=191    2.4 s
+m11_full           T=193    2.3 s
+m12_full           T=267    2.9 s
+m13_full           T=267    4.6 s
+m1_1980            T=186    1.0 s
+m2_1980            T=186    1.1 s
+m3_1980            T=186    1.2 s
+m4_1980            T=186    1.7 s
+m5_1980            T=186    1.2 s
+m6_1980            T=186    1.1 s
+m7_1980            T=186    1.2 s
+m8_1980            T=186    1.4 s
+m9_1980            T=186    1.8 s
+m10_1980           T=186    2.0 s
+m11_1980           T=186    1.7 s
+m12_1980           T=186    1.7 s
+m13_1980           T=186    3.1 s
+m13_prod           T=186    2.8 s
+m13_1980_seed2     T=186    2.8 s
+m13_full_seed2     T=267    4.2 s
+m13_full_omegag1   T=267    4.2 s
+m13_1980_omegag1   T=186    2.9 s
+m2_rdp             T=134    0.5 s
+m4_rdp             T=134    0.9 s
+m5_rdp             T=134    0.6 s
+m9_rdp             T=134    1.0 s
+m12_rdp            T=134    1.0 s
+m13_rdp            T=134    1.9 s
+m2_e2019           T=160    0.7 s
+m13_e2019          T=160    2.2 s
+m13t_1980          T=186    2.9 s
+m13t_1980_seed2    T=186    2.8 s
+m13t_rdp           T=134    1.8 s
+wrote params_all.csv                        658 rows    71414 bytes
+wrote mu_2020q2_by_fit.csv                   33 rows     2729 bytes
+wrote mu_paths_all.csv                     5663 rows   246547 bytes
+wrote variance_ratios.csv                   239 rows    23519 bytes
+wrote m13_paths.csv                        2345 rows   447032 bytes
+wrote m13_tau_decades.csv                    63 rows     3899 bytes
+wrote rdp_table5_analogue.csv                20 rows      814 bytes
+wrote rdp_table4_analogue.csv                16 rows      663 bytes
+wrote m13_robustness_paths.csv               10 rows     1917 bytes
+wrote m13_1980_omegag1_gate.csv              10 rows     1160 bytes
+wrote m13_tight_gate.csv                     40 rows     5156 bytes
+wrote test_counts.csv                         5 rows      369 bytes
+wrote rdp2014_reported.csv                   64 rows     2205 bytes
+wrote record_facts.csv                       60 rows     4408 bytes
+done
+Rscript paper/build_inputs.R  78.52s user 6.86s system 97% cpu 1:27.73 total

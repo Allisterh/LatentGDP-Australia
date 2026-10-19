@@ -1,0 +1,27 @@
+Test passed with 1 success 🎉.
+Compiling Stan functions (temporary copies)...
+Test passed with 18 successes 🎊.
+(iii) log-density difference minus prior difference: constant 0.942062 over 5 points
+── Warning: (iii) log density differs from m13's only by the prior ─────────────
+E-BFMI not computed because it is undefined for posterior chains of length less than 3.
+Backtrace:
+    ▆
+ 1. └─m13$sample(...)
+ 2.   └─CmdStanMCMC$new(runset)
+ 3.     └─cmdstanr (local) initialize(...)
+ 4.       └─self$diagnostic_summary(diagnostics, quiet = FALSE)
+ 5.         └─cmdstanr:::check_ebfmi(post_warmup_sampler_diagnostics)
+ 6.           └─cmdstanr:::ebfmi(post_warmup_sampler_diagnostics)
+── Warning: (iii) log density differs from m13's only by the prior ─────────────
+E-BFMI not computed because it is undefined for posterior chains of length less than 3.
+Backtrace:
+    ▆
+ 1. └─mT$sample(...)
+ 2.   └─CmdStanMCMC$new(runset)
+ 3.     └─cmdstanr (local) initialize(...)
+ 4.       └─self$diagnostic_summary(diagnostics, quiet = FALSE)
+ 5.         └─cmdstanr:::check_ebfmi(post_warmup_sampler_diagnostics)
+ 6.           └─cmdstanr:::ebfmi(post_warmup_sampler_diagnostics)
+Test passed with 4 successes 🎊.
+test_m13_tight.R done
+Rscript tests/test_m13_tight.R  120.78s user 12.31s system 90% cpu 2:26.60 total

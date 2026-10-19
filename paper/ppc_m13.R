@@ -3,6 +3,12 @@
 # Prior and posterior predictive checks of the production model m13 (1980 Q1 - 2026 Q2).
 #
 #   Rscript paper/ppc_m13.R
+#   Rscript paper/ppc_m13.R --variant=tight   # the tight-priors research variant
+#                                             # (stan/m13_tight_priors.stan): prior draws from
+#                                             # its priors, posterior from
+#                                             # output/sample_1980/fit_m13_tight.rds; writes
+#                                             # output/ppc/ppc_tight_draws.rds and
+#                                             # paper/data/ppc_tight_{prior,posterior,coverage}.csv
 #
 # Reads data/processed/gdp_growth.rds and output/fit_production.rds. Writes
 #   output/ppc/ppc_draws.rds           replicated test statistics, per draw (gitignored)
@@ -34,6 +40,12 @@ stopifnot(file.exists("R/production_config.R"))
 source("R/production_config.R")
 set.seed(20261019)
 dir.create("output/ppc", showWarnings = FALSE, recursive = TRUE)
+args <- commandArgs(trailingOnly = TRUE)
+variant <- if (length(hit <- grep("^--variant=", args, value = TRUE))) sub("^--variant=", "", hit) else "m13"
+stopifnot(variant %in% c("m13", "tight"))
+tight <- variant == "tight"
+fit_path <- if (tight) "output/sample_1980/fit_m13_tight.rds" else "output/fit_production.rds"
+sfx <- if (tight) "ppc_tight_" else "ppc_"
 
 g <- load_production_growth()
 Y <- as.matrix(g[, c("g_E", "g_I", "g_P")]); T <- nrow(Y)
@@ -110,6 +122,14 @@ pri <- list(c = rnorm(S0, 1.5, 1), rho = rtn(S0, 0.5, 0.3), mu_g = rnorm(S0, 2, 
             mu_h = matrix(rnorm(3 * S0, 2, 1), S0), phi = matrix(runif(3 * S0, -1, 1), S0),
             omega = matrix(abs(rnorm(3 * S0, 0, 0.5)), S0), rho_EI = rtn(S0, 0, 0.5),
             psi = matrix(rtn(3 * S0, 0, 0.5), S0))
+if (tight) {
+  # stan/m13_tight_priors.stan: rho ~ Beta(2.625, 2.625), mu_bar ~ N(3, 2), c = mu_bar (1 - rho);
+  # stationary sds s_g, s_h ~ half-N(0, 1), phi ~ U(-1, 1), omega = s sqrt(1 - phi^2).
+  rho_t <- rbeta(S0, 2.625, 2.625)
+  pri$rho <- rho_t; pri$c <- rnorm(S0, 3, 2) * (1 - rho_t)
+  pri$omega_g <- abs(rnorm(S0, 0, 1)) * sqrt(1 - pri$phi_g^2)
+  pri$omega <- matrix(abs(rnorm(3 * S0, 0, 1)), S0) * sqrt(1 - pri$phi^2)
+}
 sp <- simulate(pri, S0)
 st_prior <- stat_draws(sp$y)
 lr_sd_mu <- apply(sp$mu, 1, sd)
@@ -136,10 +156,10 @@ prior_rows$p_obs_below <- c(NA,
   mean(pmax(abs(st_prior[, "min_head"]), abs(st_prior[, "max_head"])) <= max(abs(obs[c("min_head", "max_head")]))),
   mean(st_prior[, "ac1_head"] <= obs["ac1_head"]))
 prior_rows$share_sd_head_10_or_more <- c(rep(NA, 5), mean(st_prior[, "sd_head"] > 10), rep(NA, 3))
-write.csv(prior_rows, "paper/data/ppc_prior.csv", row.names = FALSE)
+write.csv(prior_rows, paste0("paper/data/", sfx, "prior.csv"), row.names = FALSE)
 
 # ---- posterior predictive ----------------------------------------------------------------
-fit <- readRDS("output/fit_production.rds")
+fit <- readRDS(fit_path)
 S <- 1000
 dm <- as_draws_matrix(fit$draws(c("c", "rho", "mu_g", "phi_g", "omega_g", "mu_h", "phi", "omega",
                                   "rho_EI", "psi")))
@@ -159,7 +179,7 @@ sf <- simulate(post, S)                                  # full replication
 sc <- simulate(post, S, mu = mu_post, h = h_post)        # conditional on mu, h
 st_full <- stat_draws(sf$y); st_cond <- stat_draws(sc$y)
 saveRDS(list(obs = obs, prior = st_prior, full = st_full, conditional = st_cond, idx = idx),
-        "output/ppc/ppc_draws.rds")
+        paste0("output/ppc/", sfx, "draws.rds"))
 
 ppc_rows <- do.call(rbind, lapply(c("full", "conditional"), function(kind) {
   st <- if (kind == "full") st_full else st_cond
@@ -172,7 +192,7 @@ ppc_rows <- do.call(rbind, lapply(c("full", "conditional"), function(kind) {
                p_rep_ge_obs = mean(x >= obs[[nm]], na.rm = TRUE))
   }))
 }))
-write.csv(ppc_rows, "paper/data/ppc_posterior.csv", row.names = FALSE)
+write.csv(ppc_rows, paste0("paper/data/", sfx, "posterior.csv"), row.names = FALSE)
 
 # coverage of each observed measure by the conditional replication's pointwise intervals
 cov_rows <- do.call(rbind, lapply(1:3, function(k) {
@@ -182,5 +202,5 @@ cov_rows <- do.call(rbind, lapply(1:3, function(k) {
   data.frame(measure = c("E", "I", "P")[k], cover50 = mean(inside50), cover90 = mean(inside90),
              cover90_pre2020 = mean(inside90[pre]), cover90_post2020 = mean(inside90[!pre]))
 }))
-write.csv(cov_rows, "paper/data/ppc_coverage.csv", row.names = FALSE)
+write.csv(cov_rows, paste0("paper/data/", sfx, "coverage.csv"), row.names = FALSE)
 cat("done\n"); print(prior_rows); print(ppc_rows); print(cov_rows)

@@ -99,6 +99,22 @@ phi_g ~ U(-1, 1), omega_g ~ half-N(0, 0.5). Widening the omega_g prior to
 half-N(0, 1) changes omega_g from 0.61 to 0.66, the variance ratio from
 0.790 to 0.786 and the latent path by 0.03 pp on average (NOTES.md).
 
+**Tighter priors (research variant, 2026-10-19).** m13's prior predictive is
+implausibly heavy-tailed (99th percentile of the largest |quarterly growth|
+about 580% annualised), driven by log-variance persistences near +-1 and
+latent persistence near 1. Choosing from the prior predictive only, against a
+target fixed in advance (`paper/prior_candidates.R`), gave
+`stan/m13_tight_priors.stan`: rho ~ Beta(2.625, 2.625) on (0, 1) (RDP
+2014-12's prior), mu_bar ~ N(3, 2) with c = mu_bar(1 - rho), and half-N(0, 1)
+on each log-variance's stationary sd instead of half-N(0, 0.5) on omega
+(Kim-Shephard-Chib's Beta(20, 1.5) made the tails worse). It still misses the
+target's tail bound (172 vs 100). Refitted on 1980 Q1 - 2026 Q2 it passes the
+production gate on two seeds; the latent path moves by 0.06 pp on average
+(at most 0.29), the 2026 Q2 estimate and the variance ratio (0.867 vs 0.872)
+barely change, and only the latent-volatility path moves (by up to 20% in
+single quarters, as with the wider omega_g prior). Production keeps m13's
+priors (NOTES.md, "Tighter priors for m13").
+
 **Sampler settings and diagnostics.**
 - Settings: 4 chains × (2000 warmup + 2000 draws), adapt_delta 0.99,
   max_treedepth 12, seed 1.

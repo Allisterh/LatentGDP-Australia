@@ -1,0 +1,505 @@
+[31m
+
+processing file: latentgdp_wp.qmd
+[39m1/67                
+2/67 [setup]        
+3/67                
+4/67 [abs-numbers]  
+5/67                
+6/67 [data-stats]   
+7/67                
+8/67 [tbl-data]     
+9/67                
+10/67 [tbl-models]   
+11/67                
+12/67 [tbl-priors]   
+13/67                
+14/67 [tbl-post]     
+15/67                
+16/67 [fig-path]     
+17/67                
+18/67 [path-numbers] 
+19/67                
+20/67 [fig-recent]   
+21/67                
+22/67 [fig-tau]      
+23/67                
+24/67 [tbl-decades]  
+25/67                
+26/67 [fig-sigma]    
+27/67                
+28/67 [tbl-vardecomp]
+29/67                
+30/67 [tbl-ppc]      
+31/67                
+32/67 [tbl-priorcand]
+33/67                
+34/67 [tbl-lfo]      
+35/67                
+36/67 [tbl-pairs]    
+37/67                
+38/67 [tbl-sub]      
+39/67                
+40/67 [fig-cum]      
+41/67                
+42/67 [fig-covid]    
+43/67                
+44/67 [tbl-tight]    
+45/67                
+46/67 [tbl-seeds]    
+47/67                
+48/67 [retry]        
+49/67                
+50/67 [tbl-pf]       
+51/67                
+52/67 [rdp-setup]    
+53/67                
+54/67 [tbl-rdp]      
+55/67                
+56/67 [tbl-rdp-all]  
+57/67                
+58/67 [tbl-history]  
+59/67                
+60/67 [tbl-fitdiag]  
+61/67                
+62/67 [tbl-gate]     
+63/67                
+64/67 [tbl-lfodiag]  
+65/67                
+66/67 [tbl-tests]    
+67/67                
+[31moutput file: latentgdp_wp.knit.md
+
+[39m[1mpandoc [22m
+  to: pdf
+  output-file: latentgdp_wp.pdf
+  standalone: true
+  pdf-engine: tectonic
+  variables:
+    graphics: true
+    tables: true
+  default-image-extension: pdf
+  number-sections: true
+  toc: true
+  toc-depth: 2
+  
+[1mmetadata[22m
+  block-headings: true
+  engines:
+    - path: /Applications/quarto/share/extension-subtrees/julia-engine/_extensions/julia-engine/julia-engine.js
+  title: 'Measurement Error in Australian GDP Growth: A State-space Model with Serially Correlated Errors and Stochastic Volatility'
+  subtitle: Working paper draft
+  author: David Stephan
+  date: 19 October 2026
+  bibliography:
+    - references.bib
+  link-citations: true
+  documentclass: article
+  papersize: a4
+  fontsize: 11pt
+  geometry: margin=2.5cm
+  linestretch: 1.15
+  colorlinks: true
+  mainfont: STIX Two Text
+  mathfont: STIX Two Math
+  
+warning: accessing absolute path `/System/Library/Fonts/Supplemental/STIXTwoText.ttf`; build may not be reproducible in other environments
+warning: accessing absolute path `/System/Library/Fonts/Supplemental/STIXTwoText-Italic.ttf`; build may not be reproducible in other environments
+warning: accessing absolute path `/System/Library/Fonts/Supplemental/STIXTwoMath.otf`; build may not be reproducible in other environments
+warning: texput.tex:646: Overfull \hbox (8.38667pt too wide) in paragraph at lines 645--646
+warning: texput.tex:666: Overfull \hbox (8.80945pt too wide) in paragraph at lines 665--666
+warning: texput.tex:667: Overfull \hbox (8.80945pt too wide) in paragraph at lines 666--667
+warning: texput.tex:668: Overfull \hbox (8.80945pt too wide) in paragraph at lines 667--668
+warning: texput.tex:669: Overfull \hbox (8.80945pt too wide) in paragraph at lines 668--669
+warning: texput.tex:670: Overfull \hbox (8.80945pt too wide) in paragraph at lines 669--670
+warning: texput.tex:671: Overfull \hbox (8.80945pt too wide) in paragraph at lines 670--671
+warning: texput.tex:673: Overfull \hbox (8.80945pt too wide) in paragraph at lines 672--673
+warning: texput.tex:674: Overfull \hbox (8.80945pt too wide) in paragraph at lines 673--674
+warning: texput.tex:675: Overfull \hbox (8.80945pt too wide) in paragraph at lines 674--675
+warning: texput.tex:676: Overfull \hbox (8.80945pt too wide) in paragraph at lines 675--676
+warning: texput.tex:678: Overfull \hbox (8.80945pt too wide) in paragraph at lines 677--678
+warning: texput.tex:679: Overfull \hbox (8.80945pt too wide) in paragraph at lines 678--679
+warning: texput.tex:680: Overfull \hbox (8.80945pt too wide) in paragraph at lines 679--680
+warning: texput.tex:809: Overfull \hbox (5.93016pt too wide) in paragraph at lines 808--809
+warning: accessing absolute path `/private/var/folders/l8/j684zy8n0gg_l_8x97yw_m980000gn/T/media-849b6ed7a5158f0f/figures/fig1_latent_vs_headline.png`; build may not be reproducible in other environments
+warning: accessing absolute path `/private/var/folders/l8/j684zy8n0gg_l_8x97yw_m980000gn/T/media-849b6ed7a5158f0f/figures/fig2_recent_quarters.png`; build may not be reproducible in other environments
+warning: accessing absolute path `/private/var/folders/l8/j684zy8n0gg_l_8x97yw_m980000gn/T/media-849b6ed7a5158f0f/figures/fig3_latent_volatility.png`; build may not be reproducible in other environments
+warning: accessing absolute path `/private/var/folders/l8/j684zy8n0gg_l_8x97yw_m980000gn/T/media-849b6ed7a5158f0f/figures/fig4_measurement_volatility.png`; build may not be reproducible in other environments
+warning: texput.tex:1357: Overfull \hbox (0.68321pt too wide) in paragraph at lines 1356--1357
+warning: texput.tex:1467: Overfull \hbox (2.03958pt too wide) in paragraph at lines 1466--1467
+warning: texput.tex:1716: Overfull \hbox (4.3552pt too wide) in paragraph at lines 1715--1716
+warning: texput.tex:1724: Overfull \hbox (4.3552pt too wide) in paragraph at lines 1723--1724
+warning: texput.tex:1734: Overfull \hbox (4.3552pt too wide) in paragraph at lines 1733--1734
+warning: texput.tex:1743: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1743--1743
+warning: texput.tex:1745: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1745--1745
+warning: texput.tex:1747: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1747--1747
+warning: texput.tex:1749: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1749--1749
+warning: texput.tex:1751: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1751--1751
+warning: texput.tex:1753: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1753--1753
+warning: texput.tex:1755: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1755--1755
+warning: texput.tex:1757: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1757--1757
+warning: texput.tex:1759: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1759--1759
+warning: texput.tex:1805: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1805--1805
+warning: texput.tex:1807: Overfull \hbox (6.2214pt too wide) in paragraph at lines 1807--1807
+warning: texput.tex:1809: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1809--1809
+warning: texput.tex:1811: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1811--1811
+warning: texput.tex:1813: Overfull \hbox (6.2214pt too wide) in paragraph at lines 1813--1813
+warning: texput.tex:1815: Overfull \hbox (11.17142pt too wide) in paragraph at lines 1815--1815
+warning: texput.tex:1817: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1817--1817
+warning: texput.tex:1819: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1819--1819
+warning: texput.tex:1821: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1821--1821
+warning: texput.tex:1823: Overfull \hbox (6.2214pt too wide) in paragraph at lines 1823--1823
+warning: texput.tex:1825: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1825--1825
+warning: texput.tex:1827: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1827--1827
+warning: accessing absolute path `/private/var/folders/l8/j684zy8n0gg_l_8x97yw_m980000gn/T/media-849b6ed7a5158f0f/figures/fig5_lfo_cumulative.png`; build may not be reproducible in other environments
+warning: accessing absolute path `/private/var/folders/l8/j684zy8n0gg_l_8x97yw_m980000gn/T/media-849b6ed7a5158f0f/figures/fig6_covid_by_model.png`; build may not be reproducible in other environments
+warning: texput.tex:2303: Overfull \hbox (13.69217pt too wide) in paragraph at lines 2302--2303
+warning: texput.tex:2320: Overfull \hbox (2.29218pt too wide) in paragraph at lines 2320--2320
+warning: texput.tex:2374: Overfull \hbox (1.03683pt too wide) in paragraph at lines 2373--2374
+warning: texput.tex:2376: Overfull \hbox (1.12009pt too wide) in paragraph at lines 2375--2376
+warning: texput.tex:2386: Overfull \hbox (5.4124pt too wide) in paragraph at lines 2385--2386
+warning: texput.tex:2647: Overfull \hbox (3.45468pt too wide) in paragraph at lines 2646--2647
+warning: texput.tex:2830: Overfull \hbox (4.9616pt too wide) in paragraph at lines 2827--2830
+warning: texput.tex:2928: Overfull \hbox (0.32083pt too wide) in paragraph at lines 2924--2928
+warning: texput.tex:3039: Underfull \hbox (badness 1052) in paragraph at lines 3034--3039
+warning: texput.tex:3039: Underfull \hbox (badness 4543) in paragraph at lines 3034--3039
+warning: texput.tex:3039: Underfull \hbox (badness 1990) in paragraph at lines 3034--3039
+warning: texput.tex:3045: Underfull \hbox (badness 1655) in paragraph at lines 3041--3045
+warning: texput.tex:3151: Overfull \hbox (5.60812pt too wide) in paragraph at lines 3150--3151
+warning: texput.tex:3153: Overfull \hbox (5.00351pt too wide) in paragraph at lines 3152--3153
+warning: texput.tex:3174: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3174--3174
+warning: texput.tex:3176: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3176--3176
+warning: texput.tex:3180: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3180--3180
+warning: texput.tex:3182: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3182--3182
+warning: texput.tex:3184: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3184--3184
+warning: texput.tex:3186: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3186--3186
+warning: texput.tex:3188: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3188--3188
+warning: texput.tex:3190: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3190--3190
+warning: texput.tex:3192: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3192--3192
+warning: texput.tex:3194: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3194--3194
+warning: texput.tex:3196: Overfull \hbox (1.536pt too wide) in paragraph at lines 3195--3196
+warning: texput.tex:3196: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3196--3196
+warning: texput.tex:3198: Overfull \hbox (1.536pt too wide) in paragraph at lines 3197--3198
+warning: texput.tex:3198: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3198--3198
+warning: texput.tex:3200: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3200--3200
+warning: texput.tex:3203: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3202--3203
+warning: texput.tex:3204: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3204--3204
+warning: texput.tex:3206: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3206--3206
+warning: texput.tex:3208: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3208--3208
+warning: texput.tex:3210: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3210--3210
+warning: texput.tex:3212: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3212--3212
+warning: texput.tex:3214: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3214--3214
+warning: texput.tex:3216: Overfull \hbox (1.9549pt too wide) in paragraph at lines 3216--3216
+warning: texput.tex:3218: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3218--3218
+warning: texput.tex:3220: Overfull \hbox (1.9549pt too wide) in paragraph at lines 3220--3220
+warning: texput.tex:3222: Overfull \hbox (1.9549pt too wide) in paragraph at lines 3222--3222
+warning: texput.tex:3224: Overfull \hbox (1.536pt too wide) in paragraph at lines 3223--3224
+warning: texput.tex:3308: Overfull \hbox (4.24509pt too wide) in paragraph at lines 3307--3308
+warning: texput.tex:3312: Overfull \hbox (0.66238pt too wide) in paragraph at lines 3311--3312
+warning: texput.tex:3379: Underfull \hbox (badness 1152) in paragraph at lines 3379--3379
+warning: texput.tex:3485: Underfull \hbox (badness 10000) in paragraph at lines 3474--3485
+warning: texput.tex:3485: Underfull \hbox (badness 2318) in paragraph at lines 3474--3485
+warning: texput.tex:3485: Underfull \hbox (badness 1609) in paragraph at lines 3474--3485
+warning: texput.tex:3485: Underfull \hbox (badness 2762) in paragraph at lines 3474--3485
+warning: texput.tex:3496: Underfull \hbox (badness 1424) in paragraph at lines 3492--3496
+warning: texput.tex:3502: Overfull \hbox (1.22661pt too wide) in paragraph at lines 3496--3502
+warning: texput.tex:3506: Overfull \hbox (70.35939pt too wide) in paragraph at lines 3502--3506
+warning: texput.tex:3526: Overfull \hbox (51.5838pt too wide) in paragraph at lines 3508--3526
+warning: texput.tex:3526: Overfull \hbox (215.9907pt too wide) in paragraph at lines 3508--3526
+warning: texput.tex:3526: Underfull \hbox (badness 10000) in paragraph at lines 3508--3526
+warning: texput.tex:3528: Overfull \hbox (45.96928pt too wide) in paragraph at lines 3526--3528
+warning: texput.tex:646: Overfull \hbox (8.38667pt too wide) in paragraph at lines 645--646
+warning: texput.tex:666: Overfull \hbox (8.80945pt too wide) in paragraph at lines 665--666
+warning: texput.tex:667: Overfull \hbox (8.80945pt too wide) in paragraph at lines 666--667
+warning: texput.tex:668: Overfull \hbox (8.80945pt too wide) in paragraph at lines 667--668
+warning: texput.tex:669: Overfull \hbox (8.80945pt too wide) in paragraph at lines 668--669
+warning: texput.tex:670: Overfull \hbox (8.80945pt too wide) in paragraph at lines 669--670
+warning: texput.tex:671: Overfull \hbox (8.80945pt too wide) in paragraph at lines 670--671
+warning: texput.tex:673: Overfull \hbox (8.80945pt too wide) in paragraph at lines 672--673
+warning: texput.tex:674: Overfull \hbox (8.80945pt too wide) in paragraph at lines 673--674
+warning: texput.tex:675: Overfull \hbox (8.80945pt too wide) in paragraph at lines 674--675
+warning: texput.tex:676: Overfull \hbox (8.80945pt too wide) in paragraph at lines 675--676
+warning: texput.tex:678: Overfull \hbox (8.80945pt too wide) in paragraph at lines 677--678
+warning: texput.tex:679: Overfull \hbox (8.80945pt too wide) in paragraph at lines 678--679
+warning: texput.tex:680: Overfull \hbox (8.80945pt too wide) in paragraph at lines 679--680
+warning: texput.tex:809: Overfull \hbox (5.93016pt too wide) in paragraph at lines 808--809
+warning: texput.tex:1357: Overfull \hbox (0.68321pt too wide) in paragraph at lines 1356--1357
+warning: texput.tex:1467: Overfull \hbox (2.03958pt too wide) in paragraph at lines 1466--1467
+warning: texput.tex:1716: Overfull \hbox (4.3552pt too wide) in paragraph at lines 1715--1716
+warning: texput.tex:1724: Overfull \hbox (4.3552pt too wide) in paragraph at lines 1723--1724
+warning: texput.tex:1734: Overfull \hbox (4.3552pt too wide) in paragraph at lines 1733--1734
+warning: texput.tex:1743: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1743--1743
+warning: texput.tex:1745: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1745--1745
+warning: texput.tex:1747: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1747--1747
+warning: texput.tex:1749: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1749--1749
+warning: texput.tex:1751: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1751--1751
+warning: texput.tex:1753: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1753--1753
+warning: texput.tex:1755: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1755--1755
+warning: texput.tex:1757: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1757--1757
+warning: texput.tex:1759: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1759--1759
+warning: texput.tex:1805: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1805--1805
+warning: texput.tex:1807: Overfull \hbox (6.2214pt too wide) in paragraph at lines 1807--1807
+warning: texput.tex:1809: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1809--1809
+warning: texput.tex:1811: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1811--1811
+warning: texput.tex:1813: Overfull \hbox (6.2214pt too wide) in paragraph at lines 1813--1813
+warning: texput.tex:1815: Overfull \hbox (11.17142pt too wide) in paragraph at lines 1815--1815
+warning: texput.tex:1817: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1817--1817
+warning: texput.tex:1819: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1819--1819
+warning: texput.tex:1821: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1821--1821
+warning: texput.tex:1823: Overfull \hbox (6.2214pt too wide) in paragraph at lines 1823--1823
+warning: texput.tex:1825: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1825--1825
+warning: texput.tex:1827: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1827--1827
+warning: texput.tex:2303: Overfull \hbox (13.69217pt too wide) in paragraph at lines 2302--2303
+warning: texput.tex:2320: Overfull \hbox (2.29218pt too wide) in paragraph at lines 2320--2320
+warning: texput.tex:2374: Overfull \hbox (1.03683pt too wide) in paragraph at lines 2373--2374
+warning: texput.tex:2376: Overfull \hbox (1.12009pt too wide) in paragraph at lines 2375--2376
+warning: texput.tex:2386: Overfull \hbox (5.4124pt too wide) in paragraph at lines 2385--2386
+warning: texput.tex:2647: Overfull \hbox (3.45468pt too wide) in paragraph at lines 2646--2647
+warning: texput.tex:2830: Overfull \hbox (4.9616pt too wide) in paragraph at lines 2827--2830
+warning: texput.tex:2928: Overfull \hbox (0.32083pt too wide) in paragraph at lines 2924--2928
+warning: texput.tex:3039: Underfull \hbox (badness 1052) in paragraph at lines 3034--3039
+warning: texput.tex:3039: Underfull \hbox (badness 4543) in paragraph at lines 3034--3039
+warning: texput.tex:3039: Underfull \hbox (badness 1990) in paragraph at lines 3034--3039
+warning: texput.tex:3045: Underfull \hbox (badness 1655) in paragraph at lines 3041--3045
+warning: texput.tex:3151: Overfull \hbox (5.60812pt too wide) in paragraph at lines 3150--3151
+warning: texput.tex:3153: Overfull \hbox (5.00351pt too wide) in paragraph at lines 3152--3153
+warning: texput.tex:3174: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3174--3174
+warning: texput.tex:3176: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3176--3176
+warning: texput.tex:3180: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3180--3180
+warning: texput.tex:3182: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3182--3182
+warning: texput.tex:3184: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3184--3184
+warning: texput.tex:3186: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3186--3186
+warning: texput.tex:3188: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3188--3188
+warning: texput.tex:3190: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3190--3190
+warning: texput.tex:3192: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3192--3192
+warning: texput.tex:3194: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3194--3194
+warning: texput.tex:3196: Overfull \hbox (1.536pt too wide) in paragraph at lines 3195--3196
+warning: texput.tex:3196: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3196--3196
+warning: texput.tex:3198: Overfull \hbox (1.536pt too wide) in paragraph at lines 3197--3198
+warning: texput.tex:3198: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3198--3198
+warning: texput.tex:3200: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3200--3200
+warning: texput.tex:3203: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3202--3203
+warning: texput.tex:3204: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3204--3204
+warning: texput.tex:3206: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3206--3206
+warning: texput.tex:3208: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3208--3208
+warning: texput.tex:3210: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3210--3210
+warning: texput.tex:3212: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3212--3212
+warning: texput.tex:3214: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3214--3214
+warning: texput.tex:3216: Overfull \hbox (1.9549pt too wide) in paragraph at lines 3216--3216
+warning: texput.tex:3218: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3218--3218
+warning: texput.tex:3220: Overfull \hbox (1.9549pt too wide) in paragraph at lines 3220--3220
+warning: texput.tex:3222: Overfull \hbox (1.9549pt too wide) in paragraph at lines 3222--3222
+warning: texput.tex:3224: Overfull \hbox (1.536pt too wide) in paragraph at lines 3223--3224
+warning: texput.tex:3308: Overfull \hbox (4.24509pt too wide) in paragraph at lines 3307--3308
+warning: texput.tex:3312: Overfull \hbox (0.66238pt too wide) in paragraph at lines 3311--3312
+warning: texput.tex:3379: Underfull \hbox (badness 1152) in paragraph at lines 3379--3379
+warning: texput.tex:3485: Underfull \hbox (badness 10000) in paragraph at lines 3474--3485
+warning: texput.tex:3485: Underfull \hbox (badness 2318) in paragraph at lines 3474--3485
+warning: texput.tex:3485: Underfull \hbox (badness 1609) in paragraph at lines 3474--3485
+warning: texput.tex:3485: Underfull \hbox (badness 2762) in paragraph at lines 3474--3485
+warning: texput.tex:3496: Underfull \hbox (badness 1424) in paragraph at lines 3492--3496
+warning: texput.tex:3502: Overfull \hbox (1.22661pt too wide) in paragraph at lines 3496--3502
+warning: texput.tex:3506: Overfull \hbox (70.35939pt too wide) in paragraph at lines 3502--3506
+warning: texput.tex:3526: Overfull \hbox (51.5838pt too wide) in paragraph at lines 3508--3526
+warning: texput.tex:3526: Overfull \hbox (215.9907pt too wide) in paragraph at lines 3508--3526
+warning: texput.tex:3526: Underfull \hbox (badness 10000) in paragraph at lines 3508--3526
+warning: texput.tex:3528: Overfull \hbox (45.96928pt too wide) in paragraph at lines 3526--3528
+warning: texput.tex:646: Overfull \hbox (8.38667pt too wide) in paragraph at lines 645--646
+warning: texput.tex:666: Overfull \hbox (8.80945pt too wide) in paragraph at lines 665--666
+warning: texput.tex:667: Overfull \hbox (8.80945pt too wide) in paragraph at lines 666--667
+warning: texput.tex:668: Overfull \hbox (8.80945pt too wide) in paragraph at lines 667--668
+warning: texput.tex:669: Overfull \hbox (8.80945pt too wide) in paragraph at lines 668--669
+warning: texput.tex:670: Overfull \hbox (8.80945pt too wide) in paragraph at lines 669--670
+warning: texput.tex:671: Overfull \hbox (8.80945pt too wide) in paragraph at lines 670--671
+warning: texput.tex:673: Overfull \hbox (8.80945pt too wide) in paragraph at lines 672--673
+warning: texput.tex:674: Overfull \hbox (8.80945pt too wide) in paragraph at lines 673--674
+warning: texput.tex:675: Overfull \hbox (8.80945pt too wide) in paragraph at lines 674--675
+warning: texput.tex:676: Overfull \hbox (8.80945pt too wide) in paragraph at lines 675--676
+warning: texput.tex:678: Overfull \hbox (8.80945pt too wide) in paragraph at lines 677--678
+warning: texput.tex:679: Overfull \hbox (8.80945pt too wide) in paragraph at lines 678--679
+warning: texput.tex:680: Overfull \hbox (8.80945pt too wide) in paragraph at lines 679--680
+warning: texput.tex:809: Overfull \hbox (5.93016pt too wide) in paragraph at lines 808--809
+warning: texput.tex:1357: Overfull \hbox (0.68321pt too wide) in paragraph at lines 1356--1357
+warning: texput.tex:1467: Overfull \hbox (2.03958pt too wide) in paragraph at lines 1466--1467
+warning: texput.tex:1716: Overfull \hbox (4.3552pt too wide) in paragraph at lines 1715--1716
+warning: texput.tex:1724: Overfull \hbox (4.3552pt too wide) in paragraph at lines 1723--1724
+warning: texput.tex:1734: Overfull \hbox (4.3552pt too wide) in paragraph at lines 1733--1734
+warning: texput.tex:1743: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1743--1743
+warning: texput.tex:1745: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1745--1745
+warning: texput.tex:1747: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1747--1747
+warning: texput.tex:1749: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1749--1749
+warning: texput.tex:1751: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1751--1751
+warning: texput.tex:1753: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1753--1753
+warning: texput.tex:1755: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1755--1755
+warning: texput.tex:1757: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1757--1757
+warning: texput.tex:1759: Overfull \hbox (0.78983pt too wide) in paragraph at lines 1759--1759
+warning: texput.tex:1805: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1805--1805
+warning: texput.tex:1807: Overfull \hbox (6.2214pt too wide) in paragraph at lines 1807--1807
+warning: texput.tex:1809: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1809--1809
+warning: texput.tex:1811: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1811--1811
+warning: texput.tex:1813: Overfull \hbox (6.2214pt too wide) in paragraph at lines 1813--1813
+warning: texput.tex:1815: Overfull \hbox (11.17142pt too wide) in paragraph at lines 1815--1815
+warning: texput.tex:1817: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1817--1817
+warning: texput.tex:1819: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1819--1819
+warning: texput.tex:1821: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1821--1821
+warning: texput.tex:1823: Overfull \hbox (6.2214pt too wide) in paragraph at lines 1823--1823
+warning: texput.tex:1825: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1825--1825
+warning: texput.tex:1827: Overfull \hbox (1.27141pt too wide) in paragraph at lines 1827--1827
+warning: texput.tex:2303: Overfull \hbox (13.69217pt too wide) in paragraph at lines 2302--2303
+warning: texput.tex:2320: Overfull \hbox (2.29218pt too wide) in paragraph at lines 2320--2320
+warning: texput.tex:2374: Overfull \hbox (1.03683pt too wide) in paragraph at lines 2373--2374
+warning: texput.tex:2376: Overfull \hbox (1.12009pt too wide) in paragraph at lines 2375--2376
+warning: texput.tex:2386: Overfull \hbox (5.4124pt too wide) in paragraph at lines 2385--2386
+warning: texput.tex:2647: Overfull \hbox (3.45468pt too wide) in paragraph at lines 2646--2647
+warning: texput.tex:2830: Overfull \hbox (4.9616pt too wide) in paragraph at lines 2827--2830
+warning: texput.tex:2928: Overfull \hbox (0.32083pt too wide) in paragraph at lines 2924--2928
+warning: texput.tex:3039: Underfull \hbox (badness 1052) in paragraph at lines 3034--3039
+warning: texput.tex:3039: Underfull \hbox (badness 4543) in paragraph at lines 3034--3039
+warning: texput.tex:3039: Underfull \hbox (badness 1990) in paragraph at lines 3034--3039
+warning: texput.tex:3045: Underfull \hbox (badness 1655) in paragraph at lines 3041--3045
+warning: texput.tex:3151: Overfull \hbox (5.60812pt too wide) in paragraph at lines 3150--3151
+warning: texput.tex:3153: Overfull \hbox (5.00351pt too wide) in paragraph at lines 3152--3153
+warning: texput.tex:3174: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3174--3174
+warning: texput.tex:3176: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3176--3176
+warning: texput.tex:3180: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3180--3180
+warning: texput.tex:3182: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3182--3182
+warning: texput.tex:3184: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3184--3184
+warning: texput.tex:3186: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3186--3186
+warning: texput.tex:3188: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3188--3188
+warning: texput.tex:3190: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3190--3190
+warning: texput.tex:3192: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3192--3192
+warning: texput.tex:3194: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3194--3194
+warning: texput.tex:3196: Overfull \hbox (1.536pt too wide) in paragraph at lines 3195--3196
+warning: texput.tex:3196: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3196--3196
+warning: texput.tex:3198: Overfull \hbox (1.536pt too wide) in paragraph at lines 3197--3198
+warning: texput.tex:3198: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3198--3198
+warning: texput.tex:3200: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3200--3200
+warning: texput.tex:3203: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3202--3203
+warning: texput.tex:3204: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3204--3204
+warning: texput.tex:3206: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3206--3206
+warning: texput.tex:3208: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3208--3208
+warning: texput.tex:3210: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3210--3210
+warning: texput.tex:3212: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3212--3212
+warning: texput.tex:3214: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3214--3214
+warning: texput.tex:3216: Overfull \hbox (1.9549pt too wide) in paragraph at lines 3216--3216
+warning: texput.tex:3218: Overfull \hbox (6.90489pt too wide) in paragraph at lines 3218--3218
+warning: texput.tex:3220: Overfull \hbox (1.9549pt too wide) in paragraph at lines 3220--3220
+warning: texput.tex:3222: Overfull \hbox (1.9549pt too wide) in paragraph at lines 3222--3222
+warning: texput.tex:3224: Overfull \hbox (1.536pt too wide) in paragraph at lines 3223--3224
+warning: texput.tex:3308: Overfull \hbox (4.24509pt too wide) in paragraph at lines 3307--3308
+warning: texput.tex:3312: Overfull \hbox (0.66238pt too wide) in paragraph at lines 3311--3312
+warning: texput.tex:3379: Underfull \hbox (badness 1152) in paragraph at lines 3379--3379
+warning: texput.tex:3485: Underfull \hbox (badness 10000) in paragraph at lines 3474--3485
+warning: texput.tex:3485: Underfull \hbox (badness 2318) in paragraph at lines 3474--3485
+warning: texput.tex:3485: Underfull \hbox (badness 1609) in paragraph at lines 3474--3485
+warning: texput.tex:3485: Underfull \hbox (badness 2762) in paragraph at lines 3474--3485
+warning: texput.tex:3496: Underfull \hbox (badness 1424) in paragraph at lines 3492--3496
+warning: texput.tex:3502: Overfull \hbox (1.22661pt too wide) in paragraph at lines 3496--3502
+warning: texput.tex:3506: Overfull \hbox (70.35939pt too wide) in paragraph at lines 3502--3506
+warning: texput.tex:3526: Overfull \hbox (51.5838pt too wide) in paragraph at lines 3508--3526
+warning: texput.tex:3526: Overfull \hbox (215.9907pt too wide) in paragraph at lines 3508--3526
+warning: texput.tex:3526: Underfull \hbox (badness 10000) in paragraph at lines 3508--3526
+warning: texput.tex:3528: Overfull \hbox (45.96928pt too wide) in paragraph at lines 3526--3528
+warning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.
+[31m
+
+processing file: latentgdp_wp.qmd
+[39m1/67                
+2/67 [setup]        
+3/67                
+4/67 [abs-numbers]  
+5/67                
+6/67 [data-stats]   
+7/67                
+8/67 [tbl-data]     
+9/67                
+10/67 [tbl-models]   
+11/67                
+12/67 [tbl-priors]   
+13/67                
+14/67 [tbl-post]     
+15/67                
+16/67 [fig-path]     
+17/67                
+18/67 [path-numbers] 
+19/67                
+20/67 [fig-recent]   
+21/67                
+22/67 [fig-tau]      
+23/67                
+24/67 [tbl-decades]  
+25/67                
+26/67 [fig-sigma]    
+27/67                
+28/67 [tbl-vardecomp]
+29/67                
+30/67 [tbl-ppc]      
+31/67                
+32/67 [tbl-priorcand]
+33/67                
+34/67 [tbl-lfo]      
+35/67                
+36/67 [tbl-pairs]    
+37/67                
+38/67 [tbl-sub]      
+39/67                
+40/67 [fig-cum]      
+41/67                
+42/67 [fig-covid]    
+43/67                
+44/67 [tbl-tight]    
+45/67                
+46/67 [tbl-seeds]    
+47/67                
+48/67 [retry]        
+49/67                
+50/67 [tbl-pf]       
+51/67                
+52/67 [rdp-setup]    
+53/67                
+54/67 [tbl-rdp]      
+55/67                
+56/67 [tbl-rdp-all]  
+57/67                
+58/67 [tbl-history]  
+59/67                
+60/67 [tbl-fitdiag]  
+61/67                
+62/67 [tbl-gate]     
+63/67                
+64/67 [tbl-lfodiag]  
+65/67                
+66/67 [tbl-tests]    
+67/67                
+[31moutput file: latentgdp_wp.knit.md
+
+[39m[1mpandoc [22m
+  to: html
+  output-file: latentgdp_wp.html
+  standalone: true
+  embed-resources: true
+  section-divs: true
+  html-math-method: mathjax
+  wrap: none
+  default-image-extension: png
+  number-sections: true
+  toc: true
+  toc-depth: 2
+  variables: {}
+  
+[1mmetadata[22m
+  document-css: false
+  link-citations: true
+  date-format: long
+  lang: en
+  engines:
+    - path: /Applications/quarto/share/extension-subtrees/julia-engine/_extensions/julia-engine/julia-engine.js
+  title: 'Measurement Error in Australian GDP Growth: A State-space Model with Serially Correlated Errors and Stochastic Volatility'
+  subtitle: Working paper draft
+  author: David Stephan
+  date: 19 October 2026
+  bibliography:
+    - references.bib
+  
+Output created: latentgdp_wp.pdf
+

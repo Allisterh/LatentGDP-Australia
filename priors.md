@@ -2,7 +2,7 @@
 
 Every prior below is transcribed from the `model` block of the Stan file named
 in each section (checked against the files on 2026-10-17; the m13 section on
-2026-10-18). If a Stan file and
+2026-10-18; the m13_tight_priors section on 2026-10-19). If a Stan file and
 this document disagree, the Stan file is right and this document needs fixing.
 
 **Units.** Every model works in annualised growth, 400 × Δlog(GDP), in percent
@@ -22,9 +22,11 @@ scale.
   equation. The priors it implies on the latent states are written out
   wherever they apply.
 
-**Prior predictive checks.** None have been run. There is no prior predictive
-simulation anywhere in this repository. The scales were chosen by hand from
-the sample moments above, not checked by simulation.
+**Prior predictive checks.** The scales were chosen by hand from the sample
+moments above, not checked by simulation. Prior predictive simulations were
+run later, for m13 only: `paper/ppc_m13.R` (2026-10-19, for the working
+paper) and `paper/prior_candidates.R` (2026-10-19, which chose the priors of
+the research variant `m13_tight_priors`; see its section at the end).
 
 ## Shared AR(1) latent block (m2-m9, m12; m10 and m13 in part)
 
@@ -265,3 +267,46 @@ other prior is m12's, unchanged.
   tau 2.43 (from 2.47), a variance ratio of 0.786 (from 0.790) and a latent
   median path that moves by 0.03 pp on average (at most 0.18). The results
   are insensitive to this widening.
+
+## m13_tight_priors: research variant with tighter priors (`stan/m13_tight_priors.stan`; not production)
+
+Added 2026-10-19 (NOTES.md, "Tighter priors for m13 (prior predictive check
+and refit), 2026-10-19"). Same likelihood as m13 (the functions and data
+blocks are byte-identical; `tests/test_m13_tight.R`); only the priors and the
+sampled coordinates change. The priors were chosen from the prior predictive
+alone (`paper/prior_candidates.R`), against a plausibility target fixed before
+any candidate was simulated, and were not revisited after the fit.
+
+| Parameter | Declared | Prior | m13 |
+|---|---|---|---|
+| `mu_bar`  | real | N(3, 2). Long-run mean of latent growth (m1's prior); `c = mu_bar (1 - rho)` is a transformed parameter | `c` ~ N(1.5, 1) |
+| `rho`     | (0, 1) | Beta(2.625, 2.625): mean 0.5, sd 0.2, as RBA RDP 2014-12 | N(0.5, 0.3) on (-1, 1) |
+| `mu_g`    | real | N(2, 1) | same |
+| `phi_g`   | (-1, 1) | Uniform(-1, 1) | same |
+| `s_g`     | > 0 | half-N(0, 1). Stationary sd of g; `omega_g = s_g sqrt(1 - phi_g²)` is derived | `omega_g` ~ half-N(0, 0.5) |
+| `mu_h[k]` | real | N(2, 1) | same |
+| `phi[k]`  | (-1, 1) | Uniform(-1, 1) | same |
+| `s_h[k]`  | > 0 | half-N(0, 1). Stationary sd of h_k; `omega[k] = s_h[k] sqrt(1 - phi[k]²)` is derived | `omega[k]` ~ half-N(0, 0.5) |
+| `rho_EI`  | (-1, 1) | N(0, 0.5), on `z_EI = atanh(rho_EI)` with the Jacobian | same |
+| `psi[k]`  | (-1, 1) | N(0, 0.5) | same |
+| `g_raw`, `h_raw` | real | std_normal; g_1 ~ N(mu_g, s_g²), h_{1,k} ~ N(mu_h_k, s_h_k²) (the same stationary laws as m13) | same |
+
+- **No Jacobian.** The priors are densities on the sampled parameters
+  (mu_bar, rho, s_g, s_h). Putting N(3, 2) on mu_bar = c/(1-rho) while still
+  sampling c would need `target += -log1m(rho)`; the two formulations are the
+  same model.
+- **Implied priors.** c | rho ~ N(3(1-rho), 2(1-rho)). The variant excludes
+  rho <= 0 and puts 1.3% of its mass on rho > 0.9 (m13: 4.7%). At
+  |phi| = 0.87, half-N(0, 1) on s equals m13's half-N(0, 0.5) on omega; as
+  |phi| -> 1 the variant's omega shrinks to 0, so the log-variance can be
+  persistent without its stationary range exploding.
+- **Why.** Under m13's priors the prior predictive is implausible (headline sd
+  above 10 in 10% of draws; 99th percentile of the largest |quarterly growth|
+  579% annualised). Two things drive the tails: stationary log-variance sds
+  above 2 (12.7% of draws; |phi| near 1 with a moderate omega) and rho near 1
+  (c/(1-rho) and tau/sqrt(1-rho²) explode). Kim, Shephard & Chib's
+  (phi+1)/2 ~ Beta(20, 1.5) was considered and rejected: with m13's omega prior
+  it makes the tails worse (99th percentile 1747). The chosen set still misses
+  the target's 99th-percentile bound (172 against 100; NOTES.md); it was
+  chosen by the pre-set fallback rule.
+

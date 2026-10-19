@@ -2,9 +2,11 @@
 
 This is the research record. Sections dated 2026-10 replace earlier results
 that turned out to be wrong; the superseded claims are noted where they were
-made so the history stays readable. The newest section is "Production
-sample moved to 1980 Q1, 2026-10-19": production m13 is now fitted on
-1980 Q1 onward. Before it, "1980Q1 sample (RDP 2014-12 alignment)" re-ran
+made so the history stays readable. The newest section is "Tighter priors
+for m13 (prior predictive check and refit), 2026-10-19": a research variant
+of m13 with priors chosen by prior predictive simulation; production is
+unchanged. Before it, "Production sample moved to 1980 Q1, 2026-10-19":
+production m13 is now fitted on 1980 Q1 onward. Before it, "1980Q1 sample (RDP 2014-12 alignment)" re-ran
 the whole research suite on data starting in 1980 Q1 (at the time leaving
 production on the full sample). It does not supersede the full-sample
 research results: those stay as recorded. It does say which
@@ -104,6 +106,165 @@ measurement-error sd in every spec, so production-side GDP is the cleanest
 single signal of true growth. Expenditure has the largest sd on the full
 sample. On the post-1978 samples (m8, m11), Income's is slightly larger than
 Expenditure's.
+
+## Tighter priors for m13 (prior predictive check and refit), 2026-10-19
+
+Research only: **production is unchanged** (`R/fit_production.R` still fits
+`stan/m13_serial_latent_sv.stan` with m13's priors; no production file was
+edited). The variant is `stan/m13_tight_priors.stan`.
+
+**Procedure.** Three steps, in this order: (1) choose priors from the prior
+predictive only, against a target and selection rule written down before any
+candidate was simulated; (2) refit on the production sample (1980 Q1 - 2026 Q2,
+T = 186) with the production settings and gate, seeds 1 and 2, and on the RDP
+sample (1980 Q1 - 2013 Q2); (3) compare with the production fit. The choice
+in (1) was not revisited after (2).
+
+**Diagnosis of m13's prior predictive tails** (`paper/prior_candidates.R`,
+20,000 prior draws, paper/ppc_m13.R's simulator, T = 186). Headline sd
+4.9 [2.5, 14.4] (observed 3.9); 10.3% of draws above 10; 99th percentile of
+max |headline| 579% annualised; mean headline 90% interval [-0.7, 16.3].
+- Stationary sd of a log-variance, s = omega / sqrt(1 - phi^2): some s > 2 in
+  12.7% of all draws but 76% of draws with max |headline| > 100. Under
+  phi ~ U(-1, 1) and omega ~ half-N(0, 0.5), |phi| near +-1 makes s explode.
+- rho near 1 (c/(1-rho) and tau/sqrt(1-rho^2) explode): rho > 0.9 in 4.7% of
+  all draws, 26% of the extreme ones; the mean headline's 95th percentile is
+  230 given rho > 0.9.
+- Conditional prior predictive, 99th percentile of max |headline|: 579 (all),
+  467 (rho <= 0.9), 105 (all s <= 2), 63 (both). mu_g and mu_h levels matter
+  little.
+
+**Target (fixed first).** T1: 90% interval of headline sd within [1, 15].
+T2: 99th percentile of max |headline| <= 100 (about 19% QoQ, against -7% in
+2020 Q2). T3: 90% interval of mean headline within [-3, 9]. T4: six observed
+statistics (sd, mean, max |.|, AC1 of headline; sd of E - I; pre-2020 sd of
+headline) each inside the central 95% of the prior predictive. Rule: the
+first of C1, C2, C3 meeting T1-T4; if none, the candidate meeting T4 with the
+smallest T2.
+
+**Candidates and results** (20,000 draws each; seed 1):
+
+| Set | Change from m13 | headline sd, median [90%] | mean headline [90%] | q99 max \|headline\| | sd > 10 | obs. percentiles | T1/T2/T3/T4 |
+|---|---|---|---|---|---|---|---|
+| m13 | - | 4.9 [2.5, 14.4] | 2.9 [-0.7, 16.3] | 579 | 10.3% | 9-76 | yes/no/no/yes |
+| C1 | rho ~ Beta(2.625, 2.625) on (0,1) (RDP 2014-12: mean 0.5, sd 0.2); mu_bar ~ N(3, 2) (m1), c = mu_bar (1 - rho) | 4.8 [2.5, 13.7] | 3.0 [-0.8, 6.9] | 520 | 9.3% | 9-81 | yes/no/yes/yes |
+| C2 | C1 + (phi + 1)/2 ~ Beta(20, 1.5) on phi_g, phi_k (Kim, Shephard & Chib 1998), omega priors as m13 | 5.7 [2.7, 29.1] | 3.0 [-1.3, 7.2] | 1747 | 19.9% | 6-63 | no/no/yes/yes |
+| C3 | C1 + s_g, s_h ~ half-N(0, 1) on the stationary sd, phi ~ U(-1, 1) kept, omega = s sqrt(1 - phi^2) | 5.3 [2.8, 14.0] | 3.0 [-0.8, 6.9] | 172 | 12.1% | 6-70 | yes/no/yes/yes |
+
+- KSC worsens the tails, as feared: it moves persistence mass towards 1, and
+  with m13's omega prior (KSC pair it with a small volatility-of-volatility
+  prior) the stationary sd grows.
+- **No candidate meets the whole target. By the fallback rule C3 was chosen.**
+  It cuts the q99 of max |headline| from 579 to 172 and meets T1, T3, T4. Its
+  remaining tail is mostly latent: in 70% of its draws with max |headline| >
+  100 the latent path itself exceeds 100; 78% have some s > 2.
+- Justifications: the Beta on rho is RDP 2014-12's own prior on its latent
+  persistence; N(3, 2) on the long-run mean is m1's prior (Australian growth
+  averaged about 3% a year) and makes the mean prior independent of rho;
+  half-N(0, 1) on s equals m13's half-N(0, 0.5) on omega at |phi| = 0.87, so
+  the scale is unchanged for moderately persistent volatility and only the
+  explosion as |phi| -> 1 is removed. omega's own prior is not otherwise
+  tightened (m13's omega_g posterior already sits in the prior's upper tail).
+- Jacobian: none needed. mu_bar and s are the sampled parameters and carry
+  the priors; c = mu_bar (1 - rho) and omega = s sqrt(1 - phi^2) are
+  transformed parameters. (N(3, 2) on mu_bar while sampling c would need
+  target += -log1m(rho).) g_1 ~ N(mu_g, s_g^2) and h_1 ~ N(mu_h, s_h^2) are the
+  same stationary starts as m13's.
+- Post-selection information only (not a candidate, not used): with s ~
+  half-N(0, 0.75) the q99 would be 78 (T2 met; observed max |headline| at the
+  83rd percentile), with half-N(0, 0.5) 49. Recorded in the scratch target
+  file of this session, not in the repository.
+
+**Code.**
+- `stan/m13_tight_priors.stan`: functions and data blocks byte-identical to
+  m13's; parameters mu_bar, rho in (0, 1), s_g, s_h; c, omega_g, omega are
+  transformed parameters, so outputs keep m13's names and the production
+  gate's variable list applies unchanged. `mu_bar` is no longer a generated
+  quantity.
+- `tests/test_m13_tight.R` (23 expectations, all pass; log
+  `output/sample_1980/logs/test_m13_tight.log`): (i) byte-identical functions
+  and data blocks; (ii) kf_m13 output and FFBS draws identical to m13's for the
+  same inputs (9 settings of psi and rho); (iii) at 5 random points mapped
+  between the two parameterisations, the variant's log density minus m13's
+  equals the prior difference up to a constant (the dropped normalising
+  constants), on the 1980-sample data.
+- `R/fit_m13.R --variant=tight` (outputs `fit_m13_tight[_seed2].rds`, gate
+  records `<root>/tables/m13_tight_gate_seeds.csv`);
+  `paper/fit_rdp_sample.R m13_tight`; `paper/ppc_m13.R --variant=tight`;
+  `paper/prior_candidates.R`; driver `output/sample_1980/run_tight.sh`.
+
+**Fits** (4 chains x 2000 + 2000, adapt_delta 0.99, max_treedepth 12,
+parallel_chains 4; production gate):
+
+| Fit | div | min E-BFMI | max R-hat hyper | min bulk / tail ESS hyper | max R-hat mu / h / g | wall |
+|---|---|---|---|---|---|---|
+| m13 production priors, seed 1 (research fit = production draws) | 0 | 0.882 | 1.0013 | 1315 / 882 (phi[1]) | 1.0013 / 1.0015 / 1.0017 | 1048 s |
+| m13 production priors, seed 2 | 1 | 0.862 | 1.006 | 1094 / 782 (phi[1]) | 1.001 / 1.003 / 1.002 | 809 s |
+| tight, seed 1 | 0 | 0.838 | 1.0016 (phi[2]) | 1597 / 923 (phi[1]) | 1.0011 / 1.0017 / 1.0020 | 529 s |
+| tight, seed 2 | 0 | 0.869 | 1.0030 (omega[2]) | 1401 / 704 (phi[1]) | 1.0012 / 1.0024 / 1.0019 | 770 s |
+| tight, RDP sample (T = 134) | 0 | 0.872 | 1.0066 (phi_g) | 698 / 431 | mu 1.0033 | 292 s |
+
+Both production-sample fits pass the gate. Wall times are on the shared
+6-core machine (other apps open); read as "no slower" rather than faster.
+Total compute for this round: about 27 min of sampling (3 fits) plus about
+2.5 min of tests and a few minutes of R post-processing.
+
+**Comparison on the production sample (seed 1; seed 2 agrees to MC noise).**
+
+| Quantity | m13 priors | tight priors |
+|---|---|---|
+| rho | 0.39 [0.23, 0.54] | 0.42 [0.25, 0.57] |
+| mu_bar | 2.62 [2.31, 2.96] | 2.61 [2.28, 2.95] |
+| tau | 1.81 [1.26, 2.67] | 1.69 [1.20, 2.40] |
+| phi_g | 0.83 [0.65, 0.94] | 0.77 [0.53, 0.91] |
+| omega_g | 0.88 [0.59, 1.26] | 1.03 [0.65, 1.56] |
+| s_g | - | 1.65 [1.24, 2.20] (90th pct of its prior) |
+| phi E / I / P | 0.95 [0.11, 0.99] / 0.98 / 0.97 | 0.96 [0.53, 1.00] / 0.98 / 0.97 |
+| omega E / I / P | 0.23 / 0.31 / 0.36 | 0.20 / 0.27 / 0.32 |
+| psi E / I / P | -0.43 / -0.35 / -0.18 | -0.42 / -0.35 / -0.19 |
+| rho_EI | 0.09 [-0.08, 0.24] | 0.09 [-0.07, 0.24] |
+| latent 2026 Q2 (QoQ %) | 0.48 [0.31, 0.64] | 0.48 [0.29, 0.64] |
+| latent 2020 Q2 (annualised) | -27.9 [-29.0, -26.8] | -27.9 [-29.1, -26.8] |
+| per-draw variance ratio 1980-2026 | 0.872 [0.811, 0.938] | 0.867 [0.802, 0.932] |
+| ... excl. 2020 Q1-2021 Q1 | 0.776 [0.675, 0.883] | 0.766 [0.664, 0.871] |
+| tau_t decade means 1980s/90s/00s/10s/20s | 3.12 / 2.36 / 1.53 / 1.25 / 3.98 | 3.03 / 2.28 / 1.52 / 1.23 / 3.94 |
+| tau_t 2020 Q2 | 13.7 [9.1, 24.1] | 14.6 [9.3, 27.4] |
+
+- Median latent path: mean |diff| 0.056 pp annualised, max 0.29 (1994 Q3);
+  seed-to-seed for m13 is 0.016 / 0.096 and for the variant 0.015 / 0.10.
+- Median tau_t path: mean relative change 5.7%, max 20% (2019 Q3); seed to
+  seed about 0.8% / 3%.
+- Posterior predictive checks (`paper/ppc_m13.R --variant=tight`,
+  `paper/data/ppc_tight_*.csv`): essentially the same as m13's. Full
+  replication p-values 0.33-0.88 (m13: 0.34-0.90); pre-2020 headline sd p
+  0.88 (0.90); conditional 90% coverage E/I/P 96/94/99% (97/94/99%); weakest
+  conditional check still AC1 of GDP(P), p 0.14 (0.12). The replications' upper
+  tails are thinner (95th percentile of replicated headline sd 7.9 vs 11.4).
+- RDP sample (1980 Q1 - 2013 Q2): phi_g is **not** better identified:
+  0.95 [-0.29, 0.99] vs 0.91 [-0.49, 0.99]; s_g 0.80 [0.25, 1.57]. Median path
+  moves 0.049 on average (max 0.20); variance ratio 1980-2013 0.687 vs 0.686.
+  phi_g's prior (U(-1, 1)) was kept, so this was expected.
+
+**Does anything material move?** No for the latent path, the 2026 Q2
+estimate, the variance split, the measurement-error parameters and the
+predictive checks. The latent-volatility block moves: lower phi_g, higher
+omega_g, tau about 7% lower, the tau_t path by up to a fifth in single
+quarters (2020 Q2 +7%). This is the same direction and size as the earlier
+omega_g ~ half-N(0, 1) sensitivity fit on this sample (phi_g 0.79,
+omega_g 1.02, tau 1.74, max tau_t change 18%): the scale prior on the latent
+log-variance restrains it either way. phi_E's long left tail shortens (5%
+point 0.11 -> 0.53).
+
+**LFO.** Not run. Given that the latent path and the variance split do not
+move, an LFO comparison would test only whether the latent-volatility block's
+small shift changes one-step predictive densities (mostly around 2020); it
+would be warranted only if the variant were a candidate for production, under
+the project's switch-rule convention (and the window is already reused).
+
+**Open.** C3 misses T2 (q99 172 vs 100); a tighter scale (half-N(0, 0.75) on
+s) would meet it but was not fitted, by design. phi_g remains weakly
+identified without COVID. The variant was not run on the full sample or
+scored by LFO.
 
 ## Production sample moved to 1980 Q1, 2026-10-19
 
@@ -2327,7 +2488,10 @@ genuine multimodality.
 - `R/fit_m12.R`: fits m12 with the production gate (any seed), and the
   warmup-stall harness.
 - `R/fit_m13.R`: the same for m13, plus `--omega_g_sd=S` for the
-  prior-sensitivity fit; writes `output/tables/m13_gate_seeds.csv`.
+  prior-sensitivity fit and `--variant=tight` for the tighter-prior research
+  variant (`stan/m13_tight_priors.stan`); writes
+  `output/tables/m13_gate_seeds.csv` (`m13_tight_gate_seeds.csv` for the
+  variant).
 - `R/03_compare.R`: PSIS-LFO-CV comparison and per-draw variance
   decomposition.
 - `R/lib/filters.R`, `R/lib/filters.cpp`, `R/lib/lfo.R`: Kalman filter,
@@ -2340,7 +2504,8 @@ genuine multimodality.
   particle filter over (g, h) (registered by `register_m13()`).
 - `tests/test_filters.R`, `tests/test_m12.R`, `tests/test_m13.R`,
   `tests/test_m3_m10.R`: filter tests, each against a dense
-  multivariate-normal likelihood.
+  multivariate-normal likelihood. `tests/test_m13_tight.R`: the
+  tighter-prior variant has m13's filter and likelihood.
 - `R/diag_m10_modes.R`: m10 mode check (16 dispersed chains; 4 chains started
   in old mode A) -> `output/tables/m10_mode_check.csv`.
 - `R/diag_m3_ident.R`: m3 identification checks ->
@@ -2358,7 +2523,8 @@ genuine multimodality.
 - `R/input_hash.R`: CI input fingerprint.
 
 **Models**
-- `stan/m{1..13}_*.stan`: the 13 specifications.
+- `stan/m{1..13}_*.stan`: the 13 specifications. `stan/m13_tight_priors.stan`:
+  research variant of m13 with tighter priors (2026-10-19; not production).
   - m1-m5: baseline family motivated by Rees-Lancaster-Finlay. RDP Model 1
     (AR(1) latent, independent errors) corresponds to m2; m1 has an iid
     latent state. RDP Model 2 (latent innovation correlated with the errors,

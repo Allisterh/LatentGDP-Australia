@@ -8,6 +8,8 @@
 #   Rscript paper/fit_rdp_sample.R m2 m13        # a subset
 #   Rscript paper/fit_rdp_sample.R --end=2019-12-01 --out=output/sample_rdp/end2019 m2 m13
 #                                                # another sample end (1980 Q1 start kept)
+#   Rscript paper/fit_rdp_sample.R m13_tight     # the tight-priors variant of m13
+#                                                # (stan/m13_tight_priors.stan)
 #
 # Settings are those of R/02_fit_models.R / R/fit_production.R: 4 chains x (2000 warmup +
 # 2000 draws), seed 1, each model's own adapt_delta / max_treedepth. Fits are saved to
@@ -54,7 +56,11 @@ specs <- list(
              params = c("mu_bar", "c", "rho", "tau", "mu_h", "phi", "omega", "rho_EI", "psi")),
   m13 = list(file = "stan/m13_serial_latent_sv.stan", extras = sv,
              params = c("mu_bar", "c", "rho", "tau", "mu_g", "phi_g", "omega_g", "mu_h", "phi",
-                        "omega", "rho_EI", "psi"))
+                        "omega", "rho_EI", "psi")),
+  # research variant with tighter priors (NOTES.md 2026-10-19); not in the default list
+  m13_tight = list(file = "stan/m13_tight_priors.stan", extras = sv,
+             params = c("mu_bar", "c", "rho", "tau", "mu_g", "phi_g", "omega_g", "s_g", "mu_h",
+                        "phi", "omega", "s_h", "rho_EI", "psi"))
 )
 
 args <- args_all[!startsWith(args_all, "--")]

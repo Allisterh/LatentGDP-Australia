@@ -8,6 +8,9 @@
 #   Rscript R/fit_m13.R --parallel=2         # parallel chains (default 4)
 #   Rscript R/fit_m13.R --omega_g_sd=1 --out=output/fit_m13_omegag1.rds
 #                                            # prior sensitivity: omega_g ~ half-N(0, 1)
+#   Rscript R/fit_m13.R --variant=tight      # research variant stan/m13_tight_priors.stan
+#                                            # (tighter priors; NOTES.md 2026-10-19); saves
+#                                            # <root>/fit_m13_tight.rds (seed 2: _tight_seed2)
 #   Rscript R/fit_m13.R stall --chains=100 --init=2 --timeout=300 --parallel=4 --dir=DIR
 #
 # Fit mode: the production settings (4 chains x (2000 warmup + 2000 draws), adapt_delta
@@ -22,6 +25,12 @@
 # --omega_g_sd=S (S != 0.5) fits a copy of the Stan program, written to --stan_dir (default
 # tempdir()), whose only change is the prior line omega_g ~ normal(0, S); its gate record is
 # not written to m13_gate_seeds.csv unless --gate_csv is given.
+#
+# --variant=tight fits stan/m13_tight_priors.stan (m13's likelihood with the tighter priors
+# chosen by prior predictive simulation) with the same settings and the same gate (the
+# variant keeps m13's variable names: c, omega and omega_g are transformed parameters there);
+# its gate record goes to <root>/tables/m13_tight_gate_seeds.csv. It cannot be combined
+# with --omega_g_sd.
 #
 # Stall mode: the warmup-stall harness of R/fit_m12.R (from m9). Many independent
 # single-chain runs of 150 warmup iterations from Stan's random inits (init = 2 by
@@ -60,6 +69,14 @@ stan_data <- list(
 stan_file <- "stan/m13_serial_latent_sv.stan"
 omega_g_sd <- as.numeric(opt("omega_g_sd", "0.5"))
 std_prior <- isTRUE(all.equal(omega_g_sd, 0.5))
+variant <- opt("variant", "m13")
+stopifnot(variant %in% c("m13", "tight"))
+tight <- variant == "tight"
+if (tight) {
+  if (!std_prior) stop("--variant=tight cannot be combined with --omega_g_sd")
+  stan_file <- "stan/m13_tight_priors.stan"
+  cat("Variant: tight priors,", stan_file, "\n")
+}
 if (!std_prior) {
   # Prior-sensitivity copy: one line changed, checked to occur exactly once.
   src <- readLines(stan_file)
@@ -152,10 +169,12 @@ if (mode == "stall") {
 # Full fit
 # ---------------------------------------------------------------------------
 seed <- as.integer(opt("seed", "1"))
-out  <- opt("out", if (seed == 1L) sw_out("fit_m13.rds") else
-  sw_out(sprintf("fit_m13_seed%d.rds", seed)))
+tag  <- if (tight) "m13_tight" else "m13"
+out  <- opt("out", if (seed == 1L) sw_out(sprintf("fit_%s.rds", tag)) else
+  sw_out(sprintf("fit_%s_seed%d.rds", tag, seed)))
 par  <- as.integer(opt("parallel", "4"))
-gate_csv <- opt("gate_csv", if (std_prior) sw_out("tables", "m13_gate_seeds.csv") else "none")
+gate_csv <- opt("gate_csv", if (tight) sw_out("tables", "m13_tight_gate_seeds.csv") else
+  if (std_prior) sw_out("tables", "m13_gate_seeds.csv") else "none")
 dir.create(dirname(out), showWarnings = FALSE, recursive = TRUE)
 
 t_wall0 <- Sys.time()
@@ -174,9 +193,14 @@ wall_secs <- as.numeric(difftime(Sys.time(), t_wall0, units = "secs"))
 fit$save_object(file = out)
 cat(sprintf("\nSaved %s\n", out))
 
-cat(sprintf("\n=== m13 fit (seed %d, omega_g ~ half-N(0, %s)) ===\n", seed, format(omega_g_sd)))
+if (tight) {
+  cat(sprintf("\n=== m13 tight-priors variant fit (seed %d) ===\n", seed))
+} else {
+  cat(sprintf("\n=== m13 fit (seed %d, omega_g ~ half-N(0, %s)) ===\n", seed, format(omega_g_sd)))
+}
 print(fit$summary(variables = c("mu_bar", "rho", "tau", "mu_g", "phi_g", "omega_g", "rho_EI",
-                                "psi", "phi", "omega", "mu_h", "eps_sd_bar")), n = 40)
+                                "psi", "phi", "omega", "mu_h", "eps_sd_bar",
+                                if (tight) c("s_g", "s_h"))), n = 50)
 tm <- fit$time()
 cat(sprintf("Sampling time (fit$time()$total): %.0f s; wall time of $sample(): %.0f s (parallel_chains = %d); per-chain total s: %s\n",
             tm$total, wall_secs, par, paste(round(tm$chains$total), collapse = ", ")))
@@ -300,13 +324,17 @@ if (!is.na(min_eb) && min_eb < GATE$ebfmi_floor) {
 }
 gate_pass <- length(failures) == 0
 
-saveRDS(list(seed = seed, omega_g_sd = omega_g_sd, checks = checks, ebfmi = ebfmi,
+if (tight) {   # informational: the variant's sampled scale parameters (not part of the gate)
+  print(summ_conv(c("s_g", "s_h")))
+}
+saveRDS(list(seed = seed, omega_g_sd = omega_g_sd, variant = variant, checks = checks, ebfmi = ebfmi,
              n_tdmax = n_tdmax, time = tm, wall_secs = wall_secs, parallel_chains = par,
              gate_pass = gate_pass, failures = failures),
         sub("\\.rds$", "_gate.rds", out))
 
 if (gate_csv != "none") {
-  label <- sprintf("%s (R/fit_m13.R%s%s)", out, if (seed != 1L) sprintf(" --seed=%d", seed) else "",
+  label <- sprintf("%s (R/fit_m13.R%s%s%s)", out, if (tight) " --variant=tight" else "",
+                   if (seed != 1L) sprintf(" --seed=%d", seed) else "",
                    if (par != 4L) sprintf(" --parallel=%d", par) else "")
   rows <- data.frame(
     fit = label, seed = seed, metric = checks$metric, value = checks$value, op = checks$op,

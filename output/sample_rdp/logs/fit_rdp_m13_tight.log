@@ -1,0 +1,46 @@
+[20:07:24] start m13_tight (T = 134)
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 2 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 3 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 4 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 3 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 2 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 4 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 1 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 3 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 3 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 4 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 2 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 1 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 1 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 3 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 4 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 4 finished in 213.7 seconds.
+Chain 2 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 1 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 1 finished in 228.4 seconds.
+Chain 3 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 3 finished in 276.1 seconds.
+Chain 2 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 2 finished in 286.6 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 251.2 seconds.
+Total execution time: 286.8 seconds.
+
+      model   T      first       last chains draws adapt_delta max_treedepth
+1 m13_tight 134 1980-03-01 2013-06-01      4  8000        0.99            12
+  divergences treedepth_hits min_ebfmi max_rhat_hyper worst_rhat_var
+1           0              0 0.8722725       1.006649          phi_g
+  min_ess_bulk_hyper min_ess_tail_hyper max_rhat_mu min_ess_bulk_mu wall_secs
+1           697.7946            431.109     1.00328        1112.401       292
+         fitted_at
+1 2026-10-19 20:12
+[20:12:27] done m13_tight
+ALL DONE

@@ -16,6 +16,9 @@
 #   output/fit_m{1..13}.rds                          full-sample (1959 Q4) research fits
 #   output/fit_m13_seed2.rds, output/fit_m13_omegag1.rds
 #   output/sample_1980/fit_m13_omegag1.rds           1980 Q1 m13, omega_g ~ half-N(0, 1)
+#   output/sample_1980/fit_m13_tight{,_seed2}.rds    1980 Q1 tight-priors variant of m13
+#                                                    (stan/m13_tight_priors.stan; seeds 1, 2)
+#   output/sample_rdp/fit_m13_tight.rds              the same variant on 1980 Q1 - 2013 Q2
 #   output/sample_rdp/fit_m{2,4,5,9,12,13}.rds       RDP 2014-12 sample, 1980 Q1 - 2013 Q2
 #                                                    (paper/fit_rdp_sample.R)
 #   output/sample_rdp/end2019/fit_m{2,13}.rds        1980 Q1 - 2019 Q4 (paper/fit_rdp_sample.R --end)
@@ -78,6 +81,12 @@ fit_list <- rbind(
 )
 fit_list <- rbind(fit_list, data.frame(key = c("m2_e2019", "m13_e2019"), model = c("m2", "m13"),
   sample = "e2019", path = file.path("output/sample_rdp/end2019", c("fit_m2.rds", "fit_m13.rds"))))
+# Tight-priors variant of m13 (stan/m13_tight_priors.stan; keys m13t_*). model = "m13" so the
+# m13 detail (paths of mu, tau_t, sigma_t; decade means) is extracted for it too.
+fit_list <- rbind(fit_list, data.frame(key = c("m13t_1980", "m13t_1980_seed2", "m13t_rdp"),
+  model = "m13", sample = c("1980", "1980", "rdp"),
+  path = c("output/sample_1980/fit_m13_tight.rds", "output/sample_1980/fit_m13_tight_seed2.rds",
+           "output/sample_rdp/fit_m13_tight.rds")))
 fit_list$last <- ifelse(fit_list$sample == "rdp", "2013-06-01",
                  ifelse(fit_list$sample == "e2019", "2019-12-01", format(last_date)))
 fit_list <- fit_list[file.exists(fit_list$path), ]
@@ -87,7 +96,7 @@ hyper_patterns <- c("^c$", "^rho$", "^tau$", "^mu_bar$", "^mu_bar_m$", "^sigma\\
                     "^sigma_gdp\\[", "^sigma_U$", "^sigma_emp$", "^alpha$", "^beta$",
                     "^alpha_emp$", "^beta_emp$", "^mu_h\\[", "^phi\\[", "^omega\\[",
                     "^rho_EI$", "^psi\\[", "^eps_sd_bar\\[", "^eps_sd\\[", "^mu_g$",
-                    "^phi_g$", "^omega_g$", "^kappa\\[", "^Omega\\[")
+                    "^phi_g$", "^omega_g$", "^kappa\\[", "^Omega\\[", "^s_g$", "^s_h\\[")
 
 params_rows <- list(); covid_rows <- list(); path_rows <- list(); vr_rows <- list()
 m13_paths <- list(); decade_rows <- list(); stats_rows <- list(); comb_rows <- list()
@@ -261,7 +270,13 @@ rob <- rbind(
   if ("m13_1980_omegag1" %in% names(m13_paths))
     cmp("m13_prod", "m13_1980_omegag1", "prior: omega_g ~ half-N(0, 1) vs half-N(0, 0.5), 1980 sample"),
   if ("m13_rdp" %in% names(m13_paths))
-    cmp("m13_prod", "m13_rdp", "RDP sample (to 2013 Q2) vs 1980 sample (to 2026 Q2), common quarters")
+    cmp("m13_prod", "m13_rdp", "RDP sample (to 2013 Q2) vs 1980 sample (to 2026 Q2), common quarters"),
+  if ("m13t_1980" %in% names(m13_paths))
+    cmp("m13_prod", "m13t_1980", "tight priors vs m13 priors, 1980 sample (seed 1)"),
+  if (all(c("m13t_1980", "m13t_1980_seed2") %in% names(m13_paths)))
+    cmp("m13t_1980", "m13t_1980_seed2", "tight priors: seed 2 vs seed 1, 1980 sample"),
+  if (all(c("m13_rdp", "m13t_rdp") %in% names(m13_paths)))
+    cmp("m13_rdp", "m13t_rdp", "tight priors vs m13 priors, RDP sample (to 2013 Q2)")
 )
 wcsv(rob, "m13_robustness_paths.csv")
 
@@ -272,6 +287,24 @@ if (file.exists(gp)) {
   wcsv(data.frame(gr$checks, ebfmi_by_chain = paste(sprintf("%.3f", gr$ebfmi), collapse = " "),
                   sampling_secs_total = gr$time$total, wall_secs = gr$wall_secs,
                   omega_g_sd = gr$omega_g_sd), "m13_1980_omegag1_gate.csv")
+}
+
+# Gate records of the tight-priors variant (written by R/fit_m13.R --variant=tight), with
+# the production fit's seed-1 record for comparison (output/sample_1980/fit_m13_gate.rds
+# is the research fit that the production fit reproduces draw for draw)
+tg <- list(m13_prod = "output/sample_1980/fit_m13_gate.rds",
+           m13_1980_seed2 = "output/sample_1980/fit_m13_seed2_gate.rds",
+           m13t_1980 = "output/sample_1980/fit_m13_tight_gate.rds",
+           m13t_1980_seed2 = "output/sample_1980/fit_m13_tight_seed2_gate.rds")
+tg <- tg[file.exists(unlist(tg))]
+if (length(tg)) {
+  wcsv(do.call(rbind, lapply(names(tg), function(k) {
+    gr <- readRDS(tg[[k]])
+    data.frame(key = k, seed = gr$seed, gr$checks, gate_pass = gr$gate_pass,
+               ebfmi_by_chain = paste(sprintf("%.3f", gr$ebfmi), collapse = " "),
+               treedepth_hits = gr$n_tdmax, sampling_secs_total = gr$time$total,
+               wall_secs = gr$wall_secs)
+  })), "m13_tight_gate.csv")
 }
 
 # ---------------------------------------------------------------------------------------

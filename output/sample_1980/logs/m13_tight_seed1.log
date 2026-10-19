@@ -1,0 +1,123 @@
+sample start 1980-03-01; output root output/sample_1980 
+Variant: tight priors, stan/m13_tight_priors.stan 
+Running MCMC with 4 parallel chains...
+
+Chain 1 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 2 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 2 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Chain 2 Exception: m13_tight_priors_model_namespace::log_prob: omega[2] is nan, but must be greater than or equal to 0.000000 (in '/var/folders/l8/j684zy8n0gg_l_8x97yw_m980000gn/T/RtmpH2U8TY/model-728b6a903fb4.stan', line 225, column 2 to column 65)
+Chain 2 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+Chain 2 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+Chain 2 
+Chain 3 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 4 Iteration:    1 / 4000 [  0%]  (Warmup) 
+Chain 4 Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Chain 4 Exception: m13_tight_priors_model_namespace::log_prob: omega_g is nan, but must be greater than or equal to 0.000000 (in '/var/folders/l8/j684zy8n0gg_l_8x97yw_m980000gn/T/RtmpH2U8TY/model-728b6a903fb4.stan', line 224, column 2 to column 64)
+Chain 4 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+Chain 4 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+Chain 4 
+Chain 4 Iteration:  500 / 4000 [ 12%]  (Warmup) 
+Chain 3 Iteration:  500 / 4000 [ 12%]  (Warmup) 
+Chain 1 Iteration:  500 / 4000 [ 12%]  (Warmup) 
+Chain 2 Iteration:  500 / 4000 [ 12%]  (Warmup) 
+Chain 4 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 3 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 1 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 2 Iteration: 1000 / 4000 [ 25%]  (Warmup) 
+Chain 4 Iteration: 1500 / 4000 [ 37%]  (Warmup) 
+Chain 3 Iteration: 1500 / 4000 [ 37%]  (Warmup) 
+Chain 1 Iteration: 1500 / 4000 [ 37%]  (Warmup) 
+Chain 2 Iteration: 1500 / 4000 [ 37%]  (Warmup) 
+Chain 4 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 4 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 3 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 3 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 1 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 1 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 2 Iteration: 2000 / 4000 [ 50%]  (Warmup) 
+Chain 2 Iteration: 2001 / 4000 [ 50%]  (Sampling) 
+Chain 4 Iteration: 2500 / 4000 [ 62%]  (Sampling) 
+Chain 3 Iteration: 2500 / 4000 [ 62%]  (Sampling) 
+Chain 1 Iteration: 2500 / 4000 [ 62%]  (Sampling) 
+Chain 2 Iteration: 2500 / 4000 [ 62%]  (Sampling) 
+Chain 4 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 3 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 1 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 2 Iteration: 3000 / 4000 [ 75%]  (Sampling) 
+Chain 4 Iteration: 3500 / 4000 [ 87%]  (Sampling) 
+Chain 3 Iteration: 3500 / 4000 [ 87%]  (Sampling) 
+Chain 1 Iteration: 3500 / 4000 [ 87%]  (Sampling) 
+Chain 2 Iteration: 3500 / 4000 [ 87%]  (Sampling) 
+Chain 4 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 4 finished in 474.5 seconds.
+Chain 3 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 3 finished in 489.3 seconds.
+Chain 1 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 1 finished in 519.2 seconds.
+Chain 2 Iteration: 4000 / 4000 [100%]  (Sampling) 
+Chain 2 finished in 523.4 seconds.
+
+All 4 chains finished successfully.
+Mean chain execution time: 501.6 seconds.
+Total execution time: 523.5 seconds.
+
+
+Saved output/sample_1980/fit_m13_tight.rds
+
+=== m13 tight-priors variant fit (seed 1) ===
+# A tibble: 26 × 10
+   variable         mean  median     sd    mad      q5       q95  rhat ess_bulk
+   <chr>           <dbl>   <dbl>  <dbl>  <dbl>   <dbl>     <dbl> <dbl>    <dbl>
+ 1 mu_bar         2.61    2.61   0.205  0.199   2.28    2.95     1.00    10275.
+ 2 rho            0.415   0.417  0.0952 0.0964  0.254   0.567    1.000    8137.
+ 3 tau            1.73    1.69   0.374  0.336   1.20    2.40     1.00     5766.
+ 4 mu_g           1.05    1.05   0.421  0.401   0.370   1.75     1.00     5766.
+ 5 phi_g          0.754   0.774  0.117  0.110   0.534   0.911    1.00     2517.
+ 6 omega_g        1.05    1.03   0.278  0.280   0.651   1.56     1.00     2915.
+ 7 rho_EI         0.0872  0.0883 0.0943 0.0974 -0.0726  0.239    1.00    11788.
+ 8 psi[1]        -0.422  -0.423  0.0739 0.0744 -0.542  -0.299    1.00    17120.
+ 9 psi[2]        -0.354  -0.355  0.0762 0.0764 -0.478  -0.229    1.00    16130.
+10 psi[3]        -0.185  -0.186  0.112  0.111  -0.365   0.000844 1.000   11873.
+11 phi[1]         0.894   0.964  0.232  0.0369  0.533   0.995    1.00     1597.
+12 phi[2]         0.966   0.976  0.0326 0.0201  0.904   0.995    1.00     3848.
+13 phi[3]         0.956   0.969  0.0452 0.0261  0.874   0.994    1.00     3462.
+14 omega[1]       0.241   0.198  0.154  0.102   0.0837  0.549    1.00     2062.
+15 omega[2]       0.284   0.266  0.122  0.114   0.120   0.511    1.00     3108.
+16 omega[3]       0.348   0.320  0.159  0.141   0.147   0.651    1.00     3424.
+17 mu_h[1]        1.58    1.57   0.431  0.343   0.889   2.30     1.000    6668.
+18 mu_h[2]        1.64    1.63   0.578  0.531   0.711   2.60     1.00     8487.
+19 mu_h[3]        1.10    1.04   0.658  0.604   0.129   2.29     1.00     6186.
+20 eps_sd_bar[1]  2.50    2.44   0.581  0.431   1.72    3.49     1.000    6765.
+21 eps_sd_bar[2]  2.54    2.42   0.784  0.647   1.53    3.94     1.00     8637.
+22 eps_sd_bar[3]  1.88    1.72   0.696  0.508   1.09    3.20     1.00     6131.
+23 s_g            1.67    1.65   0.293  0.285   1.24    2.20     1.00     5825.
+24 s_h[1]         0.822   0.771  0.319  0.266   0.414   1.42     1.00     3501.
+25 s_h[2]         1.26    1.21   0.373  0.334   0.767   1.97     1.00     6783.
+26 s_h[3]         1.37    1.32   0.396  0.370   0.824   2.09     1.00     6805.
+# ℹ 1 more variable: ess_tail <dbl>
+Sampling time (fit$time()$total): 524 s; wall time of $sample(): 529 s (parallel_chains = 4); per-chain total s: 519, 523, 489, 474
+
+=== Convergence gate (R/fit_production.R thresholds; hyperparameters + psi, mu_g, phi_g, omega_g; R-hat on g[t]) ===
+Per-chain E-BFMI: 0.904, 0.885, 0.892, 0.838
+Max-treedepth hits: 0 of 8000 draws (informational)
+metric                                              value  threshold  status worst
+divergences (0 of 8000 draws, 4 chains)            0.000%  < 0.1%     PASS   
+min E-BFMI over chains                              0.838  >= 0.3     PASS   chain 4
+max R-hat, hyperparameters                         1.0016  <= 1.01    PASS   phi[2]
+max R-hat, mu[t]                                   1.0011  <= 1.05    PASS   mu[131]
+max R-hat, h[t,k]                                  1.0017  <= 1.05    PASS   h[45,2]
+max R-hat, g[t]                                    1.0020  <= 1.05    PASS   g[113]
+min bulk ESS, hyperparameters                        1597  >= 400     PASS   phi[1]
+min tail ESS, hyperparameters                         923  >= 400     PASS   phi[1]
+min bulk ESS, mu[t]                                  7006  >= 400     PASS   mu[167]
+min tail ESS, mu[t]                                  6441  >= 400     PASS   mu[52]
+# A tibble: 4 × 4
+  variable  rhat ess_bulk ess_tail
+  <chr>    <dbl>    <dbl>    <dbl>
+1 s_g       1.00    5825.    6603.
+2 s_h[1]    1.00    3501.    3121.
+3 s_h[2]    1.00    6783.    5528.
+4 s_h[3]    1.00    6805.    6028.
+Gate record written to output/sample_1980/tables/m13_tight_gate_seeds.csv
+
+Fit quality gate passed: all checks within thresholds.

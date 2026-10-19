@@ -44,3 +44,6 @@ stan/m13_serial_latent_sv
 .claude/
 output/sample_rdp/**/*.rds
 output/ppc/**/*.rds
+
+# Research variant of m13 with tighter priors (compiled executable)
+stan/m13_tight_priors

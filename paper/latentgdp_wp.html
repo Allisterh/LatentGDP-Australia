@@ -2774,9 +2774,9 @@ Table 2: The thirteen specifications. ‘E–I only’ means the E and I errors
 <section id="sec-failed" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="sec-failed"><span class="header-section-number">4.3</span> What the failed specifications taught us</h2>
 <p>Three specifications needed diagnosis. Each episode changed the model family.</p>
-<p><strong>m3: weak identification of the error correlations.</strong> With <span class="math inline">\(\rho\)</span> near zero the latent state is close to i.i.d. Then the data identify only the cross-sectional covariance <span class="math inline">\(v\mathbf{1}\mathbf{1}&#39; + \Sigma\)</span>, where <span class="math inline">\(v = \tau^2/(1-\rho^2)\)</span>, plus a weak lag-1 autocovariance <span class="math inline">\(\rho v\)</span>. Adding <span class="math inline">\(\delta\)</span> to every element of <span class="math inline">\(\Sigma\)</span> and subtracting it from <span class="math inline">\(v\)</span> leaves the first unchanged. This is the identification problem that <span class="citation" data-cites="aruoba2016">Aruoba et al. (<a href="#ref-aruoba2016" role="doc-biblioref">2016</a>)</span> and RDP 2014-12 solve by restriction. On the full sample the posterior correlation between <span class="math inline">\(\tau\)</span> and the mean off-diagonal error correlation is −0.70. In the lowest decile of <span class="math inline">\(\tau\)</span> draws the E–I correlation averages 0.29; in the highest decile it is −0.02. The posterior standard deviations of the three correlations are 46%, 57% and 83% of their prior standard deviation. The ridge first showed up as a sampler failure. With latent growth sampled jointly, m3 had a minimum E-BFMI of 0.03 and a minimum bulk ESS of 132. After latent growth was integrated out (<a href="#sec-estimation" class="quarto-xref">Section 5</a>) it sampled cleanly (<a href="#tbl-fitdiag" class="quarto-xref">Table 16</a>), and the weak identification remained as a property of the model. m6’s E/I-only restriction is the structural alternative.</p>
+<p><strong>m3: weak identification of the error correlations.</strong> With <span class="math inline">\(\rho\)</span> near zero the latent state is close to i.i.d. Then the data identify only the cross-sectional covariance <span class="math inline">\(v\mathbf{1}\mathbf{1}&#39; + \Sigma\)</span>, where <span class="math inline">\(v = \tau^2/(1-\rho^2)\)</span>, plus a weak lag-1 autocovariance <span class="math inline">\(\rho v\)</span>. Adding <span class="math inline">\(\delta\)</span> to every element of <span class="math inline">\(\Sigma\)</span> and subtracting it from <span class="math inline">\(v\)</span> leaves the first unchanged. This is the identification problem that <span class="citation" data-cites="aruoba2016">Aruoba et al. (<a href="#ref-aruoba2016" role="doc-biblioref">2016</a>)</span> and RDP 2014-12 solve by restriction. On the full sample the posterior correlation between <span class="math inline">\(\tau\)</span> and the mean off-diagonal error correlation is −0.70. In the lowest decile of <span class="math inline">\(\tau\)</span> draws the E–I correlation averages 0.29; in the highest decile it is −0.02. The posterior standard deviations of the three correlations are 46%, 57% and 83% of their prior standard deviation. The ridge first showed up as a sampler failure. With latent growth sampled jointly, m3 had a minimum E-BFMI of 0.03 and a minimum bulk ESS of 132. After latent growth was integrated out (<a href="#sec-estimation" class="quarto-xref">Section 5</a>) it sampled cleanly (<a href="#tbl-fitdiag" class="quarto-xref">Table 18</a>), and the weak identification remained as a property of the model. m6’s E/I-only restriction is the structural alternative.</p>
 <p><strong>m10: two modes, and a re-specification.</strong> The first version of m10 had constant latent variance and SV on four measurement errors, estimated from 1978 Q4. It had two posterior modes. Of 16 chains started from dispersed values, 9 found mode A (<span class="math inline">\(\rho \approx\)</span> 0.39, <span class="math inline">\(\tau \approx\)</span> 2.1). In mode A latent growth in 2020 Q2 was −1.3, so the model read COVID as four coincident errors of about −27 in four separately compiled series, and the latent variance ratio was 0.36. Another 3 chains found mode B (<span class="math inline">\(\tau \approx\)</span> 3.6, latent 2020 Q2 −26.9), which inflated <span class="math inline">\(\tau\)</span> for every quarter. The remaining 4 were stranded between the two. Both modes are responses to one misspecification. With a constant latent standard deviation calibrated to the post-1978 sample, the 2020 Q2 fall is a latent shock of roughly 13 standard deviations. The model must either inflate the latent variance everywhere or call a common shock measurement error. A reparameterisation cannot fix that. We re-specified m10 with SV on latent growth (<a href="#eq-latent" class="quarto-xref">Equation 4</a>), using the same priors as each measurement SV block. The economic justification does not depend on the fit: output volatility fell after the mid-1980s, and COVID was a real shock on which the measures agree. After re-specification, 16 chains from dispersed starting values all reached one mode (log posterior −2,338 to −2,334, latent 2020 Q2 −28.2 to −28.1). 4 further chains started at an old mode-A configuration all left it for the same mode. This re-specification was chosen after the old model’s fit and LFO score had been seen, so the new m10’s predictive gains are post hoc. m13 is m12 with the same latent SV block; <a href="#sec-results" class="quarto-xref">Section 7</a> and <a href="#sec-limits" class="quarto-xref">Section 10</a> discuss what that implies.</p>
-<p><strong>m4: an artefact of the sampling coordinates.</strong> The first SV specification used a random-walk log-variance anchored at the start. It was unidentified (R-hat about 1.6). A stationary AR(1) log-variance replaced it. With latent growth sampled jointly, one persistence parameter then looked bimodal (R-hat 1.30). With latent growth integrated out the bimodality disappeared (<a href="#tbl-fitdiag" class="quarto-xref">Table 16</a>). It was a sampler artefact of the coupling between latent growth and the log-variances, not a feature of the posterior.</p>
+<p><strong>m4: an artefact of the sampling coordinates.</strong> The first SV specification used a random-walk log-variance anchored at the start. It was unidentified (R-hat about 1.6). A stationary AR(1) log-variance replaced it. With latent growth sampled jointly, one persistence parameter then looked bimodal (R-hat 1.30). With latent growth integrated out the bimodality disappeared (<a href="#tbl-fitdiag" class="quarto-xref">Table 18</a>). It was a sampler artefact of the coupling between latent growth and the log-variances, not a feature of the posterior.</p>
 </section>
 </section>
 <section id="sec-estimation" class="level1" data-number="5">
@@ -2787,21 +2787,23 @@ Table 2: The thirteen specifications. ‘E–I only’ means the E and I errors
 <div id="tbl-priors" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-priors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 3: Priors of the production model m13 (annualised units). N(m, s) has standard deviation s; half-N is a normal on a positive parameter; normals on (−1, 1) parameters are truncated. Source: stan/m13_serial_latent_sv.stan and priors.md.
+Table 3: Priors of the production model m13 (annualised units), and of the research variant with tighter priors (<a href="#sec-ppc" class="quarto-xref">Section 7.6</a>, <a href="#sec-robust-priors" class="quarto-xref">Section 8.2.1</a>; not used in production). N(m, s) has standard deviation s; half-N is a normal on a positive parameter; normals on (−1, 1) parameters are truncated. In the variant <span class="math inline">\(s_g\)</span> and <span class="math inline">\(s_k\)</span> are the stationary standard deviations of the log-variances. Source: stan/m13_serial_latent_sv.stan, stan/m13_tight_priors.stan and priors.md.
 </figcaption>
 <div aria-describedby="tbl-priors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <table class="cell caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 15%">
-<col style="width: 53%">
+<col style="width: 8%">
 <col style="width: 30%">
+<col style="width: 17%">
+<col style="width: 43%">
 </colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">Parameter</th>
 <th style="text-align: left;">Role</th>
 <th style="text-align: left;">Prior</th>
+<th style="text-align: left;">Tighter-prior variant</th>
 </tr>
 </thead>
 <tbody>
@@ -2809,51 +2811,61 @@ Table 3: Priors of the production model m13 (annualised units). N(m, s) has sta
 <td style="text-align: left;"><span class="math inline">\(c\)</span></td>
 <td style="text-align: left;">latent intercept; <span class="math inline">\(\bar\mu = c/(1-\rho)\)</span></td>
 <td style="text-align: left;">N(1.5, 1)</td>
+<td style="text-align: left;"><span class="math inline">\(c = \bar\mu(1-\rho)\)</span>, <span class="math inline">\(\bar\mu \sim\)</span> N(3, 2)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><span class="math inline">\(\rho\)</span></td>
 <td style="text-align: left;">latent persistence</td>
 <td style="text-align: left;">N(0.5, 0.3) on (−1, 1)</td>
+<td style="text-align: left;">Beta(2.625, 2.625) on (0, 1)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><span class="math inline">\(\mu_g\)</span></td>
 <td style="text-align: left;">latent log-variance, long-run mean</td>
 <td style="text-align: left;">N(2, 1)</td>
+<td style="text-align: left;">as m13</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><span class="math inline">\(\phi_g\)</span></td>
 <td style="text-align: left;">latent log-variance persistence</td>
 <td style="text-align: left;">Uniform(−1, 1)</td>
+<td style="text-align: left;">as m13</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><span class="math inline">\(\omega_g\)</span></td>
 <td style="text-align: left;">latent log-variance innovation sd</td>
 <td style="text-align: left;">half-N(0, 0.5)</td>
+<td style="text-align: left;"><span class="math inline">\(\omega_g = s_g\sqrt{1-\phi_g^2}\)</span>, <span class="math inline">\(s_g \sim\)</span> half-N(0, 1)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><span class="math inline">\(\mu_{h,k}\)</span></td>
 <td style="text-align: left;">error log-variance, long-run mean</td>
 <td style="text-align: left;">N(2, 1)</td>
+<td style="text-align: left;">as m13</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><span class="math inline">\(\phi_k\)</span></td>
 <td style="text-align: left;">error log-variance persistence</td>
 <td style="text-align: left;">Uniform(−1, 1)</td>
+<td style="text-align: left;">as m13</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><span class="math inline">\(\omega_k\)</span></td>
 <td style="text-align: left;">error log-variance innovation sd</td>
 <td style="text-align: left;">half-N(0, 0.5)</td>
+<td style="text-align: left;"><span class="math inline">\(\omega_k = s_k\sqrt{1-\phi_k^2}\)</span>, <span class="math inline">\(s_k \sim\)</span> half-N(0, 1)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><span class="math inline">\(\rho_{EI}\)</span></td>
 <td style="text-align: left;">E–I innovation correlation</td>
 <td style="text-align: left;">N(0, 0.5) on (−1, 1)</td>
+<td style="text-align: left;">as m13</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><span class="math inline">\(\psi_k\)</span></td>
 <td style="text-align: left;">error AR(1) coefficient</td>
 <td style="text-align: left;">N(0, 0.5) on (−1, 1)</td>
+<td style="text-align: left;">as m13</td>
 </tr>
 </tbody>
 </table>
@@ -2862,7 +2874,7 @@ Table 3: Priors of the production model m13 (annualised units). N(m, s) has sta
 </figure>
 </div>
 </div>
-<p><a href="#tbl-priors" class="quarto-xref">Table 3</a> lists m13’s priors. The other three-measure models use the same priors for the parameters they share with m13, with three exceptions. Models with a constant latent standard deviation (all except m10 and m13) put a half-N(0, 2) prior on <span class="math inline">\(\tau\)</span>, and the constant-variance models put half-N(0, 2) priors on the error standard deviations. m1 has a N(3, 2) prior on its mean <span class="math inline">\(\bar\mu\)</span>. m11 works at monthly frequency and has its own priors (for example <span class="math inline">\(\rho \sim N(0.9, 0.1)\)</span> and half-N(0, 5) on its monthly latent and employment standard deviations; see priors.md). The scales are weakly informative for growth of about 3% a year with swings of a few percentage points. At <span class="math inline">\(\mu_g \sim N(2,1)\)</span> the prior median of <span class="math inline">\(\tau\)</span> is <span class="math inline">\(e \approx 2.7\)</span>. The scales were set by hand from sample moments. A prior predictive simulation, run for this paper after the comparison, is reported in <a href="#sec-ppc" class="quarto-xref">Section 7.6</a>.</p>
+<p><a href="#tbl-priors" class="quarto-xref">Table 3</a> lists m13’s priors. The other three-measure models use the same priors for the parameters they share with m13, with three exceptions. Models with a constant latent standard deviation (all except m10 and m13) put a half-N(0, 2) prior on <span class="math inline">\(\tau\)</span>, and the constant-variance models put half-N(0, 2) priors on the error standard deviations. m1 has a N(3, 2) prior on its mean <span class="math inline">\(\bar\mu\)</span>. m11 works at monthly frequency and has its own priors (for example <span class="math inline">\(\rho \sim N(0.9, 0.1)\)</span> and half-N(0, 5) on its monthly latent and employment standard deviations; see priors.md). The scales are weakly informative for growth of about 3% a year with swings of a few percentage points. At <span class="math inline">\(\mu_g \sim N(2,1)\)</span> the prior median of <span class="math inline">\(\tau\)</span> is <span class="math inline">\(e \approx 2.7\)</span>. The scales were set by hand from sample moments. A prior predictive simulation, run for this paper after the comparison, is reported in <a href="#sec-ppc" class="quarto-xref">Section 7.6</a>. It shows that these priors put noticeable mass on implausibly volatile economies, so we also fitted a research variant with tighter priors chosen from the prior predictive alone (last column of <a href="#tbl-priors" class="quarto-xref">Table 3</a>). Its results are in <a href="#sec-robust-priors" class="quarto-xref">Section 8.2.1</a>; production uses m13’s priors.</p>
 </section>
 <section id="integrating-out-latent-growth" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="integrating-out-latent-growth"><span class="header-section-number">5.2</span> Integrating out latent growth</h2>
@@ -2880,7 +2892,7 @@ y_t - \psi \circ y_{t-1} = \mathbf{1}\mu_t - \psi\,\mu_{t-1} + u_t, \qquad t \ge
 <h2 data-number="5.4" class="anchored" data-anchor-id="sampler-settings-the-publication-gate-and-computing-time"><span class="header-section-number">5.4</span> Sampler settings, the publication gate and computing time</h2>
 <p>Every full fit uses 4 chains of 2,000 warmup and 2,000 sampling iterations (8,000 draws), seed 1. The SV models use a target acceptance rate (adapt_delta) of 0.99 and a maximum tree depth of 12. Models are fitted through cmdstanr; the continuous-integration production run uses CmdStan 2.39.0.</p>
 <p>The published estimate is produced only if the fit passes a gate fixed in advance: divergent transitions below 0.1% of draws; minimum E-BFMI over chains at least 0.3; R-hat at most 1.01 on every hyperparameter and at most 1.05 on every <span class="math inline">\(\mu_t\)</span>, <span class="math inline">\(h_{t,k}\)</span> and <span class="math inline">\(g_t\)</span>; bulk and tail ESS at least 400 on every hyperparameter and every <span class="math inline">\(\mu_t\)</span>. Any missing diagnostic counts as a failure.</p>
-<p>The production fit on the 1980 sample (seed 1) had 0 divergences, a minimum E-BFMI of 0.882, a maximum hyperparameter R-hat of 1.0013 and a minimum hyperparameter bulk ESS of 1,315 (on phi[1]). Sampling took 1,042 seconds with four parallel chains on a six-core machine. A seed-2 fit also passed (<a href="#tbl-gate" class="quarto-xref">Table 17</a>). The full-sample fit of m13 took 1,384 seconds of wall time. m4, m9 and m10 took between 404 and 564 seconds on the full sample. m12’s research fit took 2,396 seconds with only 2 parallel chains; its production run with four took 1,260 seconds. Constant-variance models take under two minutes (<a href="#tbl-fitdiag" class="quarto-xref">Table 16</a>). According to the repository README, the whole continuous-integration job for the 1980-sample production fit takes about 27 minutes on GitHub’s runners.</p>
+<p>The production fit on the 1980 sample (seed 1) had 0 divergences, a minimum E-BFMI of 0.882, a maximum hyperparameter R-hat of 1.0013 and a minimum hyperparameter bulk ESS of 1,315 (on phi[1]). Sampling took 1,042 seconds with four parallel chains on a six-core machine. A seed-2 fit also passed (<a href="#tbl-gate" class="quarto-xref">Table 19</a>). The full-sample fit of m13 took 1,384 seconds of wall time. m4, m9 and m10 took between 404 and 564 seconds on the full sample. m12’s research fit took 2,396 seconds with only 2 parallel chains; its production run with four took 1,260 seconds. Constant-variance models take under two minutes (<a href="#tbl-fitdiag" class="quarto-xref">Table 18</a>). According to the repository README, the whole continuous-integration job for the 1980-sample production fit takes about 27 minutes on GitHub’s runners.</p>
 <p>The estimate on the public site is refitted weekly by a continuous-integration job on GitHub’s runners. That run gave different draws from the local fit with the same seed. The repository does not document why; CmdStan does not guarantee identical draws across machines. Its diagnostics (<code>docs/diagnostics.json</code>) are 2 divergences, minimum E-BFMI 0.846, maximum hyperparameter R-hat 1.0031 and minimum hyperparameter bulk ESS 1,285. The published median path differs from the local one by at most 0.017 quarter-on-quarter percentage points. All estimates in this paper come from the local fit.</p>
 </section>
 </section>
@@ -3063,7 +3075,7 @@ Table 4: Posterior of m13: medians and 90% intervals, annualised units. 1980 sa
 <p><strong>The E–I correlation is small.</strong> <span class="math inline">\(\rho_{EI}\)</span> is 0.09 [−0.08, 0.24] on the 1980 sample and 0.12 [−0.03, 0.27] on the full sample. The zero correlations between the production error and the other two are imposed, not estimated. m3, which frees them, finds all three correlations weakly identified (<a href="#sec-failed" class="quarto-xref">Section 4.3</a>), and imposing the zeros changes predictive scores little (m6 − m2 and m9 − m4, <a href="#sec-comparison" class="quarto-xref">Section 7.7</a>).</p>
 <p><strong>Error sizes.</strong> At the long-run log-variance the error standard deviations are 2.44 (E), 2.44 (I) and 1.76 (P) on the 1980 sample. Production is the cleanest single measure, as in RDP 2014-12 and in every specification we estimated. On the full sample the expenditure error is larger (3.21): the 1960s and 1970s contribute large expenditure-side errors.</p>
 <p><strong>Latent dynamics.</strong> Latent growth is moderately persistent (<span class="math inline">\(\rho\)</span> = 0.39 [0.23, 0.54]), more so on the 1980 sample than on the full sample (0.27 [0.12, 0.42]). Its long-run mean is 2.62 per cent a year from 1980. Latent log-volatility is persistent (<span class="math inline">\(\phi_g\)</span> = 0.83 [0.65, 0.94]) and variable (<span class="math inline">\(\omega_g\)</span> = 0.88 [0.59, 1.26]).</p>
-<p><strong>A weakly identified persistence.</strong> On the 1980 sample the persistence of expenditure-side volatility, <span class="math inline">\(\phi_E\)</span>, has a long left tail (0.95 [0.11, 0.99]). It has the lowest ESS of m13’s hyperparameters on both seeds (<a href="#tbl-gate" class="quarto-xref">Table 17</a>). Before 2020 the expenditure error’s log-variance barely moves on this sample, so its persistence is close to unidentified (<a href="#sec-robust-sample" class="quarto-xref">Section 8.1</a>).</p>
+<p><strong>A weakly identified persistence.</strong> On the 1980 sample the persistence of expenditure-side volatility, <span class="math inline">\(\phi_E\)</span>, has a long left tail (0.95 [0.11, 0.99]). It has the lowest ESS of m13’s hyperparameters on both seeds (<a href="#tbl-gate" class="quarto-xref">Table 19</a>). Before 2020 the expenditure error’s log-variance barely moves on this sample, so its persistence is close to unidentified (<a href="#sec-robust-sample" class="quarto-xref">Section 8.1</a>).</p>
 </section>
 <section id="sec-path" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="sec-path"><span class="header-section-number">7.2</span> The latent path</h2>
@@ -3447,7 +3459,88 @@ Table 7: Predictive checks of m13 (1980 sample). Observed: statistic of the dat
 </div>
 </div>
 <p>No prior predictive or posterior predictive checks were part of the original research suite. We ran both for the production model after the comparison was complete (<code>paper/ppc_m13.R</code>). Replicated series are simulated in R from the model equations; no Stan model is refitted. The fit’s own replicated data are not used, because they condition on the observed value of the previous quarter.</p>
-<p><strong>Prior predictive.</strong> Over 4,000 draws from the priors, the long-run mean of latent growth has a prior median of 2.8 per cent a year (90% interval [−0.2, 14.7]). The standard deviation of simulated headline growth has a prior median of 4.9 [2.5, 14.6], against 3.9 in the data. The long-run expenditure-error standard deviation is 3.1 [1.3, 8.0], and <span class="math inline">\(\tau\)</span> is 2.7 [1.2, 6.3]. The priors are therefore centred on plausible values. They are also heavy-tailed: 10% of prior draws give a headline standard deviation above 10, and the 99th percentile of the largest absolute quarterly growth rate is 648 per cent annualised. The tails come from persistence parameters near one, which make the stationary variances of the AR(1) processes very large, and from <span class="math inline">\(\rho\)</span> near one, which makes <span class="math inline">\(c/(1-\rho)\)</span> large. The observed statistics all fall well inside the prior predictive range (the observed headline standard deviation is at prior percentile 30). The priors do not rule out the data, but they put noticeable mass on implausibly volatile economies. A tighter prior on the persistence parameters would be a reasonable refinement; we have not tested its effect.</p>
+<p><strong>Prior predictive.</strong> Over 4,000 draws from the priors, the long-run mean of latent growth has a prior median of 2.8 per cent a year (90% interval [−0.2, 14.7]). The standard deviation of simulated headline growth has a prior median of 4.9 [2.5, 14.6], against 3.9 in the data. The long-run expenditure-error standard deviation is 3.1 [1.3, 8.0], and <span class="math inline">\(\tau\)</span> is 2.7 [1.2, 6.3]. The priors are therefore centred on plausible values. They are also heavy-tailed: 10% of prior draws give a headline standard deviation above 10, and the 99th percentile of the largest absolute quarterly growth rate is 648 per cent annualised. The observed statistics all fall well inside the prior predictive range (the observed headline standard deviation is at prior percentile 30). The priors do not rule out the data, but they put noticeable mass on implausibly volatile economies.</p>
+<p><strong>What drives the prior tails.</strong> We simulated 20,000 further prior draws (<code>paper/prior_candidates.R</code>) and asked which parameters the extreme draws have in common. Two features dominate. The first is the stationary standard deviation of a log-variance, <span class="math inline">\(s = \omega/\sqrt{1-\phi^2}\)</span>. Under Uniform(−1, 1) persistence and a half-N(0, 0.5) innovation scale, <span class="math inline">\(|\phi|\)</span> near one with a moderate <span class="math inline">\(\omega\)</span> makes <span class="math inline">\(s\)</span> large, and <span class="math inline">\(e^{h/2}\)</span> then ranges over orders of magnitude. At least one of the four log-variances has <span class="math inline">\(s &gt; 2\)</span> in 13% of all draws but in 76% of the draws whose largest absolute headline growth exceeds 100 per cent. The second is <span class="math inline">\(\rho\)</span> near one, which inflates both <span class="math inline">\(c/(1-\rho)\)</span> and the latent variance <span class="math inline">\(\tau^2/(1-\rho^2)\)</span>: <span class="math inline">\(\rho &gt; 0.9\)</span> in 5% of all draws and 26% of those extreme draws. Conditioning on the draws shows the size of each effect. The 99th percentile of the largest absolute headline growth is 579 in all draws, 467 given <span class="math inline">\(\rho \le 0.9\)</span>, 105 given all <span class="math inline">\(s \le 2\)</span>, and 63 given both. The levels <span class="math inline">\(\mu_g\)</span> and <span class="math inline">\(\mu_{h,k}\)</span> matter much less.</p>
+<p><strong>Choosing tighter priors.</strong> Before simulating any alternative we fixed a plausibility target and a selection rule. The target was: (T1) a 90% prior interval for the standard deviation of headline growth within [1, 15]; (T2) a 99th percentile of the largest absolute quarterly headline growth below 100 per cent annualised (about 19 per cent in a quarter, against −7 per cent in 2020 Q2); (T3) a 90% interval for mean headline growth within [−3, 9]; and (T4) each of six observed statistics (listed under <a href="#tbl-priorcand" class="quarto-xref">Table 8</a>) inside the central 95% of its prior predictive distribution, so that the priors cannot rule out the data, COVID included. We would take the first of three candidate sets, ordered by how much they change, that met all four; if none did, the one meeting T4 with the smallest T2 value. The candidates were:</p>
+<ul>
+<li><strong>C1</strong> changes only the latent mean and persistence. It puts RDP 2014-12’s prior on persistence, <span class="math inline">\(\rho \sim\)</span> Beta with mean 0.5 and standard deviation 0.2, that is Beta(2.625, 2.625) on (0, 1), and m1’s N(3, 2) prior on the long-run mean <span class="math inline">\(\bar\mu\)</span> instead of a prior on <span class="math inline">\(c\)</span>, with <span class="math inline">\(c = \bar\mu(1-\rho)\)</span>. Because <span class="math inline">\(\bar\mu\)</span> is then the sampled parameter, no Jacobian adjustment is needed.</li>
+<li><strong>C2</strong> adds the prior of <span class="citation" data-cites="kim1998">Kim et al. (<a href="#ref-kim1998" role="doc-biblioref">1998</a>)</span>, <span class="math inline">\((\phi+1)/2 \sim\)</span> Beta(20, 1.5), on the persistence of every log-variance, with m13’s <span class="math inline">\(\omega\)</span> priors.</li>
+<li><strong>C3</strong> instead puts the scale prior on the stationary standard deviation of each log-variance, <span class="math inline">\(s \sim\)</span> half-N(0, 1), keeps <span class="math inline">\(\phi \sim\)</span> Uniform(−1, 1), and derives <span class="math inline">\(\omega = s\sqrt{1-\phi^2}\)</span>. At <span class="math inline">\(|\phi| = 0.87\)</span> this is m13’s half-N(0, 0.5) prior on <span class="math inline">\(\omega\)</span>; as <span class="math inline">\(|\phi| \to 1\)</span> the log-variance can stay persistent without its range exploding.</li>
+</ul>
+<div class="cell">
+<div id="tbl-priorcand" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-priorcand-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 8: Prior predictive simulation of m13’s priors and three candidate sets (20,000 draws each, 1980 Q1–2026 Q2, annualised per cent). Cells give the median and 90% interval, or the 99th percentile. ‘Observed percentiles’ is the range, over six statistics (standard deviation, mean, largest absolute value and first-order autocorrelation of headline growth; standard deviation of E − I; pre-2020 standard deviation of headline growth), of the prior predictive percentile of the observed value. Target: T1 sd interval within [1, 15]; T2 99th percentile of max |headline| ≤ 100; T3 mean interval within [−3, 9]; T4 all observed percentiles within [2.5, 97.5].
+</figcaption>
+<div aria-describedby="tbl-priorcand-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 21%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Prior</th>
+<th style="text-align: right;">sd, headline</th>
+<th style="text-align: right;">mean, headline</th>
+<th style="text-align: right;">max |headline|, 99th pct</th>
+<th style="text-align: right;">share sd &gt; 10</th>
+<th style="text-align: right;">Observed percentiles</th>
+<th style="text-align: right;">T1 / T2 / T3 / T4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">m13</td>
+<td style="text-align: right;">4.9 [2.5, 14.4]</td>
+<td style="text-align: right;">2.9 [−0.7, 16.3]</td>
+<td style="text-align: right;">579</td>
+<td style="text-align: right;">10%</td>
+<td style="text-align: right;">9–76</td>
+<td style="text-align: right;">yes / no / no / yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C1: Beta <span class="math inline">\(\rho\)</span>, N(3, 2) on <span class="math inline">\(\bar\mu\)</span></td>
+<td style="text-align: right;">4.8 [2.5, 13.7]</td>
+<td style="text-align: right;">3.0 [−0.8, 6.9]</td>
+<td style="text-align: right;">520</td>
+<td style="text-align: right;">9%</td>
+<td style="text-align: right;">9–81</td>
+<td style="text-align: right;">yes / no / yes / yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">C2: C1 + Beta(20, 1.5) on <span class="math inline">\((\phi+1)/2\)</span></td>
+<td style="text-align: right;">5.7 [2.7, 29.1]</td>
+<td style="text-align: right;">3.0 [−1.3, 7.2]</td>
+<td style="text-align: right;">1,747</td>
+<td style="text-align: right;">20%</td>
+<td style="text-align: right;">6–63</td>
+<td style="text-align: right;">no / no / yes / yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">C3: C1 + half-N(0, 1) on stationary sd</td>
+<td style="text-align: right;">5.3 [2.8, 14.0]</td>
+<td style="text-align: right;">3.0 [−0.8, 6.9]</td>
+<td style="text-align: right;">172</td>
+<td style="text-align: right;">12%</td>
+<td style="text-align: right;">6–70</td>
+<td style="text-align: right;">yes / no / yes / yes</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p><a href="#tbl-priorcand" class="quarto-xref">Table 8</a> gives the results. C1 brings the mean within bounds but leaves the variance tails almost as they were. The Kim–Shephard–Chib prior makes them worse (99th percentile 1,747): it concentrates persistence near one, and with m13’s innovation scale that inflates the stationary variance. <span class="citation" data-cites="kim1998">Kim et al. (<a href="#ref-kim1998" role="doc-biblioref">1998</a>)</span> pair it with a prior that keeps the volatility of volatility small. C3 cuts the 99th percentile from 579 to 172 and meets T1, T3 and T4, but not T2. No candidate met the whole target, so by the fallback rule we chose C3. Its remaining tail comes mainly from the latent log-variance: in 70% of its draws with a headline above 100 per cent the latent path itself exceeds 100 per cent, and 78% have a stationary log-variance standard deviation above 2. The choice was made from the prior predictive alone and was not revisited after the fit. C3 is implemented as <code>stan/m13_tight_priors.stan</code>, which has m13’s likelihood unchanged (<code>tests/test_m13_tight.R</code>). It is a research variant; the published estimate still uses m13’s priors.</p>
 <p><strong>Posterior predictive.</strong> <a href="#tbl-ppc" class="quarto-xref">Table 7</a> compares statistics of the data with their replicated distributions. In the full replication, which draws a fresh latent and volatility history, every posterior predictive p-value lies between 0.34 and 0.90. The model reproduces the negative first-order autocorrelation of the differences between measures (E − I: observed −0.44, replicated median −0.38), the correlation between the measures and the size of the extremes. Its replications are more volatile than the data in typical quarters: the observed pre-2020 headline standard deviation, 2.84, is below 90% of replications. That is expected of a model whose latent volatility can wander: a fresh history rarely reproduces the long calm of the 2000s and 2010s. In the conditional replication, which keeps the posterior latent path and error log-variances, the 90% pointwise intervals cover 97% (E), 94% (I) and 99% (P) of the observations, and the 50% intervals 53%, 54% and 72%. Production is over-covered: given the latent path, the model’s production-error variance is somewhat too large, or the latent path absorbs part of the production signal. The weakest conditional check is the autocorrelation of GDP(P) (p = 0.12): the observed value, 0.11, is above most replications. None of these checks indicates a gross misfit. They are in-sample checks and use the data twice.</p>
 </section>
 <section id="sec-comparison" class="level2" data-number="7.7">
@@ -3456,7 +3549,7 @@ Table 7: Predictive checks of m13 (1980 sample). Observed: statistic of the dat
 <div id="tbl-lfo" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-lfo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 8: PSIS-LFO-CV scores of the three-measure models: sum of one-step-ahead log predictive densities over 146 targets (1990 Q1–2026 Q2), annualised units. Δ is the difference from m13 with i.i.d. and Newey-West (lag 8) standard errors. MCSE: Monte Carlo SE of the particle filter (4 passes); ‘exact’ for Kalman-filter models. Fits: initial fit plus refits, with the number retried (passed only after a new seed) in brackets.
+Table 9: PSIS-LFO-CV scores of the three-measure models: sum of one-step-ahead log predictive densities over 146 targets (1990 Q1–2026 Q2), annualised units. Δ is the difference from m13 with i.i.d. and Newey-West (lag 8) standard errors. MCSE: Monte Carlo SE of the particle filter (4 passes); ‘exact’ for Kalman-filter models. Fits: initial fit plus refits, with the number retried (passed only after a new seed) in brackets.
 </figcaption>
 <div aria-describedby="tbl-lfo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -3627,12 +3720,12 @@ Table 8: PSIS-LFO-CV scores of the three-measure models: sum of one-step-ahead 
 </figure>
 </div>
 </div>
-<p><a href="#tbl-lfo" class="quarto-xref">Table 8</a> reports the scores of the ten three-measure models on both samples. The ranking on the full sample is m13, m12, m9, m4, m5, m7, m6, m1, m3, m2. On the 1980 sample it is m13, m12, m9, m7, m4, m5, m1, m2, m6, m3. On the full sample three groups stand out: m13; the measurement-SV models m12, m9 and m4; and the constant-variance models. On the 1980 sample m7 joins the middle group, and the constant-variance models move closer to it. The scores are summed over 146 quarters, so a difference of 10 nats is about 0.07 nats per quarter.</p>
+<p><a href="#tbl-lfo" class="quarto-xref">Table 9</a> reports the scores of the ten three-measure models on both samples. The ranking on the full sample is m13, m12, m9, m4, m5, m7, m6, m1, m3, m2. On the 1980 sample it is m13, m12, m9, m7, m4, m5, m1, m2, m6, m3. On the full sample three groups stand out: m13; the measurement-SV models m12, m9 and m4; and the constant-variance models. On the 1980 sample m7 joins the middle group, and the constant-variance models move closer to it. The scores are summed over 146 quarters, so a difference of 10 nats is about 0.07 nats per quarter.</p>
 <div class="cell">
 <div id="tbl-pairs" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pairs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 9: Key score differences a − b (nats over 146 targets), with i.i.d. and Newey-West SEs and the Newey-West z. Most pairs add one feature; m12 − m5 adds two (measurement SV and the E–I-only structure) and m13 − m5 three. ‘Not nested’ pairs differ in more than one way.
+Table 10: Key score differences a − b (nats over 146 targets), with i.i.d. and Newey-West SEs and the Newey-West z. Most pairs add one feature; m12 − m5 adds two (measurement SV and the E–I-only structure) and m13 − m5 three. ‘Not nested’ pairs differ in more than one way.
 </figcaption>
 <div aria-describedby="tbl-pairs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -3731,8 +3824,8 @@ Table 9: Key score differences a − b (nats over 146 targets), with i.i.d. and
 </figure>
 </div>
 </div>
-<p><a href="#tbl-pairs" class="quarto-xref">Table 9</a> isolates each feature by comparing nested models.</p>
-<p><strong>Serially correlated measurement errors: the robust gain.</strong> Adding AR(1) errors to the constant-variance model improves the score by +27.4 nats on the full sample and +20.4 on the 1980 sample. The Newey-West z-statistics, 14.0 and 9.4, are the largest in the comparison. Adding them to the measurement-SV model (m12 against m9) gives +16.8 (z 2.74) and +20.6 (z 3.72). m5 − m2 is positive in every sub-period on both samples (<a href="#tbl-sub" class="quarto-xref">Table 10</a>). m12 − m9 is positive in every sub-period on the 1980 sample, but on the full sample it is −4.2 in 2020. Serial correlation is therefore the feature whose gain holds on both samples and with or without SV; only in the constant-variance comparison does it hold in every sub-period on both.</p>
+<p><a href="#tbl-pairs" class="quarto-xref">Table 10</a> isolates each feature by comparing nested models.</p>
+<p><strong>Serially correlated measurement errors: the robust gain.</strong> Adding AR(1) errors to the constant-variance model improves the score by +27.4 nats on the full sample and +20.4 on the 1980 sample. The Newey-West z-statistics, 14.0 and 9.4, are the largest in the comparison. Adding them to the measurement-SV model (m12 against m9) gives +16.8 (z 2.74) and +20.6 (z 3.72). m5 − m2 is positive in every sub-period on both samples (<a href="#tbl-sub" class="quarto-xref">Table 11</a>). m12 − m9 is positive in every sub-period on the 1980 sample, but on the full sample it is −4.2 in 2020. Serial correlation is therefore the feature whose gain holds on both samples and with or without SV; only in the constant-variance comparison does it hold in every sub-period on both.</p>
 <p><strong>SV in the measurement errors: a real gain that roughly halves from 1980.</strong> The two comparisons that add only measurement SV are m4 − m2 (independent errors) and m9 − m6 (E–I correlation). On the full sample they are +72.5 (z 3.79) and +73.3 (z 3.69). On the 1980 sample they are +33.4 (z 2.11) and +38.9 (z 2.58). The reason is discussed in <a href="#sec-robust-sample" class="quarto-xref">Section 8.1</a>. Before 2020 the gains on the 1980 sample are +19.4 (z 3.02) and +21.4 (z 3.22). On both samples they are largest in 2008–19 and 2023–26, after measurement-error variance had fallen (<a href="#fig-sigma" class="quarto-xref">Figure 4</a>).</p>
 <p><strong>SV in latent growth: first, but by a thin and post hoc margin.</strong> m13 − m12 is +59.6 nats on the full sample (SE 24.7 i.i.d., 28.9 Newey-West; z 2.06). On the 1980 sample it is +57.4 (SE 27.2 / 36.6; z 1.57). One quarter dominates the uncertainty. 2020 Q2 alone contributes +23.7 nats on the full sample and +25.6 on the 1980 sample: m12’s constant latent variance cannot accommodate the collapse. Outside 2020 Q2 to 2021 Q1 the full-sample gain is +28.5 (NW SE 6.0); before 2020 it is +20.1 (z 4.1). m13 is ahead in 122 of 146 quarters. Outside 2020 the gain per quarter grows over the window, as latent volatility falls further below m12’s constant. On the 1980 sample the pre-2020 gain is only +6.4 (z 2.31), and m13 is ahead in 107 quarters. Excluding all of 2020 to 2022, the gain is +27.1 (z 4.59) on the full sample and +12.7 (z 2.59) on the 1980 sample.</p>
 <p>m13 was proposed after the re-specified m10, which has latent SV, had been scored on the same window and had beaten m12 on the GDP-only target. m13 is therefore a second latent-SV specification evaluated on the same data. Counting only those two tries, a Bonferroni-adjusted two-sided 5% bar is z ≈ 2.24, which 2.06 does not meet. That bar is a lower bound on the correction: the old m10, the re-specified m10, m12 and m13 were all scored on the same 146 targets. The direction of the evidence is clear: latent volatility has changed a great deal over the sample (<a href="#fig-tau" class="quarto-xref">Figure 3</a>). Its strength as a test of predictive improvement is modest.</p>
@@ -3742,7 +3835,7 @@ Table 9: Key score differences a − b (nats over 146 targets), with i.i.d. and
 <div id="tbl-sub" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sub-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 10: Score differences by sub-period (nats). Each cell gives the full-sample run / the 1980-sample run. ‘Excl. COVID’ drops 2020 Q2–2021 Q1. Newey-West SEs for the longer periods are in the text and in output/sample_1980/tables/lfo_full_vs_sample.csv.
+Table 11: Score differences by sub-period (nats). Each cell gives the full-sample run / the 1980-sample run. ‘Excl. COVID’ drops 2020 Q2–2021 Q1. Newey-West SEs for the longer periods are in the text and in output/sample_1980/tables/lfo_full_vs_sample.csv.
 </figcaption>
 <div aria-describedby="tbl-sub-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -3870,7 +3963,7 @@ Figure 5: Cumulative score differences over the 146 LFO targets (nats). Left: f
 </div>
 </div>
 </div>
-<p><a href="#tbl-sub" class="quarto-xref">Table 10</a> and <a href="#fig-cum" class="quarto-xref">Figure 5</a> show where the differences arise. The serial-correlation gain (m5 − m2) accumulates steadily, mostly in the 1990s and 2000s. The measurement-SV gain (m4 − m2) builds from 2000 and is largest in 2008–19 and 2023–26. It falls back in 2020 on the full sample. The latent-SV gain (m13 − m12) is small in the 1990s, grows through the 2010s and jumps in 2020 Q2. On the 1980 sample m12 is slightly ahead of m13 in 1990–99 (−0.4, NW z −2.50).</p>
+<p><a href="#tbl-sub" class="quarto-xref">Table 11</a> and <a href="#fig-cum" class="quarto-xref">Figure 5</a> show where the differences arise. The serial-correlation gain (m5 − m2) accumulates steadily, mostly in the 1990s and 2000s. The measurement-SV gain (m4 − m2) builds from 2000 and is largest in 2008–19 and 2023–26. It falls back in 2020 on the full sample. The latent-SV gain (m13 − m12) is small in the 1990s, grows through the 2010s and jumps in 2020 Q2. On the 1980 sample m12 is slightly ahead of m13 in 1990–99 (−0.4, NW z −2.50).</p>
 <p><strong>Labour-market models.</strong> On the hours subsample the re-specified m10 is ahead of m8, which has constant variances, by +124.2 nats on the joint four-signal target (z 1.92). This gain is post hoc in the sense above. On the GDP-only target, <span class="math inline">\(\log p(y^{E,I,P}_t \mid y_{1:t-1})\)</span> with hours in the past but not in the target, m13 is ahead of m10 by +12.6 (z 2.30) and of the mixed-frequency m11 by +67.5 (z 3.67). These gaps do not measure the value of labour data. m10 has neither AR(1) errors nor the E–I correlation, m11 has no SV, and no m13-plus-hours model was fitted. m11 also conditions on employment inside the target quarter, which is released before GDP.</p>
 </section>
 </section>
@@ -3879,8 +3972,8 @@ Figure 5: Cumulative score differences over the 146 LFO targets (nats). Left: f
 <section id="sec-robust-sample" class="level2" data-number="8.1">
 <h2 data-number="8.1" class="anchored" data-anchor-id="sec-robust-sample"><span class="header-section-number">8.1</span> Starting in 1980 instead of 1959</h2>
 <p>The 146 targets are identical in the two runs. What differs is the training data: 40 against 121 quarters before the first target, and no 1960s or 1970s. Each change therefore mixes two effects: dropping data whose errors may be unrepresentative, and estimating parameters from less history.</p>
-<p><strong>What survives.</strong> m13 is first on every target on both samples. Serially correlated errors help on both samples, with and without SV; in the constant-variance comparison they help in every sub-period (<a href="#tbl-sub" class="quarto-xref">Table 10</a>). m13’s AR(1) coefficients barely move (<a href="#tbl-post" class="quarto-xref">Table 4</a>). The structural restriction is still unsupported. Production remains the cleanest measure in every specification. m10’s lead over m8 is essentially unchanged (+119.6, z 1.84). m13’s latent path is almost the same: on the common quarters the posterior mean paths have correlation 0.9985 and differ by 0.13 points on average (at most 1.03).</p>
-<p><strong>What weakens.</strong> The latent-SV evidence: m13 − m12 is +57.4 with z 1.57. Newey-West z-statistics at lags 4, 8, 12 and 16 are 1.78, 1.57, 1.49, 1.45 (full sample 2.17, 2.06, 2.05, 2.05). The z ≥ 2 condition that was used to switch production to m13 (<a href="#sec-app-history" class="quarto-xref">Section 12</a>) would not be met on this sample. Part of the 1980 margin is in 2021–22 (+12.3, against +2.5 on the full sample). In that period m12’s 1980 fit mishandles the aftermath of COVID (below), so part of the margin scores that failure rather than a general gain. Measurement SV also weakens: the nested gains roughly halve (<a href="#tbl-pairs" class="quarto-xref">Table 9</a>).</p>
+<p><strong>What survives.</strong> m13 is first on every target on both samples. Serially correlated errors help on both samples, with and without SV; in the constant-variance comparison they help in every sub-period (<a href="#tbl-sub" class="quarto-xref">Table 11</a>). m13’s AR(1) coefficients barely move (<a href="#tbl-post" class="quarto-xref">Table 4</a>). The structural restriction is still unsupported. Production remains the cleanest measure in every specification. m10’s lead over m8 is essentially unchanged (+119.6, z 1.84). m13’s latent path is almost the same: on the common quarters the posterior mean paths have correlation 0.9985 and differ by 0.13 points on average (at most 1.03).</p>
+<p><strong>What weakens.</strong> The latent-SV evidence: m13 − m12 is +57.4 with z 1.57. Newey-West z-statistics at lags 4, 8, 12 and 16 are 1.78, 1.57, 1.49, 1.45 (full sample 2.17, 2.06, 2.05, 2.05). The z ≥ 2 condition that was used to switch production to m13 (<a href="#sec-app-history" class="quarto-xref">Section 12</a>) would not be met on this sample. Part of the 1980 margin is in 2021–22 (+12.3, against +2.5 on the full sample). In that period m12’s 1980 fit mishandles the aftermath of COVID (below), so part of the margin scores that failure rather than a general gain. Measurement SV also weakens: the nested gains roughly halve (<a href="#tbl-pairs" class="quarto-xref">Table 10</a>).</p>
 <p><strong>Why the measurement-SV gain halves.</strong> Before 2020 every model scores better when trained from 1980, but the constant-variance models gain about twice as much. Their error variances, GDP(E)’s above all, are no longer inflated by the noisy early decades. The pre-2020 change from the later start is +55.2 for m2 against +25.2 for m4. In the constant-variance models the expenditure error standard deviation falls from 4.09 to 2.55 (m2). That is the pattern RDP 2014-12’s argument for a 1980 start predicts. About half of the full-sample measurement-SV gain came from pre-1980 training data. The rest survives the later start, but less cleanly: before 2020 the nested gains are +19.4 and +21.4 on the 1980 sample against +49.5 and +52.5 on the full sample, and the 1980 fits of m4 and m9 lose to the constant-variance models in 2021–22 (−8.8 and −7.4).</p>
 <p><strong>What fails: m4, m9 and m12 on COVID.</strong> On the 1980 sample these three models, which have measurement SV but a constant latent variance, treat the 2020 Q2 collapse as a common measurement error (<a href="#fig-covid" class="quarto-xref">Figure 6</a>). Their latent growth in 2020 Q2 is 0.2 (m4), 0.2 (m9) and −1.0 (m12), against −27.2, −27.2 and −27.1 on the full sample and a headline of −28.1. Their variance ratios fall to 0.32–0.37. This is the same failure as the old m10’s mode A. In m12 the expenditure-volatility persistence collapses to −0.10 [−0.65, 0.80], against 0.98 [0.93, 1.00] on the full sample, while its volatility of volatility rises to 0.79. Expenditure-side SV then behaves as i.i.d. heavy-tailed noise that can absorb one huge quarter. The prior on that persistence is Uniform(−1, 1), so a posterior centred near zero with a wide interval is close to the prior. We checked that this is not a stranded mode. For each of m4, m9 and m12, four extra chains were started from full-sample draws, where COVID is in latent growth. All twelve chains moved to the measurement-error solution and matched the reference fit. Warmup draws were saved for m4 and m12, and there every chain left the starting region within 8 to 52 warmup iterations. That is evidence about one alternative region, not proof that no other mode exists. m13 and m10, which have latent SV, keep COVID in latent growth on both samples. So, mostly, do the constant-variance models: their latent 2020 Q2 is −24.4 to −23.5 on the 1980 sample.</p>
 <div class="cell">
@@ -3903,7 +3996,208 @@ Figure 6: Latent growth in 2020 Q2 by model and sample: posterior mean and 90% 
 <section id="prior-sensitivity" class="level2" data-number="8.2">
 <h2 data-number="8.2" class="anchored" data-anchor-id="prior-sensitivity"><span class="header-section-number">8.2</span> Prior sensitivity</h2>
 <p>The posterior median of <span class="math inline">\(\omega_g\)</span> on the full sample (0.61) sits at percentile 78 of its half-N(0, 0.5) prior. On the 1980 sample (0.88) it sits at percentile 92. The prior may therefore restrain it. We refitted the full-sample m13 with a half-N(0, 1) prior; the refit also passed the gate. <span class="math inline">\(\omega_g\)</span> moved from 0.61 [0.42, 0.89] to 0.66 [0.44, 1.02], and <span class="math inline">\(\tau\)</span> from 2.47 to 2.43. The median <span class="math inline">\(\tau_t\)</span> path changed by 1.9% on average (at most 7.4%). The median latent path moved by 0.033 points on average (at most 0.18). The variance ratio went from 0.790 to 0.786. The results are insensitive to this widening.</p>
-<p>For this paper the same refit was run on the production sample, 1980 Q1 to 2026 Q2 (<code>R/fit_m13.R --omega_g_sd=1</code>). There the prior matters more, because the 1980 posterior of <span class="math inline">\(\omega_g\)</span> sits further into the prior’s tail. The refit passed the production gate (1 divergence, minimum E-BFMI 0.866, maximum hyperparameter R-hat 1.0064, minimum hyperparameter bulk ESS 1,208). <span class="math inline">\(\omega_g\)</span> moved from 0.88 [0.59, 1.26] to 1.02 [0.65, 1.53], <span class="math inline">\(\phi_g\)</span> from 0.83 to 0.79 and <span class="math inline">\(\tau\)</span> from 1.81 to 1.74. The median <span class="math inline">\(\tau_t\)</span> path changed by 4.7% on average (at most 17.7%, in 2019 Q3); 2020 Q2’s <span class="math inline">\(\tau_t\)</span> went from 13.7 to 14.7. The median latent path moved by 0.033 points on average (at most 0.17), and the variance ratio went from 0.872 to 0.871 (0.776 to 0.772 excluding 2020 Q1–2021 Q1). The latent path and the variance ratio are again insensitive. The latent-volatility path is less so: it moves by up to a sixth in some quarters, so statements about <span class="math inline">\(\tau_t\)</span> in individual quarters carry prior uncertainty beyond their posterior intervals. No other prior was varied, and the wider prior was not scored by LFO.</p>
+<p>For this paper the same refit was run on the production sample, 1980 Q1 to 2026 Q2 (<code>R/fit_m13.R --omega_g_sd=1</code>). There the prior matters more, because the 1980 posterior of <span class="math inline">\(\omega_g\)</span> sits further into the prior’s tail. The refit passed the production gate (1 divergence, minimum E-BFMI 0.866, maximum hyperparameter R-hat 1.0064, minimum hyperparameter bulk ESS 1,208). <span class="math inline">\(\omega_g\)</span> moved from 0.88 [0.59, 1.26] to 1.02 [0.65, 1.53], <span class="math inline">\(\phi_g\)</span> from 0.83 to 0.79 and <span class="math inline">\(\tau\)</span> from 1.81 to 1.74. The median <span class="math inline">\(\tau_t\)</span> path changed by 4.7% on average (at most 17.7%, in 2019 Q3); 2020 Q2’s <span class="math inline">\(\tau_t\)</span> went from 13.7 to 14.7. The median latent path moved by 0.033 points on average (at most 0.17), and the variance ratio went from 0.872 to 0.871 (0.776 to 0.772 excluding 2020 Q1–2021 Q1). The latent path and the variance ratio are again insensitive. The latent-volatility path is less so: it moves by up to a sixth in some quarters, so statements about <span class="math inline">\(\tau_t\)</span> in individual quarters carry prior uncertainty beyond their posterior intervals. The wider prior was not scored by LFO.</p>
+<section id="sec-robust-priors" class="level3" data-number="8.2.1">
+<h3 data-number="8.2.1" class="anchored" data-anchor-id="sec-robust-priors"><span class="header-section-number">8.2.1</span> Tighter priors</h3>
+<div class="cell">
+<div id="tbl-tight" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-tight-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table 12: m13 with its own priors (the production fit) and with the tighter priors chosen in <a href="#sec-ppc" class="quarto-xref">Section 7.6</a>, both on 1980 Q1–2026 Q2, seed 1 (seed 2 of the variant in the last column). Posterior medians and 90% intervals, annualised units. Variance ratio: per-draw var(μ)/var(headline). <span class="math inline">\(\tau_t\)</span> by decade: posterior median of the decade average. Diagnostics: the production gate (all checks passed for all three fits); time is the wall time of the sampler with four parallel chains on a six-core machine, which also ran other work.
+</figcaption>
+<div aria-describedby="tbl-tight-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="cell caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 27%">
+<col style="width: 27%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Quantity</th>
+<th style="text-align: right;">m13</th>
+<th style="text-align: right;">Tight</th>
+<th style="text-align: right;">Tight, seed 2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\rho\)</span></td>
+<td style="text-align: right;">0.39 [0.23, 0.54]</td>
+<td style="text-align: right;">0.42 [0.25, 0.57]</td>
+<td style="text-align: right;">0.42 [0.25, 0.57]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\bar\mu\)</span></td>
+<td style="text-align: right;">2.62 [2.31, 2.96]</td>
+<td style="text-align: right;">2.61 [2.28, 2.95]</td>
+<td style="text-align: right;">2.61 [2.27, 2.94]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\tau = e^{\mu_g/2}\)</span></td>
+<td style="text-align: right;">1.81 [1.26, 2.67]</td>
+<td style="text-align: right;">1.69 [1.20, 2.40]</td>
+<td style="text-align: right;">1.70 [1.21, 2.41]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\phi_g\)</span></td>
+<td style="text-align: right;">0.83 [0.65, 0.94]</td>
+<td style="text-align: right;">0.77 [0.53, 0.91]</td>
+<td style="text-align: right;">0.78 [0.54, 0.91]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\omega_g\)</span></td>
+<td style="text-align: right;">0.88 [0.59, 1.26]</td>
+<td style="text-align: right;">1.03 [0.65, 1.56]</td>
+<td style="text-align: right;">1.02 [0.64, 1.54]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\phi_E\)</span></td>
+<td style="text-align: right;">0.95 [0.11, 0.99]</td>
+<td style="text-align: right;">0.96 [0.53, 1.00]</td>
+<td style="text-align: right;">0.96 [0.47, 1.00]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\phi_I\)</span></td>
+<td style="text-align: right;">0.98 [0.90, 1.00]</td>
+<td style="text-align: right;">0.98 [0.90, 1.00]</td>
+<td style="text-align: right;">0.98 [0.91, 1.00]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\phi_P\)</span></td>
+<td style="text-align: right;">0.97 [0.88, 1.00]</td>
+<td style="text-align: right;">0.97 [0.87, 0.99]</td>
+<td style="text-align: right;">0.97 [0.87, 0.99]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\omega_E\)</span></td>
+<td style="text-align: right;">0.23 [0.10, 0.57]</td>
+<td style="text-align: right;">0.20 [0.08, 0.55]</td>
+<td style="text-align: right;">0.20 [0.08, 0.56]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\omega_I\)</span></td>
+<td style="text-align: right;">0.31 [0.15, 0.53]</td>
+<td style="text-align: right;">0.27 [0.12, 0.51]</td>
+<td style="text-align: right;">0.26 [0.12, 0.51]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\omega_P\)</span></td>
+<td style="text-align: right;">0.36 [0.17, 0.66]</td>
+<td style="text-align: right;">0.32 [0.15, 0.65]</td>
+<td style="text-align: right;">0.32 [0.14, 0.65]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\psi_E\)</span></td>
+<td style="text-align: right;">−0.43 [−0.54, −0.31]</td>
+<td style="text-align: right;">−0.42 [−0.54, −0.30]</td>
+<td style="text-align: right;">−0.42 [−0.55, −0.30]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\psi_I\)</span></td>
+<td style="text-align: right;">−0.35 [−0.48, −0.22]</td>
+<td style="text-align: right;">−0.35 [−0.48, −0.23]</td>
+<td style="text-align: right;">−0.36 [−0.48, −0.23]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\psi_P\)</span></td>
+<td style="text-align: right;">−0.18 [−0.36, 0.02]</td>
+<td style="text-align: right;">−0.19 [−0.37, 0.00]</td>
+<td style="text-align: right;">−0.19 [−0.37, 0.00]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\rho_{EI}\)</span></td>
+<td style="text-align: right;">0.09 [−0.08, 0.24]</td>
+<td style="text-align: right;">0.09 [−0.07, 0.24]</td>
+<td style="text-align: right;">0.09 [−0.07, 0.24]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">latent growth, 2026 Q2</td>
+<td style="text-align: right;">1.93 [1.24, 2.54]</td>
+<td style="text-align: right;">1.91 [1.14, 2.56]</td>
+<td style="text-align: right;">1.91 [1.13, 2.57]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">latent growth, 2020 Q2</td>
+<td style="text-align: right;">−27.91 [−29.03, −26.78]</td>
+<td style="text-align: right;">−27.93 [−29.08, −26.80]</td>
+<td style="text-align: right;">−27.92 [−29.04, −26.79]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\tau_t\)</span>, 2020 Q2</td>
+<td style="text-align: right;">13.67 [9.09, 24.06]</td>
+<td style="text-align: right;">14.57 [9.29, 27.36]</td>
+<td style="text-align: right;">14.55 [9.27, 27.07]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">variance ratio, 1980 Q1–2026 Q2</td>
+<td style="text-align: right;">0.872 [0.811, 0.938]</td>
+<td style="text-align: right;">0.867 [0.802, 0.932]</td>
+<td style="text-align: right;">0.868 [0.804, 0.933]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">variance ratio, excl. 2020 Q1–2021 Q1</td>
+<td style="text-align: right;">0.776 [0.675, 0.883]</td>
+<td style="text-align: right;">0.766 [0.664, 0.871]</td>
+<td style="text-align: right;">0.767 [0.665, 0.874]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\tau_t\)</span>, 1980s</td>
+<td style="text-align: right;">3.12 [2.38, 4.10]</td>
+<td style="text-align: right;">3.03 [2.26, 4.03]</td>
+<td style="text-align: right;">3.03 [2.28, 4.02]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\tau_t\)</span>, 1990s</td>
+<td style="text-align: right;">2.36 [1.74, 3.14]</td>
+<td style="text-align: right;">2.28 [1.66, 3.07]</td>
+<td style="text-align: right;">2.28 [1.68, 3.06]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\tau_t\)</span>, 2000s</td>
+<td style="text-align: right;">1.53 [1.12, 2.06]</td>
+<td style="text-align: right;">1.52 [1.10, 2.08]</td>
+<td style="text-align: right;">1.52 [1.10, 2.05]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\tau_t\)</span>, 2010s</td>
+<td style="text-align: right;">1.25 [0.80, 1.80]</td>
+<td style="text-align: right;">1.23 [0.80, 1.77]</td>
+<td style="text-align: right;">1.24 [0.78, 1.76]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\tau_t\)</span>, 2020s</td>
+<td style="text-align: right;">3.98 [3.08, 5.53]</td>
+<td style="text-align: right;">3.94 [3.02, 5.48]</td>
+<td style="text-align: right;">3.96 [3.01, 5.48]</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">diagnostics</td>
+<td style="text-align: right;">0 div; E-BFMI 0.882; R-hat 1.0013; ESS 1,315/882 (phi[1])</td>
+<td style="text-align: right;">0 div; E-BFMI 0.838; R-hat 1.0016; ESS 1,597/923 (phi[1])</td>
+<td style="text-align: right;">0 div; E-BFMI 0.869; R-hat 1.0030; ESS 1,401/704 (phi[1])</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">time</td>
+<td style="text-align: right;">17.5 min</td>
+<td style="text-align: right;">8.8 min</td>
+<td style="text-align: right;">12.8 min</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>The prior predictive check of <a href="#sec-ppc" class="quarto-xref">Section 7.6</a> chose a set of tighter priors (C3: a Beta(2.625, 2.625) prior on <span class="math inline">\(\rho\)</span>, N(3, 2) on <span class="math inline">\(\bar\mu\)</span>, and half-N(0, 1) on the stationary standard deviation of each log-variance). We fitted this variant to the production sample with the production settings and evaluated it with the production gate. It passed on both seeds (<a href="#tbl-tight" class="quarto-xref">Table 12</a>); the two seeds agree as closely as m13’s seeds do (median latent paths 0.015 points apart on average, 0.10 at most). Its sampler took 9 and 13 minutes against 17 and 13 for m13’s two seeds; the machine was shared with other work, so we read this only as “no slower”.</p>
+<p><strong>What does not move.</strong> The latent path, the measurement-error parameters and the variance split are essentially unchanged. The median latent path moves by 0.056 annualised points on average and by at most 0.29 (in 1994 Q3), against a seed-to-seed difference for m13 of 0.016 on average and 0.10 at most. Latent growth in 2026 Q2 is 0.48 per cent quarter-on-quarter (90% interval 0.29 to 0.64), against 0.48 (0.31 to 0.64). The per-draw variance ratio is 0.867 against 0.872, and 0.766 against 0.776 excluding 2020 Q1–2021 Q1. <span class="math inline">\(\rho\)</span>, <span class="math inline">\(\bar\mu\)</span>, <span class="math inline">\(\psi\)</span> and <span class="math inline">\(\rho_{EI}\)</span> move by a few hundredths at most. In the error block the only visible change is that the long left tail of the expenditure-volatility persistence <span class="math inline">\(\phi_E\)</span> (<a href="#sec-results" class="quarto-xref">Section 7</a>) shortens: its 5% point rises from 0.11 to 0.53. The Beta prior’s exclusion of negative <span class="math inline">\(\rho\)</span> does not bind: m13’s 90% interval for <span class="math inline">\(\rho\)</span> is already well inside (0, 1). The posterior predictive checks give the same picture as m13’s (<a href="#tbl-ppc" class="quarto-xref">Table 7</a>): in the full replication the p-values lie between 0.33 and 0.88, the observed pre-2020 headline standard deviation is below 88% of replications, and the conditional 90% intervals cover 96%, 94% and 99% of the observations. The replications’ upper tails are thinner: the 95th percentile of the replicated headline standard deviation is 7.9 against 11.4 under m13’s priors.</p>
+<p><strong>What moves.</strong> The latent-volatility block. Latent log-volatility is less persistent and more variable (<span class="math inline">\(\phi_g\)</span> 0.77 [0.53, 0.91] against 0.83 [0.65, 0.94]; <span class="math inline">\(\omega_g\)</span> 1.03 [0.65, 1.56] against 0.88 [0.59, 1.26]), and <span class="math inline">\(\tau\)</span> is a little lower (1.69 against 1.81). The median <span class="math inline">\(\tau_t\)</span> path changes by 5.7% on average and by up to 20% (in 2019 Q3); 2020 Q2’s <span class="math inline">\(\tau_t\)</span> goes from 13.7 to 14.6. The decade averages move by at most 0.09 (<a href="#tbl-tight" class="quarto-xref">Table 12</a>). This is the same direction and size as the half-N(0, 1) prior on <span class="math inline">\(\omega_g\)</span> above, and for the same reason: the prior on the scale of the latent log-variance restrains it. The posterior median of <span class="math inline">\(s_g\)</span>, 1.65, is at the 90th percentile of its half-N(0, 1) prior. Statements about <span class="math inline">\(\tau_t\)</span> in single quarters are therefore prior-sensitive at the level of a fifth; the latent path and the variance split are not.</p>
+<p><strong>On RDP 2014-12’s sample.</strong> On 1980 Q1–2013 Q2 (<code>paper/fit_rdp_sample.R m13_tight</code>) the variant does not identify latent-volatility persistence any better: <span class="math inline">\(\phi_g\)</span> is 0.95 [−0.29, 0.99] against 0.91 [−0.49, 0.99] under m13’s priors, and <span class="math inline">\(s_g\)</span> is 0.80 [0.25, 1.57]. Without COVID the latent log-variance varies too little for its persistence to be learnt from 134 quarters, and the Uniform(−1, 1) prior on <span class="math inline">\(\phi_g\)</span> was kept. The median latent path moves by 0.049 points on average (at most 0.20) and the variance ratio over 1980–2013 is 0.687 against 0.686. That fit had 0 divergences, minimum E-BFMI 0.87, maximum hyperparameter R-hat 1.0066 (on phi_g) and minimum hyperparameter bulk ESS 698.</p>
+<p>The variant was not scored by LFO. Since the latent path and the variance split do not move, and the production model was chosen by LFO under m13’s priors, we see no result here that would change a published number beyond the latent-volatility path. Production keeps m13’s priors.</p>
+</section>
 </section>
 <section id="seeds" class="level2" data-number="8.3">
 <h2 data-number="8.3" class="anchored" data-anchor-id="seeds"><span class="header-section-number">8.3</span> Seeds</h2>
@@ -3911,7 +4205,7 @@ Figure 6: Latent growth in 2020 Q2 by model and sample: posterior mean and 90% 
 <div id="tbl-seeds" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-seeds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 11: Seed robustness of m13: second-seed fits against seed 1. Path differences are in annualised percentage points; <span class="math inline">\(\tau_t\)</span> differences are relative changes of the posterior median.
+Table 13: Seed robustness of m13: second-seed fits against seed 1. Path differences are in annualised percentage points; <span class="math inline">\(\tau_t\)</span> differences are relative changes of the posterior median.
 </figcaption>
 <div aria-describedby="tbl-seeds-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -3958,7 +4252,7 @@ Table 11: Seed robustness of m13: second-seed fits against seed 1. Path differe
 </figure>
 </div>
 </div>
-<p><a href="#tbl-seeds" class="quarto-xref">Table 11</a> compares second-seed fits with seed 1. Both pass the gate, and the latent path, the volatility path and the variance ratio agree to within Monte Carlo noise.</p>
+<p><a href="#tbl-seeds" class="quarto-xref">Table 13</a> compares second-seed fits with seed 1. Both pass the gate, and the latent path, the volatility path and the variance ratio agree to within Monte Carlo noise.</p>
 </section>
 <section id="refit-retries-and-seed-selection" class="level2" data-number="8.4">
 <h2 data-number="8.4" class="anchored" data-anchor-id="refit-retries-and-seed-selection"><span class="header-section-number">8.4</span> Refit retries and seed selection</h2>
@@ -3970,7 +4264,7 @@ Table 11: Seed robustness of m13: second-seed fits against seed 1. Path differe
 <div id="tbl-pf" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 12: Particle-filter bias against high-particle references (nats), summed over 2020 Q1–2021 Q1 (COVID) and over 2015 Q1–2019 Q4. ‘Schedule’ is the adaptive particle count used for scoring; ‘N = 2000’ a fixed count. COVID biases use the mean of three reference passes at 2020 Q2. MCSE: Monte Carlo SE of the model’s total score.
+Table 14: Particle-filter bias against high-particle references (nats), summed over 2020 Q1–2021 Q1 (COVID) and over 2015 Q1–2019 Q4. ‘Schedule’ is the adaptive particle count used for scoring; ‘N = 2000’ a fixed count. COVID biases use the mean of three reference passes at 2020 Q2. MCSE: Monte Carlo SE of the model’s total score.
 </figcaption>
 <div aria-describedby="tbl-pf-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -4084,11 +4378,11 @@ Table 12: Particle-filter bias against high-particle references (nats), summed 
 </figure>
 </div>
 </div>
-<p><a href="#tbl-pf" class="quarto-xref">Table 12</a> reports the particle-filter checks. Under the adaptive schedule the bias summed over the COVID quarters is small for every model on the full sample. A fixed 2,000-particle filter would have been biased by a few tenths of a nat, downwards for every model except m10 (+0.11). The 1980 sample is harder. For the three models that treat COVID as measurement error, the 2020 Q2 predictive density needs all three measurement volatilities to jump at once. Its estimate varies by more than a nat between passes even at 100,000 particles, and a fixed 2,000-particle filter would be biased by about −3 nats. Comparisons involving m4, m9 or m12 on the 1980 sample therefore carry one to two nats of particle uncertainty from that quarter. That is small against m13 − m12 but not against m9 − m4. For m13 the 2020 Q2 reference has a standard error of 0.003 nats on the 1980 sample, and its total MCSE is 0.02. With four passes each MCSE has only three degrees of freedom. The checks for 2015–19 were not run for m9 (1980 sample), m4 or m10, and the COVID check was not run for m10 on the 1980 sample.</p>
+<p><a href="#tbl-pf" class="quarto-xref">Table 14</a> reports the particle-filter checks. Under the adaptive schedule the bias summed over the COVID quarters is small for every model on the full sample. A fixed 2,000-particle filter would have been biased by a few tenths of a nat, downwards for every model except m10 (+0.11). The 1980 sample is harder. For the three models that treat COVID as measurement error, the 2020 Q2 predictive density needs all three measurement volatilities to jump at once. Its estimate varies by more than a nat between passes even at 100,000 particles, and a fixed 2,000-particle filter would be biased by about −3 nats. Comparisons involving m4, m9 or m12 on the 1980 sample therefore carry one to two nats of particle uncertainty from that quarter. That is small against m13 − m12 but not against m9 − m4. For m13 the 2020 Q2 reference has a standard error of 0.003 nats on the 1980 sample, and its total MCSE is 0.02. With four passes each MCSE has only three degrees of freedom. The checks for 2015–19 were not run for m9 (1980 sample), m4 or m10, and the COVID check was not run for m10 on the 1980 sample.</p>
 </section>
 <section id="mode-checks" class="level2" data-number="8.6">
 <h2 data-number="8.6" class="anchored" data-anchor-id="mode-checks"><span class="header-section-number">8.6</span> Mode checks</h2>
-<p>Besides the m10 diagnosis (<a href="#sec-failed" class="quarto-xref">Section 4.3</a>) and the 1980-sample restarts of m4, m9 and m12 (<a href="#sec-robust-sample" class="quarto-xref">Section 8.1</a>), the m13 fits show no sign of multiple modes. All four chains of each fit agree (maximum hyperparameter R-hat 1.0056 across both samples and seeds), and the two seeds agree (<a href="#tbl-seeds" class="quarto-xref">Table 11</a>). Tempered or optimisation-based searches for other modes were not run.</p>
+<p>Besides the m10 diagnosis (<a href="#sec-failed" class="quarto-xref">Section 4.3</a>) and the 1980-sample restarts of m4, m9 and m12 (<a href="#sec-robust-sample" class="quarto-xref">Section 8.1</a>), the m13 fits show no sign of multiple modes. All four chains of each fit agree (maximum hyperparameter R-hat 1.0056 across both samples and seeds), and the two seeds agree (<a href="#tbl-seeds" class="quarto-xref">Table 13</a>). Tempered or optimisation-based searches for other modes were not run.</p>
 </section>
 </section>
 <section id="sec-rdp" class="level1" data-number="9">
@@ -4107,12 +4401,12 @@ Table 12: Particle-filter bias against high-particle references (nats), summed 
 <section id="sec-rdp-refit" class="level2" data-number="9.1">
 <h2 data-number="9.1" class="anchored" data-anchor-id="sec-rdp-refit"><span class="header-section-number">9.1</span> Re-estimation on the RDP sample</h2>
 <p>We refitted m2, m4, m5, m9, m12 and m13 on 1980 Q1 to 2013 Q2 (T = 134), on the 2026 vintage, with the production sampler settings (<code>paper/fit_rdp_sample.R</code>). To separate the effect of the COVID quarters from that of the 2013–19 data, m2 and m13 were also fitted on 1980 Q1 to 2019 Q4. Across the 8 fits there was at most 1 divergence in 8,000 draws, a minimum E-BFMI of 0.52 and a minimum hyperparameter bulk ESS of 558. The largest hyperparameter R-hat is 1.0123 (m13 to 2019 Q4, on the persistence of the production-error volatility), just above the production gate’s 1.01; the m13 fit to 2013 Q2 has 1.0087. On these shorter samples m13’s latent-volatility parameters are weakly identified: on 1980 Q1–2013 Q2, <span class="math inline">\(\phi_g\)</span> is 0.91 [−0.49, 0.99] and <span class="math inline">\(\omega_g\)</span> 0.27 [0.07, 0.66], against 0.88 [0.59, 1.26] when 2020–26 is included. Each fit took at most 11 minutes. No LFO comparison was run on these samples.</p>
-<p>Their Model 1, an AR(1) latent state with independent constant-variance errors, has the same structure as our m2 except for priors. <a href="#tbl-rdp" class="quarto-xref">Table 13</a> sets the two side by side. All numbers are in quarterly units: our annualised estimates divided by four. Panel B describes the posterior-median latent path over RDP 2014-12’s window, 1980 Q1 to 2013 Q2, whatever the end of the estimation sample.</p>
+<p>Their Model 1, an AR(1) latent state with independent constant-variance errors, has the same structure as our m2 except for priors. <a href="#tbl-rdp" class="quarto-xref">Table 15</a> sets the two side by side. All numbers are in quarterly units: our annualised estimates divided by four. Panel B describes the posterior-median latent path over RDP 2014-12’s window, 1980 Q1 to 2013 Q2, whatever the end of the estimation sample.</p>
 <div class="cell">
 <div id="tbl-rdp" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-rdp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 13: RDP 2014-12’s Model 1 against our m2 and m13 fitted on three sample ends, quarterly units (per cent per quarter). RDP: values as published (Tables 1, 4 and 5; sample 1980 Q1–2013 Q2; sds are square roots of median variances). Ours: posterior medians, all samples starting in 1980 Q1, 2026 vintage. Panels B and C are computed over 1980 Q1–2013 Q2 for every column. For m13 the latent sd is the average median <span class="math inline">\(\tau_t\)</span> over 1980 Q1–2013 Q2 and the error sds are <span class="math inline">\(\bar\sigma^\varepsilon_k\)</span> (at the long-run log-variance), so they are not like-for-like with constant-variance sds. In Panel B the sd of GDP(A) is RDP 2014-12’s value (2014 vintage) and ours (2026 vintage).
+Table 15: RDP 2014-12’s Model 1 against our m2 and m13 fitted on three sample ends, quarterly units (per cent per quarter). RDP: values as published (Tables 1, 4 and 5; sample 1980 Q1–2013 Q2; sds are square roots of median variances). Ours: posterior medians, all samples starting in 1980 Q1, 2026 vintage. Panels B and C are computed over 1980 Q1–2013 Q2 for every column. For m13 the latent sd is the average median <span class="math inline">\(\tau_t\)</span> over 1980 Q1–2013 Q2 and the error sds are <span class="math inline">\(\bar\sigma^\varepsilon_k\)</span> (at the long-run log-variance), so they are not like-for-like with constant-variance sds. In Panel B the sd of GDP(A) is RDP 2014-12’s value (2014 vintage) and ours (2026 vintage).
 </figcaption>
 <div aria-describedby="tbl-rdp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -4302,13 +4596,13 @@ Table 13: RDP 2014-12’s Model 1 against our m2 and m13 fitted on three sample
 <li><strong>On RDP 2014-12’s sample, m2 reproduces their Model 1 closely.</strong> Latent persistence is 0.43 against their 0.40. The latent innovation standard deviation is 0.58 against 0.62. The error standard deviations are 0.73, 0.87 and 0.54 (E, I, P) against 0.66, 0.84 and 0.56, with the same ordering: income noisiest, production cleanest. The posterior-median path has a standard deviation of 0.55 (RDP 2014-12: 0.57) and first-order autocorrelation 0.52 (0.47). The weights of the closest fixed combination of E, I and P (their section 4.5.2) are 0.26, 0.20 and 0.54 against 0.30, 0.21 and 0.49: somewhat more weight on production and less on expenditure. The largest gap is in the expenditure error, 11% larger in our fit. Different priors, a different sampler and thirteen years of data revisions otherwise change little. The published series over 1980–2013 also look the same on both vintages: the headline standard deviation is 0.76 on ours and 0.76 on theirs.</li>
 <li><strong>The sample end changes the constant-variance model a great deal.</strong> Fitted to 2026, m2 has persistence 0.14 and a latent innovation standard deviation of 0.89, and its median path over 1980–2013 is less smooth (86% of the headline standard deviation, against 73% when fitted to 2013). Fitted to 2019 Q4, m2 is close to the 2013 fit (persistence 0.42, innovation sd 0.54, path sd 72% of the headline’s). So the change comes from the COVID quarters, not from the 2013–19 data: a constant latent variance must accommodate a fall of 7.0 quarterly percentage points in 2020 Q2, which inflates the latent variance for every quarter and lowers persistence.</li>
 <li><strong>The latent-SV model is much less sensitive to the sample end.</strong> m13’s per-draw variance ratio over 1980–2013 is 0.69 when fitted to 2013 and 0.74 when fitted to 2026; for m2 the two numbers are 0.70 and 0.92. m13’s latent volatility can rise in 2020 without raising it in the 1990s.</li>
-<li><strong>RDP 2014-12’s headline result holds like-for-like, and the statistic matters.</strong> Their posterior-median latent paths have standard deviations 25%, 26% and 36% below GDP(A)’s (Models 1–3). On the same sample and with the same statistic, our six models give 25% to 32% (<a href="#tbl-rdp-all" class="quarto-xref">Table 14</a>). In variance terms the median paths have 46% to 56% of headline variance. The per-draw ratio of <a href="#sec-vardecomp" class="quarto-xref">Section 7.5</a> is higher, 60% to 72%: a single plausible latent path is less smooth than the median path. By the per-draw measure, about 28% to 40% of measured variance over 1980–2013 is attributed to measurement error, against roughly half by the median-path measure.</li>
+<li><strong>RDP 2014-12’s headline result holds like-for-like, and the statistic matters.</strong> Their posterior-median latent paths have standard deviations 25%, 26% and 36% below GDP(A)’s (Models 1–3). On the same sample and with the same statistic, our six models give 25% to 32% (<a href="#tbl-rdp-all" class="quarto-xref">Table 16</a>). In variance terms the median paths have 46% to 56% of headline variance. The per-draw ratio of <a href="#sec-vardecomp" class="quarto-xref">Section 7.5</a> is higher, 60% to 72%: a single plausible latent path is less smooth than the median path. By the per-draw measure, about 28% to 40% of measured variance over 1980–2013 is attributed to measurement error, against roughly half by the median-path measure.</li>
 </ol>
 <div class="cell">
 <div id="tbl-rdp-all" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-rdp-all-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 14: Six models fitted to 2013 Q2 (RDP 2014-12’s sample end) and to 2026 Q2, all from 1980 Q1, statistics over 1980 Q1–2013 Q2. Variance ratio: per-draw var(μ)/var(headline), median and 90% interval. Path sd: sd of the posterior-median latent path relative to the sd of the headline.
+Table 16: Six models fitted to 2013 Q2 (RDP 2014-12’s sample end) and to 2026 Q2, all from 1980 Q1, statistics over 1980 Q1–2013 Q2. Variance ratio: per-draw var(μ)/var(headline), median and 90% interval. Path sd: sd of the posterior-median latent path relative to the sd of the headline.
 </figcaption>
 <div aria-describedby="tbl-rdp-all-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -4379,7 +4673,7 @@ Table 14: Six models fitted to 2013 Q2 (RDP 2014-12’s sample end) and to 2026
 </figure>
 </div>
 </div>
-<p><a href="#tbl-rdp-all" class="quarto-xref">Table 14</a> shows the same comparison for all six models. On the RDP sample the models agree closely. On the longer sample they spread out. The constant-variance models m2 and m5 rise to 0.92 and 0.93, because COVID inflates their constant latent variance. The measurement-SV models m4, m9 and m12 barely move over this window, although their 1980–2026 fits treat 2020 Q2 itself as measurement error (<a href="#sec-robust-sample" class="quarto-xref">Section 8.1</a>). m13 moves much less than m2 and m5 (0.69 to 0.74).</p>
+<p><a href="#tbl-rdp-all" class="quarto-xref">Table 16</a> shows the same comparison for all six models. On the RDP sample the models agree closely. On the longer sample they spread out. The constant-variance models m2 and m5 rise to 0.92 and 0.93, because COVID inflates their constant latent variance. The measurement-SV models m4, m9 and m12 barely move over this window, although their 1980–2026 fits treat 2020 Q2 itself as measurement error (<a href="#sec-robust-sample" class="quarto-xref">Section 8.1</a>). m13 moves much less than m2 and m5 (0.69 to 0.74).</p>
 <p><strong>What remains not comparable.</strong> Estimating RDP 2014-12’s Model 2 would need the latent–error correlations and the variance-ratio restriction, which none of our Stan programs has. Their Model 3 would need the unemployment rate. Their real-time results (Table 6) would need the 2001–2013 data vintages. None of these is in the repository.</p>
 </section>
 </section>
@@ -4391,12 +4685,12 @@ Table 14: Six models fitted to 2013 Q2 (RDP 2014-12’s sample end) and to 2026
 <li><strong>The evaluation window is reused.</strong> All thirteen models, both samples and every round of the project use the same 146 targets. Re-scoring on the 1980 sample is not independent evidence. The cleanest test of the production model is its record on future ABS releases, scored as they arrive.</li>
 <li><strong>The comparison does not test the variance decomposition.</strong> Predictive scores evaluate forecasts of the observed measures. The split of measured growth into latent growth and error depends on the model’s structure, and models that cannot be told apart by score can imply different splits (m7 and m1; <a href="#sec-vardecomp" class="quarto-xref">Section 7.5</a>). The “about an eighth” (or “about a fifth excluding COVID”) figure is a property of m13 on the 1980 sample.</li>
 <li><strong>Labour signals.</strong> Our fourth signal is hours worked, not RDP 2014-12’s unemployment rate. No model combines m13’s structure with a labour signal, so the value of labour data for the production model is unknown.</li>
-<li><strong>Limited model checking.</strong> Prior and posterior predictive checks were run only for the production model and only after the comparison (<a href="#sec-ppc" class="quarto-xref">Section 7.6</a>). The priors are heavy-tailed; the effect of tighter priors on the persistence parameters is untested.</li>
+<li><strong>Limited model checking.</strong> Prior and posterior predictive checks were run only for the production model and its tighter-prior variant, and only after the comparison (<a href="#sec-ppc" class="quarto-xref">Section 7.6</a>). The production priors are heavy-tailed. A variant with tighter priors, chosen from the prior predictive, changes little (<a href="#sec-robust-priors" class="quarto-xref">Section 8.2.1</a>), but it still misses part of the plausibility target set for it, and it was not scored by LFO.</li>
 <li><strong>Weak identification in places.</strong> On the 1980 sample the persistence of expenditure-side volatility is close to its prior in m4, m9 and m12 and has a long tail in m13. m3’s error correlations are weakly identified on both samples.</li>
 <li><strong>One-step-ahead only.</strong> We do not evaluate multi-step forecasts or the accuracy of the latent estimate itself (which is unobservable).</li>
 <li><strong>Process.</strong> Some diagnostics behind statements in this paper exist only in the project’s research log, not as tables: the warmup-stall counts, the 1980-sample restart checks, and the old m10 mode table. Two long computing jobs stopped without an exit status and were resumed from checkpoints; resumed results were checked against re-created fits. The production fit’s run time on GitHub’s runners is known only from the repository README (about 27 minutes for the whole job).</li>
 </ol>
-<p>Further work follows from the list: real-time scoring on ABS vintages; RDP 2014-12’s Models 2 and 3; an m13 model with a labour signal; tighter priors on the persistence parameters; and scoring on future releases.</p>
+<p>Further work follows from the list: real-time scoring on ABS vintages; RDP 2014-12’s Models 2 and 3; an m13 model with a labour signal; and scoring on future releases.</p>
 </section>
 <section id="sec-conclusion" class="level1" data-number="11">
 <h1 data-number="11"><span class="header-section-number">11</span> Conclusion</h1>
@@ -4545,7 +4839,7 @@ Vehtari, Aki, Daniel Simpson, Andrew Gelman, Yuling Yao, and Jonah Gabry. 2024. 
 <div id="tbl-history" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-history-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 15: Production-model changes. Each model switch was decided by a rule fixed before the candidate’s LFO results were known. All values are on the full sample unless stated. Times are local run times with four parallel chains on a six-core machine (m12: CmdStan sampling time; m13: wall time).
+Table 17: Production-model changes. Each model switch was decided by a rule fixed before the candidate’s LFO results were known. All values are on the full sample unless stated. Times are local run times with four parallel chains on a six-core machine (m12: CmdStan sampling time; m13: wall time).
 </figcaption>
 <div aria-describedby="tbl-history-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -4630,7 +4924,7 @@ Table 15: Production-model changes. Each model switch was decided by a rule fix
 </figure>
 </div>
 </div>
-<p>The production model was m9 (structural correlation and measurement SV) until 17 October 2026. It became m12 (adding AR(1) errors) and then, a day later, m13 (adding latent SV). Each switch rule was written down before the candidate’s comparison results were known, and every model-switch condition in <a href="#tbl-history" class="quarto-xref">Table 15</a> was met. The m12 → m13 rule added a fifth condition because m13 was a post-hoc candidate. The condition requires the z ≥ 2 margin to hold when every LFO refit uses its first sampling attempt, so that no retry with a new seed can create the margin. m13 needed no retry, so the condition changed nothing. The comparison author recommended treating m13 as a leading candidate rather than switching automatically, given the thin margin; the pre-set rule decided.</p>
+<p>The production model was m9 (structural correlation and measurement SV) until 17 October 2026. It became m12 (adding AR(1) errors) and then, a day later, m13 (adding latent SV). Each switch rule was written down before the candidate’s comparison results were known, and every model-switch condition in <a href="#tbl-history" class="quarto-xref">Table 17</a> was met. The m12 → m13 rule added a fifth condition because m13 was a post-hoc candidate. The condition requires the z ≥ 2 margin to hold when every LFO refit uses its first sampling attempt, so that no retry with a new seed can create the margin. m13 needed no retry, so the condition changed nothing. The comparison author recommended treating m13 as a leading candidate rather than switching automatically, given the thin margin; the pre-set rule decided.</p>
 <p>The move of the production sample to 1980 Q1 was not governed by a rule. The author of the comparison recommended keeping the full sample; the move was the project owner’s decision, taken on RDP 2014-12’s rationale. The prediction evidence was below the bar used for model switches, and the latent path barely moved. The decision rests on RDP 2014-12’s argument that early measurement errors are unrepresentative, and on the evidence in <a href="#sec-robust-sample" class="quarto-xref">Section 8.1</a> that pre-1980 data inflate the constant-variance models’ error variances.</p>
 </section>
 <section id="sec-app-diag" class="level1" data-number="13">
@@ -4639,7 +4933,7 @@ Table 15: Production-model changes. Each model switch was decided by a rule fix
 <div id="tbl-fitdiag" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-fitdiag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 16: Full fits: 4 chains × (2000 warmup + 2000 draws), seed 1. div: divergent transitions of 8000; E-BFMI: minimum over chains; R-hat: maximum over hyperparameters; ESS: minimum bulk / tail over hyperparameters; s: sampling seconds. Full sample, then 1980 sample. m11’s full-sample fit is not in the diagnostics table.
+Table 18: Full fits: 4 chains × (2000 warmup + 2000 draws), seed 1. div: divergent transitions of 8000; E-BFMI: minimum over chains; R-hat: maximum over hyperparameters; ESS: minimum bulk / tail over hyperparameters; s: sampling seconds. Full sample, then 1980 sample. m11’s full-sample fit is not in the diagnostics table.
 </figcaption>
 <div aria-describedby="tbl-fitdiag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -4982,7 +5276,7 @@ Table 16: Full fits: 4 chains × (2000 warmup + 2000 draws), seed 1. div: diver
 <div id="tbl-gate" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-gate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 17: Production gate for m13, both samples and both seeds. Thresholds: divergences &lt; 0.1%; min E-BFMI ≥ 0.3; R-hat ≤ 1.01 (hyperparameters), ≤ 1.05 (<span class="math inline">\(\mu_t\)</span>, <span class="math inline">\(h_{t,k}\)</span>, <span class="math inline">\(g_t\)</span>); bulk and tail ESS ≥ 400 (hyperparameters, <span class="math inline">\(\mu_t\)</span>).
+Table 19: Production gate for m13, both samples and both seeds. Thresholds: divergences &lt; 0.1%; min E-BFMI ≥ 0.3; R-hat ≤ 1.01 (hyperparameters), ≤ 1.05 (<span class="math inline">\(\mu_t\)</span>, <span class="math inline">\(h_{t,k}\)</span>, <span class="math inline">\(g_t\)</span>); bulk and tail ESS ≥ 400 (hyperparameters, <span class="math inline">\(\mu_t\)</span>).
 </figcaption>
 <div aria-describedby="tbl-gate-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -5085,7 +5379,7 @@ Table 17: Production gate for m13, both samples and both seeds. Thresholds: div
 <div id="tbl-lfodiag" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-lfodiag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 18: LFO fits by model: number of stored fits, retried fits, failed attempts, fits with bulk ESS &lt; 400 (weak mixing), and the worst diagnostics among stored fits. Full sample / 1980 sample.
+Table 20: LFO fits by model: number of stored fits, retried fits, failed attempts, fits with bulk ESS &lt; 400 (weak mixing), and the worst diagnostics among stored fits. Full sample / 1980 sample.
 </figcaption>
 <div aria-describedby="tbl-lfodiag-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -5265,7 +5559,7 @@ Table 18: LFO fits by model: number of stored fits, retried fits, failed attemp
 </figure>
 </div>
 </div>
-<p>All stored LFO fits meet the refit rule (<a href="#tbl-lfodiag" class="quarto-xref">Table 18</a>). On the full sample the weakest-mixing fits are those trained on data ending just after COVID, where the constant-latent-variance models’ latent standard deviation mixes slowly. Weak mixing is not confined to those models: m13 has 2 weak-mixing fits on the full sample and 1 on the 1980 sample, all trained on data ending before 2020. On the 1980 sample the first attempt of m4’s refit to 2016 Q2 failed badly (E-BFMI 0.011, R-hat 1.28); its second attempt passed. The diagnostics table records each fit’s lowest bulk ESS but not the variable that has it.</p>
+<p>All stored LFO fits meet the refit rule (<a href="#tbl-lfodiag" class="quarto-xref">Table 20</a>). On the full sample the weakest-mixing fits are those trained on data ending just after COVID, where the constant-latent-variance models’ latent standard deviation mixes slowly. Weak mixing is not confined to those models: m13 has 2 weak-mixing fits on the full sample and 1 on the 1980 sample, all trained on data ending before 2020. On the 1980 sample the first attempt of m4’s refit to 2016 Q2 failed badly (E-BFMI 0.011, R-hat 1.28); its second attempt passed. The diagnostics table records each fit’s lowest bulk ESS but not the variable that has it.</p>
 </section>
 <section id="sec-app-tests" class="level1" data-number="14">
 <h1 data-number="14"><span class="header-section-number">14</span> Filter tests</h1>
@@ -5273,7 +5567,7 @@ Table 18: LFO fits by model: number of stored fits, retried fits, failed attemp
 <div id="tbl-tests" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table 19: Unit tests of the filters (counts of passed expectations, from the test logs in output/sample_1980/logs/). All tests use the full-sample fits.
+Table 21: Unit tests of the filters (counts of passed expectations, from the test logs in output/sample_1980/logs/). All tests use the full-sample fits, except test_m13_tight.R, which uses the 1980-sample data.
 </figcaption>
 <div aria-describedby="tbl-tests-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -5297,11 +5591,16 @@ Table 19: Unit tests of the filters (counts of passed expectations, from the te
 <td style="text-align: right;">0</td>
 </tr>
 <tr class="odd">
+<td style="text-align: left;">tests/test_m13_tight.R</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
 <td style="text-align: left;">tests/test_m13.R</td>
 <td style="text-align: right;">133</td>
 <td style="text-align: right;">0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">tests/test_m3_m10.R</td>
 <td style="text-align: right;">30</td>
 <td style="text-align: right;">0</td>
@@ -5313,7 +5612,7 @@ Table 19: Unit tests of the filters (counts of passed expectations, from the te
 </figure>
 </div>
 </div>
-<p>Every filter used in estimation or evaluation is tested against a dense multivariate-normal computation (<a href="#tbl-tests" class="quarto-xref">Table 19</a>; 283 expectations in all, none failed). For m13 the tests check:</p>
+<p>Every filter used in estimation or evaluation is tested against a dense multivariate-normal computation (<a href="#tbl-tests" class="quarto-xref">Table 21</a>; 306 expectations in all, none failed). For m13 the tests check:</p>
 <ul>
 <li>the Stan Kalman filter’s total and per-period log-likelihood against the dense multivariate-normal density of <span class="math inline">\(y\)</span> (to <span class="math inline">\(10^{-9}\)</span>), for five settings of <span class="math inline">\(\psi\)</span> including <span class="math inline">\(\psi = 0\)</span>, equal <span class="math inline">\(\psi_E = \psi_I\)</span> and <span class="math inline">\(|\psi|\)</span> up to 0.95, with non-constant <span class="math inline">\(g\)</span> and <span class="math inline">\(h\)</span>, a jump of +5 in <span class="math inline">\(g\)</span>, very small variances and extreme <span class="math inline">\(z_{EI}\)</span>;</li>
 <li>bit-identity with m12’s filter when <span class="math inline">\(\tau_t\)</span> is constant;</li>
@@ -5321,7 +5620,7 @@ Table 19: Unit tests of the filters (counts of passed expectations, from the te
 <li>the C++ filter used for LFO against the Stan filter (to <span class="math inline">\(10^{-11}\)</span>) and against the fit’s stored predictive log-likelihood on posterior draws;</li>
 <li>the particle filter against the exact Kalman filter as the volatilities of volatility go to zero, against m12’s particle filter at <span class="math inline">\(\omega_g = 0\)</span>, and against brute-force Monte Carlo over 200,000 simulated <span class="math inline">\((g, h)\)</span> paths with a latent-volatility jump. The bootstrap and adapted proposals gave -37.488 and -37.497 against a brute-force value of -37.496 (standard error 0.005).</li>
 </ul>
-<p>Equivalent tests exist for m12, m3 and m10 and for the Kalman filters of the linear-Gaussian models.</p>
+<p>Equivalent tests exist for m12, m3 and m10 and for the Kalman filters of the linear-Gaussian models. For the tighter-prior variant, <code>tests/test_m13_tight.R</code> checks that its filter code is byte-identical to m13’s and returns identical output, and that at the same point (mapped between the two parameterisations) its log density differs from m13’s only by the difference of the priors, on the 1980-sample data.</p>
 </section>
 <section id="sec-app-withdrawn" class="level1" data-number="15">
 <h1 data-number="15"><span class="header-section-number">15</span> Withdrawn results</h1>
@@ -5344,7 +5643,7 @@ Table 19: Unit tests of the filters (counts of passed expectations, from the te
 <li>The research suite on the full sample: <code>Rscript R/02_fit_models.R</code>, <code>Rscript R/fit_m11.R</code>, <code>Rscript R/fit_m12.R</code>, <code>Rscript R/fit_m13.R</code> (seeds 1 and 2, and <code>--omega_g_sd=1</code>), then <code>Rscript R/03_compare.R</code> (several hours).</li>
 <li>The same on the 1980 sample, with <code>LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980</code> (drivers in <code>output/sample_1980/</code>).</li>
 <li><code>Rscript R/fit_production.R</code> (the production fit).</li>
-<li>The analyses added for this paper: <code>Rscript paper/fit_rdp_sample.R</code> (RDP-sample fits, output in <code>output/sample_rdp/</code>), <code>Rscript paper/fit_rdp_sample.R --end=2019-12-01 --out=output/sample_rdp/end2019 m2 m13</code> (fits ending in 2019 Q4), <code>LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980 Rscript R/fit_m13.R --omega_g_sd=1 --out=output/sample_1980/fit_m13_omegag1.rds</code> (prior sensitivity on the production sample) and <code>Rscript paper/ppc_m13.R</code> (predictive checks). The driver <code>output/sample_rdp/run_new_analyses.sh</code> runs the fits in order.</li>
+<li>The analyses added for this paper: <code>Rscript paper/fit_rdp_sample.R</code> (RDP-sample fits, output in <code>output/sample_rdp/</code>), <code>Rscript paper/fit_rdp_sample.R --end=2019-12-01 --out=output/sample_rdp/end2019 m2 m13</code> (fits ending in 2019 Q4), <code>LATENTGDP_START=1980-03-01 LATENTGDP_OUT=output/sample_1980 Rscript R/fit_m13.R --omega_g_sd=1 --out=output/sample_1980/fit_m13_omegag1.rds</code> (prior sensitivity on the production sample) and <code>Rscript paper/ppc_m13.R</code> (predictive checks). The driver <code>output/sample_rdp/run_new_analyses.sh</code> runs the fits in order. The tighter-prior variant: <code>Rscript paper/prior_candidates.R</code> (prior predictive choice), <code>bash output/sample_1980/run_tight.sh</code> (its fits on seeds 1 and 2 and on the RDP sample, through <code>R/fit_m13.R --variant=tight</code> and <code>paper/fit_rdp_sample.R m13_tight</code>), <code>Rscript tests/test_m13_tight.R</code> and <code>Rscript paper/ppc_m13.R --variant=tight</code>.</li>
 <li><code>Rscript paper/build_inputs.R</code> (about a minute), then <code>quarto render paper/latentgdp_wp.qmd</code>.</li>
 </ol>
 <p>Steps 1–4 are documented in the repository’s README. The fits are large (about 0.1–0.3 GB each) and are not committed; the tables and the CSVs in <code>paper/data/</code> are small and can be.</p>
